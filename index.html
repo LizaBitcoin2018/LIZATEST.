@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIZABITCOIN</title>
+    <!-- Подключаем библиотеку Ethers.js для связи с MetaMask -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f0c1b;
+            color: #ffffff;
+            margin: 0;
+            padding: 50px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+        }
+        .main-layout {
+            display: flex;
+            max-width: 850px;
+            width: 100%;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .container {
+            flex: 1;
+            min-width: 350px;
+            background: linear-gradient(145deg, #1d1836, #141126);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        #title {
+            font-size: 32px;
+            color: #00ffcc;
+            margin-bottom: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .label {
+            font-size: 14px;
+            color: #a09cb0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        #connect-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        #connect-btn:hover { background-color: #2563eb; }
+        #click-btn {
+            background: linear-gradient(135deg, #00ffcc, #ff007f);
+            color: #ffffff;
+            border: none;
+            padding: 25px 0;
+            width: 100%;
+            font-size: 26px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.05s, box-shadow 0.2s;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            margin: 10px 0;
+        }
+        #click-btn:active { transform: scale(0.97); }
+        #click-btn:disabled {
+            background: #333344;
+            box-shadow: none;
+            cursor: not-allowed;
+            color: #666677;
+        }
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff007f;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px;
+        }
+        .wallet-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .wallet-item {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .wallet-coins {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <!-- Главное окно кликера -->
+        <div class="container">
+            <div id="title">LIZABITCOIN</div>
+            
+            <button id="connect-btn">Connect MetaMask</button>
+            
+            <div class="stat-box">
+                <div class="label">Balance (LIZA)</div>
+                <div id="user-balance" class="value">0</div>
+            </div>
+            
+            <button id="click-btn" disabled>LIZA</button>
+        </div>
+
+        <!-- Боковая панель статистики -->
+        <div class="sidebar">
+            <div class="sidebar-title">Connected Wallets</div>
+            <ul id="wallet-list" class="wallet-list">
+                <!-- Сюда будут добавляться кошельки -->
+                <li id="no-data" style="color: #a09cb0; font-size: 14px;">No wallets connected yet</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let userAddress = null;
+        let stats = {}; // База данных накликавших монет: { адрес: количество }
+
+        const connectBtn = document.getElementById('connect-btn');
+        const clickBtn = document.getElementById('click-btn');
+        const balanceDiv = document.getElementById('user-balance');
+        const walletListUl = document.getElementById('wallet-list');
+
+        // Проверка и авторизация через MetaMask
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Запрашиваем аккаунты у MetaMask
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAddress = accounts[0];
+                    
+                    // Обновляем кнопку подключения
+                    connectBtn.innerText = userAddress.substring(0, 6) + '...' + userAddress.substring(userAddress.length - 4);
+                    connectBtn.style.backgroundColor = '#10b981'; // зеленый цвет
+                    
+                    // Разблокируем кнопку кликера
+                    clickBtn.disabled = false;
+                    
+                    // Инициализируем статистику для кошелька, если его еще нет
+                    if (!stats[userAddress]) {
+                        stats[userAddress] = 0;
+                    }
+                    
+                    updateUI();
+                } catch (error) {
+                    console.error("User denied account access", error);
+                }
+            } else {
+                alert('Please install MetaMask to play this game!');
+            }
+        }
+
+        // Обновление интерфейса
+        function updateUI() {
+            if (!userAddress) return;
+
+            // Выводим личный баланс текущего пользователя
+            balanceDiv.innerText = stats[userAddress].toLocaleString('en-US');
+
+            // Очищаем и заново строим боковую панель статистики
+            walletListUl.innerHTML = '';
+            
+            const addresses = Object.keys(stats);
+            if (addresses.length === 0) {
+                walletListUl.innerHTML = '<li id="no-data" style="color: #a09cb0; font-size: 14px;">No wallets connected yet</li>';
+                return;
+            }
+
+            addresses.forEach(addr => {
+                const li = document.createElement('li');
+                li.className = 'wallet-item';
+                
+                // Сокращаем адрес для красоты
+                const shortAddr = addr.substring(0, 6) + '...' + addr.substring(addr.length - 4);
+                
+                li.innerHTML = `
+                    <span>${shortAddr}</span>
+                    <span class="wallet-coins">${stats[addr]} LIZA</span>
+                `;
+                walletListUl.appendChild(li);
+            });
+        }
+
+        // Обработчик клика по кнопке LIZA
+        clickBtn.addEventListener('click', () => {
+            if (!userAddress) return;
+
+            // Начисляем монеты на адрес во временную базу статистики
+            stats[userAddress] += 1;
+            
+            updateUI();
+        });
+
+        // Привязка функции к кнопке авторизации
+        connectBtn.addEventListener('click', connectWallet);
+    </script>
+
+</body>
+</html>
