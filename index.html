@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN - AUTO URL FIXED</title>
+    <title>LIZABITCOIN - FIX ACCOUNTS ARRAY</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -48,13 +48,8 @@
     </div>
 
     <script>
-        // Две возможные структуры ссылок Firebase Realtime Database
-        const URL_OPTIONS = [
-            "https://firebaseio.com",
-            "https://firebaseio.com"
-        ];
-        let currentUrlIndex = 0;
-        let DB_URL = URL_OPTIONS[currentUrlIndex];
+        // Проверяем правильный URL базы данных (теперь точно без дефиса перед default)
+        const DB_URL = "https://firebaseio.com";
 
         let currentAccount = null;
         let userBalance = 0;
@@ -68,20 +63,23 @@
             return currentReward > 0 ? currentReward : 0;
         }
 
-        function handleWalletConnected(address) {
-            currentAccount = address.toLowerCase();
+        // ИСПРАВЛЕНО: Теперь сюда передается строка адреса, а не массив объектов
+        function handleWalletConnected(addressString) {
+            currentAccount = addressString.toLowerCase();
             document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
             document.getElementById('lizaButton').removeAttribute('disabled');
-            document.getElementById('statusMessage').innerText = "Кошелек подключен! Начинай майнинг.";
+            document.getElementById('statusMessage').innerText = "Кошелек успешно авторизован! Погнали кликать!";
             updateDataFromServer();
         }
 
+        // Автоматическая проверка авторизации
         async function checkExistingConnection() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     if (accounts && accounts.length > 0) {
-                        handleWalletConnected(accounts);
+                        // ИСПРАВЛЕНО ТУТ: Передаем конкретную строку из массива
+                        handleWalletConnected(accounts[0]);
                     } else {
                         document.getElementById('statusMessage').innerText = "Кошелек не подключен. Нажмите Connect MetaMask.";
                     }
@@ -93,11 +91,11 @@
             }
         }
 
-        // Обновление данных с автоматическим перебором URL при ошибках
+        // Обновление данных из Firebase через REST API
         async function updateDataFromServer() {
             try {
                 const res = await fetch(`${DB_URL}.json`);
-                if (!res.ok) throw new Error("Network response was not ok");
+                if (!res.ok) throw new Error("Network error");
                 const data = await res.json();
                 
                 totalGlobalSupply = (data && data.global) ? data.global.totalSupply : 0;
@@ -125,20 +123,19 @@
                     userList.innerHTML = '<li class="user-item" style="color: #888;">Нет активных майнеров</li>';
                 }
             } catch (err) {
-                console.warn(`Ошибка запроса по адресу ${DB_URL}, пробуем резервный...`);
-                // Переключаем на следующий URL из списка, если текущий выдал сбой
-                currentUrlIndex = (currentUrlIndex + 1) % URL_OPTIONS.length;
-                DB_URL = URL_OPTIONS[currentUrlIndex];
+                console.error("Ошибка обновления данных:", err);
             }
         }
 
+        // Ручное подключение MetaMask по кнопке
         async function connectMetaMask() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     document.getElementById('statusMessage').innerText = "Ожидание авторизации в MetaMask...";
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     if (accounts && accounts.length > 0) {
-                        handleWalletConnected(accounts);
+                        // ИСПРАВЛЕНО ТУТ: Берем первую строку из массива аккаунтов
+                        handleWalletConnected(accounts[0]);
                     }
                 } catch (error) {
                     alert("Ошибка MetaMask: " + error.message);
@@ -149,6 +146,7 @@
             }
         }
 
+        // Отправка клика в Firebase через PATCH запрос
         async function handleTap() {
             if (!currentAccount) return;
 
@@ -188,16 +186,10 @@
         if (typeof window.ethereum !== 'undefined') {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length > 0) {
-                    handleWalletConnected(accounts);
+                    // ИСПРАВЛЕНО ТУТ: При смене аккаунта берем первый элемент
+                    handleWalletConnected(accounts[0]);
                 } else {
                     currentAccount = null;
                     document.getElementById('lizaButton').setAttribute('disabled', 'true');
                     document.getElementById('connectWallet').innerText = "Connect MetaMask";
                     document.getElementById('balanceDisplay').innerText = "0.00";
-                    document.getElementById('statusMessage').innerText = "Кошелек отключен.";
-                }
-            });
-        }
-    </script>
-</body>
-</html>
