@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIZABITCOIN</title>
-    <!-- Подключаем библиотеку Ethers.js для связи с MetaMask -->
+    <!-- Подключаем внешние библиотеки для MetaMask и Firebase -->
     <script src="https://cloudflare.com"></script>
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -68,6 +70,12 @@
             font-size: 32px;
             font-weight: bold;
         }
+        #reward-info {
+            font-size: 14px;
+            color: #ff007f;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
         #connect-btn {
             background-color: #3b82f6;
             color: white;
@@ -113,7 +121,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
         }
         .wallet-item {
@@ -135,112 +143,139 @@
 <body>
 
     <div class="main-layout">
-        <!-- Главное окно кликера -->
+        <!-- Главная игровая панель -->
         <div class="container">
             <div id="title">LIZABITCOIN</div>
-            
             <button id="connect-btn">Connect MetaMask</button>
             
+            <div class="stat-box">
+                <div class="label">Total Mined Supply</div>
+                <div id="global-supply" class="value">0 / 21,000,000</div>
+            </div>
+
             <div class="stat-box">
                 <div class="label">Balance (LIZA)</div>
                 <div id="user-balance" class="value">0</div>
             </div>
-            
+
+            <div id="reward-info">Current Reward: +50 per click</div>
             <button id="click-btn" disabled>LIZA</button>
         </div>
 
-        <!-- Боковая панель статистики -->
+        <!-- Боковая статистика кошельков -->
         <div class="sidebar">
             <div class="sidebar-title">Connected Wallets</div>
             <ul id="wallet-list" class="wallet-list">
-                <!-- Сюда будут добавляться кошельки -->
-                <li id="no-data" style="color: #a09cb0; font-size: 14px;">No wallets connected yet</li>
+                <li style="color: #a09cb0; font-size: 14px;">Loading leaderboard...</li>
             </ul>
         </div>
     </div>
 
     <script>
+        // Конфигурация Firebase lizatest
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
+            authDomain: "lizatest-124da.firebaseapp.com",
+            projectId: "lizatest-124da",
+            storageBucket: "lizatest-124da.firebasestorage.app",
+            messagingSenderId: "88106031938",
+            appId: "1:88106031938:web:0b3b08517e71ce33aa06db",
+            measurementId: "G-HT8D6XRFSY"
+        };
+
+        // Инициализация базы данных
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         let userAddress = null;
-        let stats = {}; // База данных накликавших монет: { адрес: количество }
+        let stats = {};
+        let totalMinedGlobal = 0;
+
+        const MAX_SUPPLY = 21000000;
+        const HALVING_INTERVAL = 210000; // Халвинг каждые 210 000 кликов (общих в игре)
 
         const connectBtn = document.getElementById('connect-btn');
         const clickBtn = document.getElementById('click-btn');
         const balanceDiv = document.getElementById('user-balance');
+        const supplyDiv = document.getElementById('global-supply');
+        const rewardDiv = document.getElementById('reward-info');
         const walletListUl = document.getElementById('wallet-list');
 
-        // Проверка и авторизация через MetaMask
+        // Синхронизация данных с облаком в реальном времени
+        database.ref('game_state').on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            stats = data.players || {};
+            totalMinedGlobal = data.total_mined || 0;
+            updateUI();
+        });
+
+        // Функция подсчета текущей награды на основе общего числа кликов во всей игре
+        function getCurrentReward() {
+            let totalClicksInGame = 0;
+            Object.keys(stats).forEach(addr => {
+                totalClicksInGame += (stats[addr].clicks || 0);
+            });
+
+            let halvings = Math.floor(totalClicksInGame / HALVING_INTERVAL);
+            let reward = 50 / Math.pow(2, halvings);
+            
+            return reward > 0 ? reward : 0;
+        }
+
         async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Запрашиваем аккаунты у MetaMask
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAddress = accounts[0];
+                    userAddress = accounts[0].toLowerCase();
                     
-                    // Обновляем кнопку подключения
                     connectBtn.innerText = userAddress.substring(0, 6) + '...' + userAddress.substring(userAddress.length - 4);
-                    connectBtn.style.backgroundColor = '#10b981'; // зеленый цвет
+                    connectBtn.style.backgroundColor = '#10b981';
                     
-                    // Разблокируем кнопку кликера
-                    clickBtn.disabled = false;
+                    if (totalMinedGlobal < MAX_SUPPLY) {
+                        clickBtn.disabled = false;
+                    }
                     
-                    // Инициализируем статистику для кошелька, если его еще нет
+                    // Регистрация нового игрока в облаке, если его нет
                     if (!stats[userAddress]) {
-                        stats[userAddress] = 0;
+                        database.ref('game_state/players/' + userAddress).set({
+                            balance: 0,
+                            clicks: 0
+                        });
                     }
                     
                     updateUI();
                 } catch (error) {
-                    console.error("User denied account access", error);
+                    console.error("Wallet connection failed", error);
                 }
             } else {
-                alert('Please install MetaMask to play this game!');
+                alert('Please install MetaMask!');
             }
         }
 
-        // Обновление интерфейса
         function updateUI() {
-            if (!userAddress) return;
-
-            // Выводим личный баланс текущего пользователя
-            balanceDiv.innerText = stats[userAddress].toLocaleString('en-US');
-
-            // Очищаем и заново строим боковую панель статистики
-            walletListUl.innerHTML = '';
+            // Считаем актуальную награду и глобальную эмиссию
+            const currentReward = getCurrentReward();
             
-            const addresses = Object.keys(stats);
-            if (addresses.length === 0) {
-                walletListUl.innerHTML = '<li id="no-data" style="color: #a09cb0; font-size: 14px;">No wallets connected yet</li>';
-                return;
+            supplyDiv.innerText = `${Math.floor(totalMinedGlobal).toLocaleString('en-US')} / ${MAX_SUPPLY.toLocaleString('en-US')}`;
+
+            if (totalMinedGlobal >= MAX_SUPPLY) {
+                rewardDiv.innerText = "Emission Limit Reached!";
+                clickBtn.disabled = true;
+                clickBtn.innerText = "MAXED OUT";
+            } else {
+                rewardDiv.innerText = `Current Reward: +${currentReward} LIZA per click`;
             }
 
-            addresses.forEach(addr => {
-                const li = document.createElement('li');
-                li.className = 'wallet-item';
-                
-                // Сокращаем адрес для красоты
-                const shortAddr = addr.substring(0, 6) + '...' + addr.substring(addr.length - 4);
-                
-                li.innerHTML = `
-                    <span>${shortAddr}</span>
-                    <span class="wallet-coins">${stats[addr]} LIZA</span>
-                `;
-                walletListUl.appendChild(li);
-            });
-        }
+            // Баланс подключенного пользователя
+            if (userAddress && stats[userAddress]) {
+                balanceDiv.innerText = stats[userAddress].balance.toLocaleString('en-US', { maximumFractionDigits: 4 });
+            } else {
+                balanceDiv.innerText = '0';
+            }
 
-        // Обработчик клика по кнопке LIZA
-        clickBtn.addEventListener('click', () => {
-            if (!userAddress) return;
+            // Построение топа кошельков
+            walletListUl.innerHTML = '';
+            const addresses = Object.keys(stats);
 
-            // Начисляем монеты на адрес во временную базу статистики
-            stats[userAddress] += 1;
-            
-            updateUI();
-        });
+            if (addresses.length === 0) {
 
-        // Привязка функции к кнопке авторизации
-        connectBtn.addEventListener('click', connectWallet);
-    </script>
-
-</body>
-</html>
