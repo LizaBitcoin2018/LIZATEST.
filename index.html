@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN - FIX ACCOUNTS ARRAY</title>
+    <title>LIZABITCOIN - TOTAL FIX</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -48,7 +48,6 @@
     </div>
 
     <script>
-        // Проверяем правильный URL базы данных (теперь точно без дефиса перед default)
         const DB_URL = "https://firebaseio.com";
 
         let currentAccount = null;
@@ -63,12 +62,14 @@
             return currentReward > 0 ? currentReward : 0;
         }
 
-        // ИСПРАВЛЕНО: Теперь сюда передается строка адреса, а не массив объектов
+        // Принимает строго текстовую строку адреса
         function handleWalletConnected(addressString) {
+            if (!addressString || typeof addressString !== 'string') return;
+            
             currentAccount = addressString.toLowerCase();
             document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
             document.getElementById('lizaButton').removeAttribute('disabled');
-            document.getElementById('statusMessage').innerText = "Кошелек успешно авторизован! Погнали кликать!";
+            document.getElementById('statusMessage').innerText = "Кошелек успешно подключен! Погнали кликать.";
             updateDataFromServer();
         }
 
@@ -78,7 +79,7 @@
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     if (accounts && accounts.length > 0) {
-                        // ИСПРАВЛЕНО ТУТ: Передаем конкретную строку из массива
+                        // Строго берем первый элемент [0]
                         handleWalletConnected(accounts[0]);
                     } else {
                         document.getElementById('statusMessage').innerText = "Кошелек не подключен. Нажмите Connect MetaMask.";
@@ -91,7 +92,7 @@
             }
         }
 
-        // Обновление данных из Firebase через REST API
+        // Синхронизация данных с базой
         async function updateDataFromServer() {
             try {
                 const res = await fetch(`${DB_URL}.json`);
@@ -123,18 +124,18 @@
                     userList.innerHTML = '<li class="user-item" style="color: #888;">Нет активных майнеров</li>';
                 }
             } catch (err) {
-                console.error("Ошибка обновления данных:", err);
+                console.error("Ошибка синхронизации:", err);
             }
         }
 
-        // Ручное подключение MetaMask по кнопке
+        // Ручной вход по клику
         async function connectMetaMask() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     document.getElementById('statusMessage').innerText = "Ожидание авторизации в MetaMask...";
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     if (accounts && accounts.length > 0) {
-                        // ИСПРАВЛЕНО ТУТ: Берем первую строку из массива аккаунтов
+                        // Строго берем первый элемент [0]
                         handleWalletConnected(accounts[0]);
                     }
                 } catch (error) {
@@ -146,7 +147,7 @@
             }
         }
 
-        // Отправка клика в Firebase через PATCH запрос
+        // Обработка клика кнопки LIZA
         async function handleTap() {
             if (!currentAccount) return;
 
@@ -186,10 +187,17 @@
         if (typeof window.ethereum !== 'undefined') {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length > 0) {
-                    // ИСПРАВЛЕНО ТУТ: При смене аккаунта берем первый элемент
+                    // Строго берем первый элемент [0]
                     handleWalletConnected(accounts[0]);
                 } else {
                     currentAccount = null;
                     document.getElementById('lizaButton').setAttribute('disabled', 'true');
                     document.getElementById('connectWallet').innerText = "Connect MetaMask";
                     document.getElementById('balanceDisplay').innerText = "0.00";
+                    document.getElementById('statusMessage').innerText = "Кошелек отключен.";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
