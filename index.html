@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN DIAGNOSTIC</title>
+    <title>LIZABITCOIN LOCAL-FIREBASE</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; }
@@ -12,7 +12,7 @@
         .header-actions { position: absolute; top: 20px; right: 20px; }
         button { background-color: var(--accent-color); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
         #lizaButton { width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; }
-        .info-text { margin-top: 20px; color: #ff5555; font-weight: bold; text-align: center; }
+        .info-text { margin-top: 20px; color: #666; text-align: center; }
     </style>
 </head>
 <body>
@@ -31,26 +31,50 @@
             <p>Total Supply: <span id="supplyDisplay">0</span> / 21,000,000</p>
         </div>
         <button id="lizaButton" onclick="handleTap()" disabled>LIZA</button>
-        <div id="statusMessage" class="info-text">Инициализация...</div>
+        <div id="statusMessage" class="info-text">Инициализация модулей...</div>
     </div>
 
-    <!-- Загрузка скриптов -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
-
     <script>
-        // Проверка загрузки Firebase скриптов
-        window.addEventListener('load', () => {
-            const status = document.getElementById('statusMessage');
-            if (typeof firebase === 'undefined') {
-                status.innerText = "КРИТИЧЕСКАЯ ОШИБКА: Браузер полностью заблокировал Firebase! Кнопка работать не будет.";
-                alert("Ошибка: Скрипты базы данных Firebase не смогли загрузиться в этом браузере.");
-            } else {
-                status.innerText = "Firebase успешно загружен. Нажми Connect MetaMask.";
-                status.style.color = "#666";
-                initFirebase();
+        // Загружаем Firebase динамически через Fetch, чтобы обойти любые MIME-блокировки браузеров
+        async function loadFirebaseLocally() {
+            try {
+                const responseApp = await fetch('https://unpkg.com');
+                const codeApp = await responseApp.text();
+                const scriptApp = document.createElement('script');
+                scriptApp.text = codeApp;
+                document.body.appendChild(scriptApp);
+
+                const responseDb = await fetch('https://unpkg.com');
+                const codeDb = await responseDb.text();
+                const scriptDb = document.createElement('script');
+                scriptDb.text = codeDb;
+                document.body.appendChild(scriptDb);
+
+                setTimeout(() => {
+                    if (typeof firebase !== 'undefined') {
+                        document.getElementById('statusMessage').innerText = "База данных успешно подключена! Нажмите Connect MetaMask.";
+                        initFirebase();
+                    } else {
+                        document.getElementById('statusMessage').innerText = "Ошибка активации базы данных.";
+                    }
+                }, 500);
+
+            } catch (err) {
+                document.getElementById('statusMessage').innerText = "Браузер блокирует сеть. Пробуем резервный метод...";
+                // Резервный чистый JS метод, если Fetch тоже режется защитой
+                const s1 = document.createElement('script');
+                s1.src = "https://gstatic.com";
+                s1.onload = () => {
+                    const s2 = document.createElement('script');
+                    s2.src = "https://gstatic.com";
+                    s2.onload = () => { initFirebase(); document.getElementById('statusMessage').innerText = "Резервное подключение успешно!"; };
+                    document.body.appendChild(s2);
+                };
+                document.body.appendChild(s1);
             }
-        });
+        }
+
+        window.addEventListener('load', loadFirebaseLocally);
 
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
@@ -67,68 +91,52 @@
         let totalGlobalSupply = 0;
 
         function initFirebase() {
-            try {
-                firebase.initializeApp(firebaseConfig);
-                database = firebase.database();
-                
-                // Слушаем глобальный саплай
-                database.ref('global/totalSupply').on('value', (snapshot) => {
-                    totalGlobalSupply = snapshot.val() || 0;
-                    document.getElementById('supplyDisplay').innerText = totalGlobalSupply;
-                }, (error) => {
-                    alert("Firebase Read Error: " + error.message);
-                });
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            
+            database.ref('global/totalSupply').on('value', (snapshot) => {
+                totalGlobalSupply = snapshot.val() || 0;
+                document.getElementById('supplyDisplay').innerText = totalGlobalSupply;
+            });
 
-                // Слушаем список юзеров
-                database.ref('users').on('value', (snapshot) => {
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = '';
-                    const users = snapshot.val();
-                    if(users) {
-                        Object.keys(users).forEach(addr => {
-                            const li = document.createElement('li');
-                            li.innerText = addr.substring(0,6) + "...: " + (users[addr].balance || 0);
-                            userList.appendChild(li);
-                        });
-                    }
-                });
-            } catch(e) {
-                alert("Ошибка инициализации базы: " + e.message);
-            }
+            database.ref('users').on('value', (snapshot) => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                const users = snapshot.val();
+                if(users) {
+                    Object.keys(users).forEach(addr => {
+                        const li = document.createElement('li');
+                        li.innerText = addr.substring(0,6) + "...: " + (users[addr].balance || 0).toFixed(2);
+                        userList.appendChild(li);
+                    });
+                }
+            });
         }
 
         async function connectMetaMask() {
-            alert("Кнопка нажата! Начинаем поиск MetaMask...");
-            
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    alert("MetaMask обнаружен в браузере. Запрашиваем окно авторизации...");
-                    
+                    document.getElementById('statusMessage').innerText = "Открываем MetaMask...";
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
                     if (accounts && accounts.length > 0) {
                         currentAccount = accounts[0].toLowerCase();
                         
-                        alert("Успешно подключено! Ваш адрес: " + currentAccount);
-                        
                         document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
                         document.getElementById('lizaButton').removeAttribute('disabled');
-                        document.getElementById('statusMessage').innerText = "Кошелек подключен. Кликай!";
+                        document.getElementById('statusMessage').innerText = "Успешно подключено! Кликай на кнопку LIZA!";
                         
-                        // Подгружаем баланс кошелька
                         database.ref('users/' + currentAccount).on('value', (snapshot) => {
                             const data = snapshot.val();
                             userBalance = data ? data.balance : 0;
-                            document.getElementById('balanceDisplay').innerText = userBalance;
+                            document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
                         });
-                    } else {
-                        alert("MetaMask вернул пустой список аккаунтов.");
                     }
                 } catch (error) {
-                    alert("ОШИБКА ВНУТРИ METAMASK:\nКод: " + error.code + "\nСообщение: " + error.message);
+                    alert("Ошибка MetaMask: " + error.message);
                 }
             } else {
-                alert("КРИТИЧЕСКАЯ ОШИБКА: Расширение MetaMask вообще не найдено в этом браузере! Убедись, что кошелек установлен и включен.");
+                alert("MetaMask не найден! Установите расширение кошелька.");
             }
         }
 
