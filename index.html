@@ -34,7 +34,6 @@
             height: calc(100vh - 48px);
         }
 
-        /* ===== ЛЕВАЯ ПАНЕЛЬ ===== */
         .left-panel {
             background: #1a1a1a;
             border-right: 1px solid #333;
@@ -90,7 +89,6 @@
         .miner-card .timer { color: #00ffcc; font-size: 0.9rem; font-weight: bold; }
         .miner-card .status { font-size: 0.7rem; color: #888; }
 
-        /* ===== ЦЕНТР ===== */
         .center-panel {
             display: flex;
             flex-direction: column;
@@ -128,7 +126,6 @@
             transition: width 0.5s;
         }
 
-        /* Топ кошельков */
         .leaderboard {
             background: #1a1a1a;
             border-radius: 12px;
@@ -153,7 +150,6 @@
         .lb-addr { color: #00ffcc; font-family: monospace; }
         .lb-bal { font-weight: bold; }
 
-        /* ===== ПРАВАЯ ПАНЕЛЬ ===== */
         .right-panel {
             background: #1a1a1a;
             border-left: 1px solid #333;
@@ -206,7 +202,6 @@
             font-weight: bold;
         }
 
-        /* Auth */
         #authBlock {
             position: fixed;
             inset: 0;
@@ -250,7 +245,6 @@
     </div>
 
     <div class="main" id="game" style="display:none;">
-        <!-- ЛЕВАЯ -->
         <div class="left-panel">
             <h3>Мои майнеры</h3>
             <div class="buy-section">
@@ -261,7 +255,6 @@
             <div class="miners-list" id="minersList"></div>
         </div>
 
-        <!-- ЦЕНТР -->
         <div class="center-panel">
             <div style="color:#aaa; font-size:1rem;">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
@@ -276,14 +269,12 @@
                 <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
             </div>
 
-            <!-- СТАТИСТИКА КОШЕЛЬКОВ -->
             <div class="leaderboard">
                 <h4>Топ кошельков</h4>
                 <div id="leaderboardList">Загрузка...</div>
             </div>
         </div>
 
-        <!-- ЧАТ -->
         <div class="right-panel">
             <h3>Чат майнеров</h3>
             <div class="chat-messages" id="chatMessages"></div>
@@ -312,6 +303,7 @@
 
         const TOTAL_SUPPLY = 21000000;
         const CYCLE_MS = 10 * 60 * 1000;
+        const MAX_MINERS = 300; // защита от слишком большого количества
 
         let myAddress = "";
         let myBalance = 0;
@@ -353,7 +345,7 @@
 
             const price = +(currentReward * 0.8).toFixed(4);
             document.getElementById('minerPrice').innerText = formatNum(price);
-            document.getElementById('buyBtn').disabled = !(myBalance >= price && currentReward > 0);
+            document.getElementById('buyBtn').disabled = !(myBalance >= price && currentReward > 0 && myMiners.length < MAX_MINERS);
         }
 
         async function connectMetaMask() {
@@ -374,37 +366,42 @@
                 document.getElementById('game').style.display = 'grid';
                 document.getElementById('walletDisplay').innerText = shortAddress(myAddress);
 
-                // Пользователь
                 const userRef = db.ref('users/' + myAddress);
+
                 userRef.once('value').then(snap => {
                     if (!snap.exists()) {
+                        // Новый игрок — даём 1 бесплатный майнер
                         const firstMiner = { id: Date.now(), lastPayout: Date.now() };
-                        userRef.set({ balance: 0, miners: [firstMiner] });
                         myBalance = 0;
                         myMiners = [firstMiner];
+                        userRef.set({ balance: 0, miners: myMiners });
                     } else {
                         const data = snap.val();
                         myBalance = data.balance || 0;
                         myMiners = data.miners || [];
                     }
+
+                    // Гарантия: если майнеров 0 — выдаём один
+                    if (myMiners.length === 0) {
+                        const freeMiner = { id: Date.now(), lastPayout: Date.now() };
+                        myMiners = [freeMiner];
+                        saveUser();
+                    }
+
                     renderMiners();
                     updateUI();
                 });
 
-                // Глобальный total
                 db.ref('global/totalMined').on('value', snap => {
                     globalTotalMined = snap.val() || 0;
                     updateRewardInfo();
                 });
 
-                // Топ кошельков
                 db.ref('users').on('value', snap => {
                     renderLeaderboard(snap.val());
                 });
 
-                // ЧАТ (исправленная версия)
-                const chatRef = db.ref('chat').orderByChild('time').limitToLast(50);
-                chatRef.on('value', snap => {
+                db.ref('chat').orderByChild('time').limitToLast(50).on('value', snap => {
                     renderChat(snap.val());
                 });
 
@@ -418,10 +415,13 @@
 
         function buyMiner() {
             const price = +(currentReward * 0.8).toFixed(4);
-            if (myBalance < price || currentReward <= 0) return;
+            if (myBalance < price || currentReward <= 0 || myMiners.length >= MAX_MINERS) return;
 
             myBalance = +(myBalance - price).toFixed(4);
-            myMiners.push({ id: Date.now() + Math.random(), lastPayout: Date.now() });
+            myMiners.push({
+                id: Date.now() + Math.random(),
+                lastPayout: Date.now()
+            });
             saveUser();
             renderMiners();
             updateUI();
@@ -432,13 +432,14 @@
 
         function checkPayouts() {
             if (!myAddress || myMiners.length === 0) return;
+
             let totalEarned = 0;
             let changed = false;
             const now = Date.now();
 
             myMiners.forEach(miner => {
                 const periods = Math.floor((now - miner.lastPayout) / CYCLE_MS);
-                if (periods > 0) {
+                if (periods > 0 && periods < 1000) { // защита от слишком больших начислений
                     totalEarned += periods * currentReward;
                     miner.lastPayout += periods * CYCLE_MS;
                     changed = true;
@@ -447,7 +448,12 @@
 
             if (changed && totalEarned > 0) {
                 myBalance = +(myBalance + totalEarned).toFixed(4);
-                db.ref('global/totalMined').transaction(cur => (cur || 0) + totalEarned);
+
+                // Увеличиваем только через transaction
+                db.ref('global/totalMined').transaction(cur => {
+                    return (cur || 0) + totalEarned;
+                });
+
                 saveUser();
                 updateUI();
             }
@@ -485,7 +491,13 @@
         }
 
         function saveUser() {
-            db.ref('users/' + myAddress).set({ balance: myBalance, miners: myMiners });
+            // Небольшая защита: не даём сохранить слишком большой баланс за раз
+            if (myBalance > 50000000) myBalance = 50000000;
+
+            db.ref('users/' + myAddress).set({
+                balance: myBalance,
+                miners: myMiners
+            });
         }
 
         function updateUI() {
@@ -493,7 +505,6 @@
             updateRewardInfo();
         }
 
-        // ===== ЧАТ =====
         function sendChat() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
@@ -506,8 +517,8 @@
             }).then(() => {
                 input.value = '';
             }).catch(err => {
-                console.error('Ошибка отправки в чат:', err);
-                alert('Не удалось отправить сообщение.\nПроверь Rules в Firebase (нужно разрешить запись в /chat)');
+                console.error(err);
+                alert('Ошибка отправки. Проверь Rules в Firebase.');
             });
         }
 
@@ -535,7 +546,6 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ===== ТОП КОШЕЛЬКОВ =====
         function renderLeaderboard(users) {
             const box = document.getElementById('leaderboardList');
             if (!users) {
@@ -557,7 +567,7 @@
                     <span>
                         <span class="lb-rank">${i + 1}.</span>
                         <span class="lb-addr">${shortAddress(u.addr)}</span>
-                        <span style="color:#666;font-size:0.8rem;"> (${u.miners} майнеров)</span>
+                        <span style="color:#666;font-size:0.8rem;"> (${u.miners})</span>
                     </span>
                     <span class="lb-bal">${formatNum(u.balance)}</span>
                 </div>
