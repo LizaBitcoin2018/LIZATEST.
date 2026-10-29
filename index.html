@@ -124,6 +124,7 @@
             color: #666;
             font-size: 0.85rem;
             text-align: center;
+            max-width: 400px;
         }
     </style>
 </head>
@@ -159,7 +160,7 @@
     <script src="https://gstatic.com"></script>
 
     <script>
-        // 1. Твой конфиг Firebase
+        // Конфиг Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
             authDomain: "lizatest-124da.firebaseapp.com",
@@ -192,7 +193,6 @@
         // Расчет текущей награды на основе общего саплая (Халвинг модели Биткоина)
         function calculateReward(globalSupply) {
             let baseReward = 50;
-            // Каждые 5 250 000 монет (четверть от 21 млн) происходит халвинг
             const halvingEra = Math.floor(globalSupply / 5250000);
             let currentReward = baseReward / Math.pow(2, halvingEra);
             return currentReward > 0 ? currentReward : 0;
@@ -204,6 +204,8 @@
                 try {
                     statusMessage.innerText = "Connecting to MetaMask...";
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    // ИСПРАВЛЕНО: Берем первый элемент массива аккаунтов [0]
                     currentAccount = accounts[0].toLowerCase();
                     
                     connectBtn.innerText = currentAccount.substring(0, 6) + "..." + currentAccount.substring(38);
@@ -214,10 +216,10 @@
                     loadUserData(currentAccount);
                 } catch (error) {
                     console.error(error);
-                    statusMessage.innerText = "Connection rejected by user.";
+                    statusMessage.innerText = "Error or rejection: " + error.message;
                 }
             } else {
-                statusMessage.innerText = "MetaMask not found. Please install the MetaMask extension.";
+                statusMessage.innerText = "MetaMask not found! If you are on a phone, open this link inside the MetaMask built-in browser.";
             }
         }
 
@@ -235,7 +237,6 @@
                 totalGlobalSupply = snapshot.val() || 0;
                 supplyDisplay.innerText = totalGlobalSupply.toLocaleString(undefined, {maximumFractionDigits: 2});
                 
-                // Пересчитываем награду за клик в реальном времени
                 const currentReward = calculateReward(totalGlobalSupply);
                 rewardDisplay.innerText = currentReward;
             });
@@ -269,4 +270,4 @@
 
             const reward = calculateReward(totalGlobalSupply);
 
-            // Проверка на достижение лимита эмиссии
+            if (totalGlobalSupply + reward > MAX_SUPPLY) {
