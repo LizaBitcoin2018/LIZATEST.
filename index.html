@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN - OFFICIAL DATABASE INITIALIZATION</title>
+    <title>LIZABITCOIN - SECURE TEXT INPUT</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -18,7 +18,7 @@
         #lizaButton { width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); margin-top: 10px; }
         #lizaButton:disabled { background-color: #555; cursor: not-allowed; box-shadow: none; }
         .info-text { margin-top: 20px; color: #00ffcc; text-align: center; max-width: 400px; font-weight: bold; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-box { background: var(--sidebar-bg); border: 2px solid var(--accent-color); padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; }
         .modal-box input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: white; font-size: 1rem; box-sizing: border-box; text-align: center; }
         .logout-btn { background-color: #444; border: 1px solid #555; font-size: 0.85rem; padding: 8px 16px; }
@@ -26,28 +26,28 @@
 </head>
 <body>
 
-    <!-- Auth Modal Window -->
+    <!-- Окно авторизации -->
     <div id="authModal" class="modal-overlay" style="display: none;">
         <div class="modal-box">
-            <h3 style="margin-top:0; color:var(--accent-color);">LIZABITCOIN</h3>
-            <p style="color: #bbb; font-size: 0.9rem;">Введите ваш никнейм или адрес кошелька для входа</p>
-            <input type="text" id="usernameInput" placeholder="Например: Terentiy" maxlength="42">
-            <button onclick="loginWithText()">Войти в аккаунт</button>
+            <h3>LIZABITCOIN</h3>
+            <p style="color: #bbb; font-size: 0.9rem;">Введите ваш никнейм или текстовый адрес для входа в игру</p>
+            <input type="text" id="usernameInput" placeholder="Например: LizaBitcoin" maxlength="20">
+            <button id="loginBtn">Войти в игру</button>
         </div>
     </div>
 
-    <!-- Dashboard Sidebar -->
+    <!-- Dashboard -->
     <div class="sidebar">
         <h2>Wallets Dashboard</h2>
         <ul id="userList" class="user-list">
-            <li class="user-item">Подключение к серверам Google...</li>
+            <li class="user-item">Синхронизация базы данных...</li>
         </ul>
     </div>
 
     <!-- Main Game Area -->
     <div class="main-content">
         <div class="header-actions">
-            <button id="authBtn" class="logout-btn" onclick="logout()">Сменить аккаунт</button>
+            <button id="logoutBtn" class="logout-btn">Сменить аккаунт</button>
         </div>
 
         <div style="text-align: center; margin-bottom: 30px;">
@@ -57,26 +57,14 @@
             <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Total Supply: <span id="supplyDisplay">0</span> / 21,000,000</div>
         </div>
 
-        <button id="lizaButton" onclick="handleTap()" disabled>LIZA</button>
-        <div id="statusMessage" class="info-text">Загрузка модулей безопасности...</div>
+        <button id="lizaButton" disabled>LIZA</button>
+        <div id="statusMessage" class="info-text">Инициализация модулей...</div>
     </div>
 
-    <!-- Подключаем официальные скрипты Firebase через стабильный глобальный хостинг unpkg -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
-
     <script>
-        // Твой личный рабочий конфиг Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
-            authDomain: "://firebaseapp.com",
-            projectId: "lizatest-124da",
-            storageBucket: "lizatest-124da.firebasestorage.app",
-            messagingSenderId: "88106031938",
-            appId: "1:88106031938:web:0b3b08517e71ce33aa06db"
-        };
+        // Твой прямой URL базы данных без дефиса перед default
+        const DB_URL = "https://firebaseio.com";
 
-        let database = null;
         let currentAccount = null;
         let userBalance = 0;
         let totalGlobalSupply = 0;
@@ -96,52 +84,30 @@
             return name;
         }
 
-        // Инициализация Firebase при старте
-        window.addEventListener('load', () => {
-            if (typeof firebase === 'undefined') {
-                document.getElementById('statusMessage').innerText = "Критическая ошибка: Браузер заблокировал сетевые скрипты Google.";
-                alert("Ошибка: Скрипты Firebase заблокированы браузером. Отключите AdBlock или Яндекс.Защиту.");
-                return;
-            }
-
+        // Обновление всей информации через чистый REST API Fetch (не блокируется!)
+        async function updateDataFromServer() {
             try {
-                firebase.initializeApp(firebaseConfig);
-                database = firebase.database();
+                const res = await fetch(`${DB_URL}.json`);
+                if (!res.ok) throw new Error("Network error");
+                const data = await res.json();
                 
-                // Запускаем постоянное прослушивание данных
-                initDatabaseListeners();
-                
-                // Проверяем, входил ли пользователь ранее
-                const savedUser = localStorage.getItem('lizabitcoin_user');
-                if (savedUser) {
-                    initUserSession(savedUser);
-                } else {
-                    document.getElementById('authModal').style.display = 'flex';
-                    document.getElementById('statusMessage').innerText = "Пожалуйста, введите никнейм для начала игры.";
-                }
-            } catch (err) {
-                alert("Ошибка подключения к базе: " + err.message);
-            }
-        });
-
-        // Включение живых слушателей Firebase (Саплай и Дашборд)
-        function initDatabaseListeners() {
-            // Слушаем общий объем эмиссии монет
-            database.ref('global/totalSupply').on('value', (snapshot) => {
-                totalGlobalSupply = snapshot.val() || 0;
+                // 1. Считываем глобальный саплай
+                totalGlobalSupply = (data && data.global) ? data.global.totalSupply : 0;
                 document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
                 document.getElementById('rewardDisplay').innerText = calculateReward(totalGlobalSupply);
-            });
 
-            // Обновляем Дашборд участников в реальном времени
-            database.ref('users').on('value', (snapshot) => {
+                // 2. Считываем баланс игрока
+                if (currentAccount && data && data.users && data.users[currentAccount]) {
+                    userBalance = data.users[currentAccount].balance || 0;
+                    document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
+                }
+
+                // 3. Обновляем дашборд участников
                 const userList = document.getElementById('userList');
                 userList.innerHTML = '';
-                const users = snapshot.val();
-                
-                if (users) {
-                    Object.keys(users).forEach(addr => {
-                        const bal = users[addr].balance || 0;
+                if (data && data.users) {
+                    Object.keys(data.users).forEach(addr => {
+                        const bal = data.users[addr].balance || 0;
                         const li = document.createElement('li');
                         li.className = 'user-item';
                         li.innerHTML = `<span style="font-family:monospace;color:#aaa;">${formatDisplayName(addr)}</span><strong style="color:#f7931a;">${bal.toFixed(2)}</strong>`;
@@ -150,37 +116,72 @@
                 } else {
                     userList.innerHTML = '<li class="user-item" style="color: #888;">Нет активных майнеров</li>';
                 }
-            });
+            } catch (err) {
+                console.error("Ошибка синхронизации данных:", err);
+            }
         }
 
-        // Вход по кнопке
+        function initUserSession(username) {
+            currentAccount = username;
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('currentUserNameDisplay').innerText = formatDisplayName(currentAccount);
+            document.getElementById('lizaButton').removeAttribute('disabled');
+            document.getElementById('statusMessage').innerText = "Вы успешно вошли! Кликайте по кнопке LIZA!";
+            updateDataFromServer();
+        }
+
         function loginWithText() {
             const input = document.getElementById('usernameInput').value.trim();
             if (!input) {
                 alert("Пожалуйста, введите никнейм!");
                 return;
             }
-
-            // Заменяем запрещенные символы для путей Firebase
             const safeName = input.replace(/[\.\$\#\[\]\/]/g, "_");
             localStorage.setItem('lizabitcoin_user', safeName);
             initUserSession(safeName);
         }
 
-        // Запуск сессии игрока
-        function initUserSession(username) {
-            currentAccount = username;
-            document.getElementById('authModal').style.display = 'none';
-            document.getElementById('currentUserNameDisplay').innerText = formatDisplayName(currentAccount);
-            document.getElementById('lizaButton').removeAttribute('disabled');
-            document.getElementById('statusMessage').innerText = "Вы в игре! Нажимайте кнопку LIZA для майнинга.";
-
-            // Подписываемся на баланс КОНКРЕТНОГО вошедшего юзера
-            database.ref('users/' + currentAccount).on('value', (snapshot) => {
-                const data = snapshot.val();
-                userBalance = data ? data.balance : 0;
-                document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
-            });
+        function logout() {
+            localStorage.removeItem('lizabitcoin_user');
+            currentAccount = null;
+            document.getElementById('lizaButton').setAttribute('disabled', 'true');
+            document.getElementById('balanceDisplay').innerText = "0.00";
+            document.getElementById('currentUserNameDisplay').innerText = "-";
+            document.getElementById('statusMessage').innerText = "Пожалуйста, авторизуйтесь.";
+            document.getElementById('usernameInput').value = "";
+            document.getElementById('authModal').style.display = 'flex';
         }
 
-        // Смена аккаунта
+        // Клик по кнопке LIZA отправляется PATCH пакетом прямо в JSON базы данных
+        async function handleTap() {
+            if (!currentAccount) return;
+
+            const reward = calculateReward(totalGlobalSupply);
+            if (totalGlobalSupply + reward > MAX_SUPPLY) {
+                document.getElementById('statusMessage').innerText = "Лимит эмиссии в 21 000 000 LIZA исчерпан!";
+                return;
+            }
+
+            const nextUserBalance = userBalance + reward;
+            const nextGlobalSupply = totalGlobalSupply + reward;
+
+            // Мгновенный локальный апдейт на экране для плавности
+            userBalance = nextUserBalance;
+            totalGlobalSupply = nextGlobalSupply;
+            document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
+            document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
+
+            try {
+                await fetch(`${DB_URL}.json`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        [`users/${currentAccount}/balance`]: nextUserBalance,
+                        [`global/totalSupply`]: nextGlobalSupply
+                    })
+                });
+            } catch (err) {
+                console.error("Ошибка сохранения клика:", err);
+            }
+        }
+
+        // Привязка слушателей
