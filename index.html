@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN - DASHBOARD FIXED</title>
+    <title>LIZABITCOIN - AUTO URL FIXED</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -26,7 +26,7 @@
     <div class="sidebar">
         <h2>Wallets Dashboard</h2>
         <ul id="userList" class="user-list">
-            <li class="user-item">Загрузка данных...</li>
+            <li class="user-item">Синхронизация базы...</li>
         </ul>
     </div>
 
@@ -44,12 +44,17 @@
         </div>
 
         <button id="lizaButton" onclick="handleTap()" disabled>LIZA</button>
-        <div id="statusMessage" class="info-text">Система готова. Синхронизация...</div>
+        <div id="statusMessage" class="info-text">Подключение...</div>
     </div>
 
     <script>
-        // ИСПРАВЛЕНО: Убран лишний дефис в названии вашей базы данных
-        const DB_URL = "https://firebaseio.com";
+        // Две возможные структуры ссылок Firebase Realtime Database
+        const URL_OPTIONS = [
+            "https://firebaseio.com",
+            "https://firebaseio.com"
+        ];
+        let currentUrlIndex = 0;
+        let DB_URL = URL_OPTIONS[currentUrlIndex];
 
         let currentAccount = null;
         let userBalance = 0;
@@ -64,7 +69,7 @@
         }
 
         function handleWalletConnected(address) {
-            currentAccount = address[0].toLowerCase();
+            currentAccount = address.toLowerCase();
             document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
             document.getElementById('lizaButton').removeAttribute('disabled');
             document.getElementById('statusMessage').innerText = "Кошелек подключен! Начинай майнинг.";
@@ -88,13 +93,13 @@
             }
         }
 
-        // Обновление данных с Firebase через REST API
+        // Обновление данных с автоматическим перебором URL при ошибках
         async function updateDataFromServer() {
             try {
                 const res = await fetch(`${DB_URL}.json`);
+                if (!res.ok) throw new Error("Network response was not ok");
                 const data = await res.json();
                 
-                // Обновляем саплай глобально, даже если база полностью пустая
                 totalGlobalSupply = (data && data.global) ? data.global.totalSupply : 0;
                 document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
                 document.getElementById('rewardDisplay').innerText = calculateReward(totalGlobalSupply);
@@ -120,7 +125,10 @@
                     userList.innerHTML = '<li class="user-item" style="color: #888;">Нет активных майнеров</li>';
                 }
             } catch (err) {
-                console.error("Ошибка обновления данных:", err);
+                console.warn(`Ошибка запроса по адресу ${DB_URL}, пробуем резервный...`);
+                // Переключаем на следующий URL из списка, если текущий выдал сбой
+                currentUrlIndex = (currentUrlIndex + 1) % URL_OPTIONS.length;
+                DB_URL = URL_OPTIONS[currentUrlIndex];
             }
         }
 
@@ -171,7 +179,6 @@
             }
         }
 
-        // Запуск интервала фонового обновления
         setInterval(updateDataFromServer, 2000);
         window.addEventListener('load', () => {
             updateDataFromServer();
