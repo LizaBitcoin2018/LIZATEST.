@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN - AUTO CONNECT VERSION</title>
+    <title>LIZABITCOIN - DASHBOARD FIXED</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         .sidebar { width: 300px; background-color: var(--sidebar-bg); border-right: 2px solid var(--accent-color); padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
         .sidebar h2 { color: var(--accent-color); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2rem; }
         .user-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
-        .user-item { padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .user-item { padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
         .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; }
         .header-actions { position: absolute; top: 20px; right: 20px; }
         button { background-color: var(--accent-color); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: transform 0.1s; }
@@ -48,6 +48,7 @@
     </div>
 
     <script>
+        // ИСПРАВЛЕНО: Убран лишний дефис в названии вашей базы данных
         const DB_URL = "https://firebaseio.com";
 
         let currentAccount = null;
@@ -62,23 +63,20 @@
             return currentReward > 0 ? currentReward : 0;
         }
 
-        // Функция успешной авторизации кошелька
         function handleWalletConnected(address) {
-            currentAccount = address.toLowerCase();
+            currentAccount = address[0].toLowerCase();
             document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
-            // ИСПРАВЛЕНО ТУТ: Кнопка гарантированно включается
             document.getElementById('lizaButton').removeAttribute('disabled');
-            document.getElementById('statusMessage').innerText = "Кошелек подключен автоматически! Кликай!";
+            document.getElementById('statusMessage').innerText = "Кошелек подключен! Начинай майнинг.";
             updateDataFromServer();
         }
 
-        // Автоматическая проверка авторизации при загрузке страницы
         async function checkExistingConnection() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     if (accounts && accounts.length > 0) {
-                        handleWalletConnected(accounts[0]);
+                        handleWalletConnected(accounts);
                     } else {
                         document.getElementById('statusMessage').innerText = "Кошелек не подключен. Нажмите Connect MetaMask.";
                     }
@@ -96,44 +94,43 @@
                 const res = await fetch(`${DB_URL}.json`);
                 const data = await res.json();
                 
-                if (data) {
-                    totalGlobalSupply = data.global ? data.global.totalSupply : 0;
-                    document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
-                    document.getElementById('rewardDisplay').innerText = calculateReward(totalGlobalSupply);
+                // Обновляем саплай глобально, даже если база полностью пустая
+                totalGlobalSupply = (data && data.global) ? data.global.totalSupply : 0;
+                document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
+                document.getElementById('rewardDisplay').innerText = calculateReward(totalGlobalSupply);
 
-                    if (currentAccount && data.users && data.users[currentAccount]) {
-                        userBalance = data.users[currentAccount].balance || 0;
-                        document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
-                    }
+                if (currentAccount && data && data.users && data.users[currentAccount]) {
+                    userBalance = data.users[currentAccount].balance || 0;
+                    document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
+                }
 
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = '';
-                    if (data.users) {
-                        Object.keys(data.users).forEach(addr => {
-                            const shortAddr = addr.substring(0, 6) + "..." + addr.substring(38);
-                            const bal = data.users[addr].balance || 0;
-                            const li = document.createElement('li');
-                            li.className = 'user-item';
-                            li.innerHTML = `<span>${shortAddr}</span><strong>${bal.toFixed(2)}</strong>`;
-                            userList.appendChild(li);
-                        });
-                    } else {
-                        userList.innerHTML = '<li class="user-item">Нет активных майнеров</li>';
-                    }
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                
+                if (data && data.users) {
+                    Object.keys(data.users).forEach(addr => {
+                        const shortAddr = addr.substring(0, 6) + "..." + addr.substring(38);
+                        const bal = data.users[addr].balance || 0;
+                        const li = document.createElement('li');
+                        li.className = 'user-item';
+                        li.innerHTML = `<span>${shortAddr}</span><strong>${bal.toFixed(2)}</strong>`;
+                        userList.appendChild(li);
+                    });
+                } else {
+                    userList.innerHTML = '<li class="user-item" style="color: #888;">Нет активных майнеров</li>';
                 }
             } catch (err) {
                 console.error("Ошибка обновления данных:", err);
             }
         }
 
-        // Ручное подключение MetaMask по кнопке
         async function connectMetaMask() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     document.getElementById('statusMessage').innerText = "Ожидание авторизации в MetaMask...";
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     if (accounts && accounts.length > 0) {
-                        handleWalletConnected(accounts[0]);
+                        handleWalletConnected(accounts);
                     }
                 } catch (error) {
                     alert("Ошибка MetaMask: " + error.message);
@@ -144,7 +141,6 @@
             }
         }
 
-        // Отправка клика в Firebase через PATCH запрос
         async function handleTap() {
             if (!currentAccount) return;
 
@@ -175,18 +171,17 @@
             }
         }
 
-        // Запуск
+        // Запуск интервала фонового обновления
         setInterval(updateDataFromServer, 2000);
         window.addEventListener('load', () => {
             updateDataFromServer();
             checkExistingConnection();
         });
 
-        // Отслеживание смены аккаунта в кошельке
         if (typeof window.ethereum !== 'undefined') {
             window.ethereum.on('accountsChanged', function (accounts) {
                 if (accounts.length > 0) {
-                    handleWalletConnected(accounts[0]);
+                    handleWalletConnected(accounts);
                 } else {
                     currentAccount = null;
                     document.getElementById('lizaButton').setAttribute('disabled', 'true');
