@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>LIZABITCOIN - Fixed Rewards & Colors</title>
+    <title>LIZABITCOIN - Online</title>
     <style>
         body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 250px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .sidebar { width: 280px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
         .sidebar h3 { color:#f7931a; margin-top:0; }
         .user-list { overflow-y: auto; flex-grow: 1; }
         .user-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; }
@@ -26,12 +26,16 @@
         input { padding: 12px; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: white; font-size: 1rem; text-align: center; margin-bottom: 10px; }
         .upgrade-text { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
     </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
     <div class="sidebar">
-        <h3>Dashboard</h3>
-        <div id="userList" class="user-list">Список пуст...</div>
+        <h3>Dashboard (Online)</h3>
+        <div id="userList" class="user-list">Загрузка игроков...</div>
     </div>
 
     <div class="main-content">
@@ -58,9 +62,24 @@
     </div>
 
     <script>
+        // Твой конфиг
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
+            authDomain: "lizatest-124da.firebaseapp.com",
+            databaseURL: "https://lizatest-124da-default-rtdb.firebaseio.com",  // ← проверь этот URL
+            projectId: "lizatest-124da",
+            storageBucket: "lizatest-124da.firebasestorage.app",
+            messagingSenderId: "88106031938",
+            appId: "1:88106031938:web:0b3b08517e71ce33aa06db",
+            measurementId: "G-HT8D6XRFSY"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let myName = "";
         let myBalance = 0;
-        let globalSupply = 0;
         let currentArch = 32;
 
         const LIMIT_32 = 2147483647; 
@@ -73,6 +92,7 @@
         function login() {
             const input = document.getElementById('usernameInput').value.trim();
             if (!input) return alert("Ник не может быть пустым!");
+            
             myName = input.replace(/[\.\$\#\[\]\/]/g, "_");
             
             document.getElementById('authBlock').style.display = 'none';
@@ -80,23 +100,35 @@
             document.getElementById('archPanel').style.display = 'flex';
             document.getElementById('nameDisplay').innerText = myName;
 
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-            if (!usersData[myName]) {
-                usersData[myName] = { balance: 0, arch: 32 };
-                localStorage.setItem('local_users', JSON.stringify(usersData));
-            } else {
-                currentArch = usersData[myName].arch || 32;
-            }
+            // Проверяем/создаём пользователя в Firebase
+            const userRef = db.ref('users/' + myName);
+            userRef.once('value').then(snapshot => {
+                if (!snapshot.exists()) {
+                    // Новый игрок
+                    userRef.set({
+                        balance: 0,
+                        arch: 32
+                    });
+                    currentArch = 32;
+                } else {
+                    const data = snapshot.val();
+                    myBalance = data.balance || 0;
+                    currentArch = data.arch || 32;
+                }
+                switchArch(currentArch);
+            });
 
-            switchArch(currentArch);
-            setInterval(updateData, 1000);
+            // Слушаем всех игроков в реальном времени
+            db.ref('users').on('value', snapshot => {
+                updateDashboard(snapshot.val());
+            });
         }
 
         function switchArch(bits) {
             currentArch = bits;
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-            usersData[myName].arch = bits;
-            localStorage.setItem('local_users', JSON.stringify(usersData));
+            
+            // Сохраняем выбор архитектуры
+            db.ref('users/' + myName + '/arch').set(bits);
 
             const btn32 = document.getElementById('btn32');
             const btn64 = document.getElementById('btn64');
@@ -117,33 +149,44 @@
                 archDisplay.innerText = "32-разрядное INT32";
                 maxSupplyDisplay.innerText = "2,147,483,647";
             }
-            updateData();
+            updateUI();
         }
 
-        function updateData() {
-            if (!myName) return;
-            
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-            
-            myBalance = usersData[myName] ? usersData[myName].balance : 0;
+        function updateUI() {
             document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString();
             document.getElementById('rewardDisplay').innerText = calculateReward(currentArch);
 
             const btn64 = document.getElementById('btn64');
             const upgradeHint = document.getElementById('upgradeHint');
+
             if (myBalance >= 1000000000) {
                 btn64.removeAttribute('disabled');
                 upgradeHint.innerText = "🔥 Доступен апгрейд до 64-бит! Переключите режим в правом верхнем углу.";
                 upgradeHint.style.color = "#00ffcc";
+            } else {
+                btn64.setAttribute('disabled', true);
+                upgradeHint.innerText = "Накликай 1,000,000,000 LIZA, чтобы разблокировать 64-битный процессор!";
+                upgradeHint.style.color = "#aaa";
             }
+        }
 
+        function updateDashboard(users) {
             const listDiv = document.getElementById('userList');
             listDiv.innerHTML = '';
-            Object.keys(usersData).forEach(u => {
+
+            if (!users) {
+                listDiv.innerHTML = 'Пока никого нет...';
+                return;
+            }
+
+            // Сортируем по балансу (от большего к меньшему)
+            const sorted = Object.entries(users).sort((a, b) => (b[1].balance || 0) - (a[1].balance || 0));
+
+            sorted.forEach(([name, data]) => {
                 const div = document.createElement('div');
                 div.className = 'user-item';
-                const userArch = usersData[u].arch ? usersData[u].arch + "-bit" : "32-bit";
-                div.innerHTML = "<span>" + u + " (" + userArch + ")</span><strong>" + (usersData[u].balance || 0).toLocaleString() + "</strong>";
+                const userArch = data.arch ? data.arch + "-bit" : "32-bit";
+                div.innerHTML = `<span>${name} (${userArch})</span><strong>${(data.balance || 0).toLocaleString()}</strong>`;
                 listDiv.appendChild(div);
             });
         }
@@ -155,16 +198,15 @@
             const limit = currentArch === 64 ? LIMIT_64 : LIMIT_32;
             
             if (myBalance + currentReward > limit) {
-                alert("Ошибка переполнения! Достигнут лимит 32-битной архитектуры. Срочно переключитесь на 64-бит!");
+                alert("Ошибка переполнения! Достигнут лимит архитектуры. Переключитесь на 64-бит!");
                 return;
             }
 
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
             myBalance += currentReward;
-            usersData[myName].balance = myBalance;
-            
-            localStorage.setItem('local_users', JSON.stringify(usersData));
-            updateData();
+
+            // Записываем новый баланс в Firebase
+            db.ref('users/' + myName + '/balance').set(myBalance);
+            updateUI();
         }
     </script>
 </body>
