@@ -5,64 +5,75 @@
     <title>LIZABITCOIN - Mining</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden;          /* Главное: страница больше не скроллится */
             font-family: 'Segoe UI', sans-serif;
             background: #0f0f0f;
             color: #eee;
-            height: 100vh;
+        }
+        body {
             display: flex;
             flex-direction: column;
         }
         .header {
             background: #1a1a1a;
             border-bottom: 2px solid #f7931a;
-            padding: 12px 20px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
+            height: 48px;
         }
         .header h1 {
             color: #f7931a;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
         .main {
             flex: 1;
             display: grid;
-            grid-template-columns: 320px 1fr 340px;
-            overflow: hidden;
+            grid-template-columns: 280px 1fr 320px;
+            overflow: hidden;          /* Важно */
+            height: calc(100vh - 48px);
         }
 
-        /* Левая панель - Майнеры */
+        /* ===== ЛЕВАЯ ПАНЕЛЬ ===== */
         .left-panel {
             background: #1a1a1a;
             border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
-            padding: 15px;
+            overflow: hidden;
         }
         .left-panel h3 {
             color: #f7931a;
-            margin-bottom: 12px;
-            font-size: 1.1rem;
+            padding: 12px 14px 8px;
+            font-size: 1rem;
+            flex-shrink: 0;
         }
         .buy-section {
             background: #252525;
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 15px;
+            margin: 0 12px 10px;
+            border-radius: 8px;
+            padding: 10px;
             text-align: center;
+            flex-shrink: 0;
+        }
+        .buy-section div {
+            font-size: 0.9rem;
         }
         .buy-btn {
             background: #f7931a;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 9px 0;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 7px;
             transition: 0.2s;
         }
         .buy-btn:hover:not(:disabled) { background: #e07b00; }
@@ -71,64 +82,75 @@
             color: #888;
             cursor: not-allowed;
         }
+
         .miners-list {
             flex: 1;
             overflow-y: auto;
+            padding: 0 12px 12px;
         }
+        /* Компактные карточки майнеров */
         .miner-card {
             background: #252525;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-left: 4px solid #f7931a;
+            border-radius: 6px;
+            padding: 7px 10px;
+            margin-bottom: 6px;
+            border-left: 3px solid #f7931a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .miner-card .left {
+            display: flex;
+            flex-direction: column;
         }
         .miner-card .title {
-            font-weight: bold;
-            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1px;
         }
         .miner-card .timer {
             color: #00ffcc;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            font-weight: bold;
         }
         .miner-card .status {
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-top: 4px;
+            font-size: 0.7rem;
+            color: #888;
         }
 
-        /* Центр */
+        /* ===== ЦЕНТР ===== */
         .center-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
-            background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
+            background: linear-gradient(180deg, #0f0f0f 0%, #151515 100%);
+            overflow: hidden;
         }
         .balance {
-            font-size: 3.2rem;
+            font-size: 2.8rem;
             font-weight: bold;
             color: #f7931a;
-            margin: 10px 0;
+            margin: 8px 0 20px;
         }
         .stats {
             background: #1a1a1a;
             border-radius: 12px;
-            padding: 20px 30px;
-            margin-top: 20px;
-            min-width: 340px;
+            padding: 18px 26px;
+            min-width: 320px;
         }
         .stats p {
-            margin: 8px 0;
-            font-size: 1.05rem;
+            margin: 7px 0;
+            font-size: 1rem;
         }
         .highlight { color: #00ffcc; }
         .progress-bar {
             width: 100%;
-            height: 12px;
+            height: 10px;
             background: #333;
-            border-radius: 6px;
+            border-radius: 5px;
             margin-top: 8px;
             overflow: hidden;
         }
@@ -138,26 +160,30 @@
             transition: width 0.5s;
         }
 
-        /* Правая панель - Чат */
+        /* ===== ПРАВАЯ ПАНЕЛЬ (ЧАТ) ===== */
         .right-panel {
             background: #1a1a1a;
             border-left: 1px solid #333;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         .right-panel h3 {
             color: #f7931a;
-            padding: 15px;
+            padding: 12px 15px;
             border-bottom: 1px solid #333;
+            flex-shrink: 0;
+            font-size: 1rem;
         }
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 12px 15px;
         }
         .chat-msg {
-            margin-bottom: 12px;
-            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-size: 0.88rem;
+            line-height: 1.35;
         }
         .chat-msg .author {
             color: #f7931a;
@@ -165,39 +191,42 @@
         }
         .chat-msg .time {
             color: #666;
-            font-size: 0.75rem;
-            margin-left: 6px;
+            font-size: 0.72rem;
+            margin-left: 5px;
         }
         .chat-input-area {
-            padding: 12px;
+            padding: 10px 12px;
             border-top: 1px solid #333;
             display: flex;
             gap: 8px;
+            flex-shrink: 0;
         }
         .chat-input-area input {
             flex: 1;
             background: #252525;
             border: 1px solid #444;
             color: white;
-            padding: 10px 12px;
+            padding: 9px 12px;
             border-radius: 6px;
             outline: none;
+            font-size: 0.9rem;
         }
         .chat-input-area button {
             background: #f7931a;
             border: none;
             color: white;
-            padding: 0 16px;
+            padding: 0 14px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1.1rem;
         }
 
         /* Auth */
         #authBlock {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.93);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -208,20 +237,19 @@
             background: #f7931a;
             color: white;
             border: none;
-            padding: 16px 36px;
-            font-size: 1.2rem;
+            padding: 15px 34px;
+            font-size: 1.15rem;
             font-weight: bold;
             border-radius: 10px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 18px;
         }
         .connect-btn:hover { background: #e07b00; }
-        .error { color: #ff5555; margin-top: 15px; }
-
+        .error { color: #ff5555; margin-top: 12px; }
         .wallet {
             color: #00ffcc;
             font-family: monospace;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
     </style>
 
@@ -230,10 +258,9 @@
 </head>
 <body>
 
-    <!-- Экран подключения -->
     <div id="authBlock">
-        <h1 style="color:#f7931a; font-size:2.5rem;">LIZABITCOIN</h1>
-        <p style="margin-top:10px; color:#aaa;">Подключи MetaMask, чтобы начать майнить</p>
+        <h1 style="color:#f7931a; font-size:2.4rem;">LIZABITCOIN</h1>
+        <p style="margin-top:8px; color:#aaa;">Подключи MetaMask, чтобы начать майнить</p>
         <button class="connect-btn" onclick="connectMetaMask()">Подключить MetaMask</button>
         <p id="errorText" class="error"></p>
     </div>
@@ -244,43 +271,42 @@
     </div>
 
     <div class="main" id="game" style="display:none;">
-        <!-- ЛЕВАЯ ПАНЕЛЬ: Майнеры -->
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
         <div class="left-panel">
             <h3>Мои майнеры</h3>
             
             <div class="buy-section">
-                <div>Цена майнера: <strong id="minerPrice" class="highlight">40</strong> LIZA</div>
-                <div style="font-size:0.85rem; color:#aaa; margin-top:4px;">(80% от текущей награды)</div>
+                <div>Цена: <strong id="minerPrice" class="highlight">40</strong> LIZA</div>
+                <div style="font-size:0.78rem; color:#999; margin-top:2px;">80% от текущей награды</div>
                 <button class="buy-btn" id="buyBtn" onclick="buyMiner()">Купить майнер</button>
             </div>
 
-            <div class="miners-list" id="minersList">
-                <!-- Карточки майнеров -->
-            </div>
+            <div class="miners-list" id="minersList"></div>
         </div>
 
         <!-- ЦЕНТР -->
         <div class="center-panel">
-            <div style="color:#aaa; font-size:1.1rem;">Твой баланс</div>
+            <div style="color:#aaa; font-size:1rem;">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
 
             <div class="stats">
-                <p>Текущая награда за 10 мин: <strong id="rewardDisplay" class="highlight">50</strong> LIZA</p>
-                <p>Всего добыто в сети: <strong id="totalMinedDisplay">0</strong> / 21 000 000</p>
-                <p>До следующего халвинга: <strong id="nextHalvingDisplay">10 500 000</strong> LIZA</p>
+                <p>Награда за 10 мин: <strong id="rewardDisplay" class="highlight">50</strong> LIZA</p>
+                <p>Всего добыто: <strong id="totalMinedDisplay">0</strong> / 21 000 000</p>
+                <p>До халвинга: <strong id="nextHalvingDisplay">10.50M</strong> LIZA</p>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill" style="width:0%"></div>
                 </div>
-                <p style="font-size:0.85rem; color:#888; margin-top:8px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
+                <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
             </div>
         </div>
 
-        <!-- ПРАВАЯ ПАНЕЛЬ: Чат -->
+        <!-- ЧАТ -->
         <div class="right-panel">
             <h3>Чат майнеров</h3>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Написать сообщение..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
+                <input type="text" id="chatInput" placeholder="Написать сообщение..." maxlength="200" 
+                       onkeydown="if(event.key==='Enter')sendChat()">
                 <button onclick="sendChat()">➤</button>
             </div>
         </div>
@@ -306,20 +332,20 @@
 
         let myAddress = "";
         let myBalance = 0;
-        let myMiners = [];          // [{ id, lastPayout }]
+        let myMiners = [];
         let globalTotalMined = 0;
         let currentReward = 50;
 
-        // ========== ХАЛВИНГИ КАК В БИТКОИНЕ ==========
+        // ========== ХАЛВИНГИ ==========
         function getRewardInfo(totalMined) {
             if (totalMined >= TOTAL_SUPPLY) {
-                return { reward: 0, era: 34, nextHalving: 0, progress: 100, eraMined: 0, eraSupply: 0 };
+                return { reward: 0, era: 34, nextHalving: 0, progress: 100 };
             }
 
             let remaining = totalMined;
             let reward = 50;
             let era = 1;
-            let eraSupply = 10500000; // 10.5 млн
+            let eraSupply = 10500000;
 
             while (remaining >= eraSupply && reward > 0) {
                 remaining -= eraSupply;
@@ -331,14 +357,7 @@
             const nextHalving = eraSupply - remaining;
             const progress = (remaining / eraSupply) * 100;
 
-            return {
-                reward: reward,
-                era: era,
-                nextHalving: nextHalving,
-                progress: progress,
-                eraMined: remaining,
-                eraSupply: eraSupply
-            };
+            return { reward, era, nextHalving, progress };
         }
 
         function updateRewardInfo() {
@@ -351,16 +370,11 @@
             document.getElementById('progressFill').style.width = info.progress + '%';
             document.getElementById('eraInfo').innerText = `Эра ${info.era} • Награда ${formatNum(currentReward)} LIZA`;
             
-            // Цена майнера = 80% от текущей награды
-            const price = currentReward * 0.8;
+            const price = +(currentReward * 0.8).toFixed(4);
             document.getElementById('minerPrice').innerText = formatNum(price);
             
             const buyBtn = document.getElementById('buyBtn');
-            if (myBalance >= price && currentReward > 0) {
-                buyBtn.disabled = false;
-            } else {
-                buyBtn.disabled = true;
-            }
+            buyBtn.disabled = !(myBalance >= price && currentReward > 0);
         }
 
         // ========== ПОДКЛЮЧЕНИЕ ==========
@@ -382,16 +396,12 @@
                 document.getElementById('game').style.display = 'grid';
                 document.getElementById('walletDisplay').innerText = shortAddress(myAddress);
 
-                // Загружаем данные пользователя
+                // Пользователь
                 const userRef = db.ref('users/' + myAddress);
                 userRef.once('value').then(snap => {
                     if (!snap.exists()) {
-                        // Первый вход — даём 1 бесплатный майнер
                         const firstMiner = { id: Date.now(), lastPayout: Date.now() };
-                        userRef.set({
-                            balance: 0,
-                            miners: [firstMiner]
-                        });
+                        userRef.set({ balance: 0, miners: [firstMiner] });
                         myBalance = 0;
                         myMiners = [firstMiner];
                     } else {
@@ -403,18 +413,18 @@
                     updateUI();
                 });
 
-                // Глобальная статистика
+                // Глобальный totalMined
                 db.ref('global/totalMined').on('value', snap => {
                     globalTotalMined = snap.val() || 0;
                     updateRewardInfo();
                 });
 
-                // Чат
-                db.ref('chat').limitToLast(50).on('value', snap => {
+                // ЧАТ (исправлено)
+                db.ref('chat').orderByChild('time').limitToLast(40).on('value', snap => {
                     renderChat(snap.val());
                 });
 
-                // Проверка выплат каждую секунду
+                // Проверка выплат
                 setInterval(checkPayouts, 1000);
 
             } catch (err) {
@@ -425,19 +435,22 @@
 
         // ========== МАЙНЕРЫ ==========
         function buyMiner() {
-            const price = currentReward * 0.8;
+            const price = +(currentReward * 0.8).toFixed(4);
             if (myBalance < price || currentReward <= 0) return;
 
-            myBalance -= price;
-            const newMiner = {
+            myBalance = +(myBalance - price).toFixed(4);
+            myMiners.push({
                 id: Date.now() + Math.random(),
                 lastPayout: Date.now()
-            };
-            myMiners.push(newMiner);
+            });
 
             saveUser();
             renderMiners();
             updateUI();
+
+            // Прокручиваем список майнеров вниз к новому
+            const list = document.getElementById('minersList');
+            list.scrollTop = list.scrollHeight;
         }
 
         function checkPayouts() {
@@ -450,19 +463,16 @@
             myMiners.forEach(miner => {
                 const elapsed = now - miner.lastPayout;
                 const periods = Math.floor(elapsed / CYCLE_MS);
-
                 if (periods > 0) {
-                    const earned = periods * currentReward;
-                    totalEarned += earned;
+                    totalEarned += periods * currentReward;
                     miner.lastPayout += periods * CYCLE_MS;
                     changed = true;
                 }
             });
 
             if (changed && totalEarned > 0) {
-                myBalance += totalEarned;
+                myBalance = +(myBalance + totalEarned).toFixed(4);
 
-                // Увеличиваем глобальный totalMined
                 db.ref('global/totalMined').transaction(current => {
                     return (current || 0) + totalEarned;
                 });
@@ -471,15 +481,17 @@
                 updateUI();
             }
 
-            renderMiners(); // обновляем таймеры
+            renderMiners();
         }
 
         function renderMiners() {
             const list = document.getElementById('minersList');
+            const scrollPos = list.scrollTop; // сохраняем позицию скролла
+
             list.innerHTML = '';
 
             if (myMiners.length === 0) {
-                list.innerHTML = '<div style="color:#666; text-align:center; margin-top:20px;">Нет майнеров</div>';
+                list.innerHTML = '<div style="color:#666; text-align:center; margin-top:30px; font-size:0.9rem;">Нет майнеров</div>';
                 return;
             }
 
@@ -493,12 +505,17 @@
                 const div = document.createElement('div');
                 div.className = 'miner-card';
                 div.innerHTML = `
-                    <div class="title">Майнер #${index + 1}</div>
+                    <div class="left">
+                        <div class="title">Майнер #${index + 1}</div>
+                        <div class="status">до выплаты</div>
+                    </div>
                     <div class="timer">${mins}:${secs.toString().padStart(2, '0')}</div>
-                    <div class="status">до следующей выплаты</div>
                 `;
                 list.appendChild(div);
             });
+
+            // Восстанавливаем скролл (чтобы не прыгало)
+            list.scrollTop = scrollPos;
         }
 
         function saveUser() {
@@ -532,8 +549,8 @@
             box.innerHTML = '';
             if (!messages) return;
 
-            const sorted = Object.values(messages).sort((a, b) => a.time - b.time);
-            sorted.forEach(msg => {
+            const arr = Object.values(messages).sort((a, b) => a.time - b.time);
+            arr.forEach(msg => {
                 const div = document.createElement('div');
                 div.className = 'chat-msg';
                 const time = new Date(msg.time).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
@@ -555,7 +572,7 @@
         function formatNum(n) {
             if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
             if (Number.isInteger(n)) return n.toLocaleString('ru');
-            return n.toLocaleString('ru', { maximumFractionDigits: 4 });
+            return parseFloat(n.toFixed(4)).toLocaleString('ru');
         }
 
         function escapeHtml(text) {
