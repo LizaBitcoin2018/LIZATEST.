@@ -3,26 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN - CLEAN VERSION</title>
+    <title>LIZABITCOIN - TEXT LOGIN</title>
     <style>
-        :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
+        :root { 
+            --bg-color: #1a1a1a; 
+            --text-color: #ffffff; 
+            --accent-color: #f7931a; 
+            --sidebar-bg: #252525; 
+        }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Dashboard Sidebar */
         .sidebar { width: 300px; background-color: var(--sidebar-bg); border-right: 2px solid var(--accent-color); padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
         .sidebar h2 { color: var(--accent-color); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2rem; }
         .user-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
         .user-item { padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        .user-name { font-family: monospace; color: #aaa; }
+        .user-balance { color: var(--accent-color); font-weight: bold; }
+        
+        /* Main Game Area */
         .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; }
         .header-actions { position: absolute; top: 20px; right: 20px; }
+        
         button { background-color: var(--accent-color); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: transform 0.1s; }
         button:active { transform: scale(0.95); }
-        #lizaButton { width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
+        #lizaButton { width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); margin-top: 10px; }
         #lizaButton:disabled { background-color: #555; cursor: not-allowed; box-shadow: none; }
+        
         .info-text { margin-top: 20px; color: #00ffcc; text-align: center; max-width: 400px; font-weight: bold; }
+        
+        /* Auth Modal Overlay */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.3s ease; }
+        .modal-box { background: var(--sidebar-bg); border: 2px solid var(--accent-color); padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; }
+        .modal-box h3 { margin-top: 0; color: var(--accent-color); font-size: 1.5rem; }
+        .modal-box input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: white; font-size: 1rem; box-sizing: border-box; text-align: center; }
+        .modal-box input:focus { border-color: var(--accent-color); outline: none; }
+        
+        .logout-btn { background-color: #444; border: 1px solid #555; font-size: 0.85rem; padding: 8px 16px; }
     </style>
 </head>
 <body>
 
-    <!-- Dashboard -->
+    <!-- Auth Modal Window -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>LIZABITCOIN</h3>
+            <p style="color: #bbb; font-size: 0.9rem;">Введите ваш никнейм или текстовый адрес MetaMask кошелька для входа в игру</p>
+            <input type="text" id="usernameInput" placeholder="Например: Terentiy или 0x71C..." maxlength="42">
+            <button onclick="loginWithText()">Войти в аккаунт</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Sidebar -->
     <div class="sidebar">
         <h2>Wallets Dashboard</h2>
         <ul id="userList" class="user-list">
@@ -33,19 +65,18 @@
     <!-- Main Game Area -->
     <div class="main-content">
         <div class="header-actions">
-            <!-- ИСПРАВЛЕНО: Полностью убран onclick из HTML, чтобы избежать двойного конфликта вызовов -->
-            <button id="connectWallet">Connect MetaMask</button>
+            <button id="authBtn" class="logout-btn" onclick="logout()">Сменить аккаунт</button>
         </div>
 
         <div style="text-align: center; margin-bottom: 30px;">
-            <div style="font-size: 1.2rem; color: #888;">BALANCE</div>
-            <div id="balanceDisplay" style="font-size: 3rem; font-weight: bold; margin: 5px 0;">0.00</div>
-            <div style="color: #aaa;">Reward per click: <span id="rewardDisplay">50</span> LIZA</div>
+            <div style="font-size: 1.2rem; color: #888; text-transform: uppercase;">User: <span id="currentUserNameDisplay" style="color: #fff;">-</span></div>
+            <div id="balanceDisplay" style="font-size: 3rem; font-weight: bold; margin: 10px 0; color: var(--accent-color);">0.00</div>
+            <div style="color: #aaa; font-size: 0.95rem;">Reward per click: <span id="rewardDisplay">50</span> LIZA</div>
             <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Total Supply: <span id="supplyDisplay">0</span> / 21,000,000</div>
         </div>
 
-        <button id="lizaButton" disabled>LIZA</button>
-        <div id="statusMessage" class="info-text">Подключение...</div>
+        <button id="lizaButton" onclick="handleTap()" disabled>LIZA</button>
+        <div id="statusMessage" class="info-text">Пожалуйста, авторизуйтесь.</div>
     </div>
 
     <script>
@@ -63,141 +94,97 @@
             return currentReward > 0 ? currentReward : 0;
         }
 
-        function handleWalletConnected(accountsData) {
-            if (!accountsData) return;
-            
-            let rawAddress = "";
-            if (Array.isArray(accountsData)) {
-                rawAddress = accountsData[0];
-            } else if (typeof accountsData === 'string') {
-                rawAddress = accountsData;
+        // Логика форматирования вывода имен в дашборде (красиво сокращает длинные адреса)
+        function formatDisplayName(name) {
+            if (name.startsWith('0x') && name.length >= 12) {
+                return name.substring(0, 6) + "..." + name.substring(name.length - 4);
             }
-            
-            if (!rawAddress || typeof rawAddress !== 'string') return;
+            return name;
+        }
 
-            currentAccount = rawAddress.toLowerCase();
-            document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "..." + currentAccount.substring(38);
+        // Текстовая авторизация
+        function loginWithText() {
+            const input = document.getElementById('usernameInput').value.trim();
+            if (!input) {
+                alert("Пожалуйста, введите корректный никнейм или адрес!");
+                return;
+            }
+
+            // Очищаем имя от спецсимволов для Firebase путей, сохраняя регистр
+            const safeName = input.replace(/[\.\$\#\[\]\/]/g, "_");
+            
+            // Запоминаем сессию в локальном браузере, чтобы не входить каждый раз
+            localStorage.setItem('lizabitcoin_user', safeName);
+            
+            initUserSession(safeName);
+        }
+
+        // Активация игрового процесса
+        function initUserSession(username) {
+            currentAccount = username;
+            
+            // Закрываем модальное окно авторизации
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('currentUserNameDisplay').innerText = formatDisplayName(currentAccount);
             document.getElementById('lizaButton').removeAttribute('disabled');
-            document.getElementById('statusMessage').innerText = "Кошелек подключен! Можно собирать LIZA.";
+            document.getElementById('statusMessage').innerText = "Вы успешно вошли! Кликайте по кнопке LIZA!";
+            
             updateDataFromServer();
         }
 
-        async function checkExistingConnection() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                    if (accounts && accounts.length > 0) {
-                        handleWalletConnected(accounts);
-                    } else {
-                        document.getElementById('statusMessage').innerText = "Кошелек не авторизован. Нажмите кнопку сверху.";
-                    }
-                } catch (err) {
-                    console.error("Ошибка автоподключения:", err);
-                }
-            } else {
-                document.getElementById('statusMessage').innerText = "MetaMask не найден в вашем браузере.";
-            }
+        // Выход / Смена пользователя
+        function logout() {
+            localStorage.removeItem('lizabitcoin_user');
+            currentAccount = null;
+            document.getElementById('lizaButton').setAttribute('disabled', 'true');
+            document.getElementById('balanceDisplay').innerText = "0.00";
+            document.getElementById('currentUserNameDisplay').innerText = "-";
+            document.getElementById('statusMessage').innerText = "Пожалуйста, авторизуйтесь.";
+            document.getElementById('usernameInput').value = "";
+            document.getElementById('authModal').style.display = 'flex';
         }
 
+        // Синхронизация данных с базой через REST API
         async function updateDataFromServer() {
             try {
                 const res = await fetch(`${DB_URL}.json`);
-                if (!res.ok) throw new Error("Network error");
+                if (!res.ok) throw new Error("Database network error");
                 const data = await res.json();
                 
+                // 1. Считываем глобальный саплай и рассчитываем халвинг
                 totalGlobalSupply = (data && data.global) ? data.global.totalSupply : 0;
                 document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
                 document.getElementById('rewardDisplay').innerText = calculateReward(totalGlobalSupply);
 
+                // 2. Считываем индивидуальный баланс игрока
                 if (currentAccount && data && data.users && data.users[currentAccount]) {
                     userBalance = data.users[currentAccount].balance || 0;
                     document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
                 }
 
+                // 3. Перестраиваем живой Дашборд
                 const userList = document.getElementById('userList');
                 userList.innerHTML = '';
                 
                 if (data && data.users) {
                     Object.keys(data.users).forEach(addr => {
-                        const shortAddr = addr.substring(0, 6) + "..." + addr.substring(38);
                         const bal = data.users[addr].balance || 0;
                         const li = document.createElement('li');
                         li.className = 'user-item';
-                        li.innerHTML = `<span>${shortAddr}</span><strong>${bal.toFixed(2)}</strong>`;
+                        li.innerHTML = `<span class="user-name">${formatDisplayName(addr)}</span><span class="user-balance">${bal.toFixed(2)}</span>`;
                         userList.appendChild(li);
                     });
                 } else {
                     userList.innerHTML = '<li class="user-item" style="color: #888;">Нет активных майнеров</li>';
                 }
             } catch (err) {
-                console.error("Ошибка синхронизации данных:", err);
+                console.error("Ошибка синхронизации:", err);
             }
         }
 
-        // Чистая функция вызова кошелька
-        async function connectMetaMask() {
-            const connectBtn = document.getElementById('connectWallet');
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    connectBtn.innerText = "Открываю кошелек...";
-                    document.getElementById('statusMessage').innerText = "Ожидание подтверждения в MetaMask...";
-                    
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    if (accounts && accounts.length > 0) {
-                        handleWalletConnected(accounts);
-                    }
-                } catch (error) {
-                    connectBtn.innerText = "Connect MetaMask";
-                    document.getElementById('statusMessage').innerText = "Вход отменен пользователем.";
-                    alert("Ошибка MetaMask: " + error.message);
-                }
-            } else {
-                alert("MetaMask не обнаружен! Установите расширение.");
-            }
-        }
-
-        // Логика клика кнопки LIZA
+        // Клик майнинга монет LIZA
         async function handleTap() {
             if (!currentAccount) return;
 
             const reward = calculateReward(totalGlobalSupply);
             if (totalGlobalSupply + reward > MAX_SUPPLY) {
-                document.getElementById('statusMessage').innerText = "Лимит в 21 000 000 LIZA достигнут!";
-                return;
-            }
-
-            const nextUserBalance = userBalance + reward;
-            const nextGlobalSupply = totalGlobalSupply + reward;
-
-            userBalance = nextUserBalance;
-            totalGlobalSupply = nextGlobalSupply;
-            document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
-            document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
-
-            try {
-                await fetch(`${DB_URL}.json`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({
-                        [`users/${currentAccount}/balance`]: nextUserBalance,
-                        [`global/totalSupply`]: nextGlobalSupply
-                    })
-                });
-            } catch (err) {
-                console.error("Ошибка сохранения клика:", err);
-            }
-        }
-
-        // Привязываем события СТРОГО через один JavaScript слушатель
-        document.getElementById('connectWallet').addEventListener('click', connectMetaMask);
-        document.getElementById('lizaButton').addEventListener('click', handleTap);
-
-        // Старт циклов
-        setInterval(updateDataFromServer, 2000);
-        window.addEventListener('load', () => {
-            updateDataFromServer();
-            checkExistingConnection();
-        });
-
-        if (typeof window.ethereum !== 'undefined') {
-            window.ethereum.on('accountsChanged', function (accounts) {
-                if (accounts.length > 0) {
