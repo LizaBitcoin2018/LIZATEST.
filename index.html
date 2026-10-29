@@ -4,27 +4,132 @@
     <meta charset="UTF-8">
     <title>LIZABITCOIN - MetaMask</title>
     <style>
-        body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 300px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
-        .sidebar h3 { color:#f7931a; margin-top:0; }
-        .user-list { overflow-y: auto; flex-grow: 1; }
-        .user-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.85rem; display: flex; justify-content: space-between; gap: 10px; }
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
+        body {
+            font-family: sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .sidebar {
+            width: 100%;
+            background: #252525;
+            border-top: 2px solid #f7931a;
+            padding: 15px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            max-height: 220px;
+        }
+        .sidebar h3 {
+            color: #f7931a;
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+        }
+        .user-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .user-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #333;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
         
-        .arch-panel { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
-        .arch-btn { background: #333; color: #888; border: 1px solid #555; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .arch-btn.active { background: #f7931a; color: white; border-color: #f7931a; box-shadow: 0 0 10px rgba(247, 147, 26, 0.5); }
-        .arch-btn:disabled { background: #222; color: #444; border-color: #333; cursor: not-allowed; }
+        .arch-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .arch-btn {
+            background: #333;
+            color: #888;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .arch-btn.active {
+            background: #f7931a;
+            color: white;
+            border-color: #f7931a;
+            box-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
+        }
+        .arch-btn:disabled {
+            background: #222;
+            color: #444;
+            border-color: #333;
+            cursor: not-allowed;
+        }
 
-        button.click-btn { background: #f7931a; color: white; border: none; padding: 14px 28px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        button.click-btn:hover { background: #e07b00; }
+        button.click-btn {
+            background: #f7931a;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button.click-btn:hover {
+            background: #e07b00;
+        }
 
-        #lizaButton { background: #f7931a; color: white; border: none; width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
-        #lizaButton:active { transform: scale(0.95); }
-        #lizaButton.mode-64 { background: #00ffcc; color: #1a1a1a; box-shadow: 0 0 25px rgba(0, 255, 204, 0.6); }
+        #lizaButton {
+            background: #f7931a;
+            color: white;
+            border: none;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            font-size: 2rem;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 20px rgba(247, 147, 26, 0.4);
+        }
+        #lizaButton:active {
+            transform: scale(0.95);
+        }
+        #lizaButton:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #lizaButton.mode-64 {
+            background: #00ffcc;
+            color: #1a1a1a;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+        }
 
-        .upgrade-text { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
-        .address { color: #00ffcc; font-family: monospace; }
+        .upgrade-text {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .address {
+            color: #00ffcc;
+            font-family: monospace;
+        }
     </style>
 
     <!-- Firebase -->
@@ -32,11 +137,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-
-    <div class="sidebar">
-        <h3>Dashboard (Online)</h3>
-        <div id="userList" class="user-list">Подключите кошелёк...</div>
-    </div>
 
     <div class="main-content">
         <div class="arch-panel" id="archPanel" style="display: none;">
@@ -56,11 +156,19 @@
             <p>Кошелёк: <strong class="address" id="nameDisplay">-</strong></p>
             <p>Ядро: <strong id="archDisplay" style="color:#f7931a;">32-разрядное</strong></p>
             <h1 style="font-size: 3rem; margin: 10px 0;"><span id="balanceDisplay">0</span> LIZA</h1>
-            <p style="color:#aaa;">За клик: +<span id="rewardDisplay">50</span> LIZA | Лимит: <span id="maxSupplyDisplay">2,147,483,647</span></p>
+            <p style="color:#aaa;">
+                За клик: +<span id="rewardDisplay">50</span> LIZA | 
+                Лимит: <span id="maxSupplyDisplay">2,147,483,647</span>
+            </p>
             
             <button id="lizaButton" onclick="handleTap()">LIZA</button>
             <div id="upgradeHint" class="upgrade-text">Накликай 1,000,000,000 LIZA, чтобы разблокировать 64-бит</div>
         </div>
+    </div>
+
+    <div class="sidebar">
+        <h3>Dashboard (Online)</h3>
+        <div id="userList" class="user-list">Подключите кошелёк...</div>
     </div>
 
     <script>
@@ -82,12 +190,16 @@
         let myAddress = "";
         let myBalance = 0;
         let currentArch = 32;
+        let isClickOnCooldown = false;   // задержка 1 секунда
 
         const LIMIT_32 = 2147483647;
-        const LIMIT_64 = 9223372036854775807;
+        const LIMIT_64 = 9223372036854775807n; // BigInt для точности
 
         function calculateReward(arch) {
-            return arch === 64 ? 250 : 50;
+            // Базовая награда + прибавка +50 за каждые 1000 LIZA
+            const base = arch === 64 ? 250 : 50;
+            const bonus = Math.floor(myBalance / 1000) * 50;
+            return base + bonus;
         }
 
         // Подключение MetaMask
@@ -208,19 +320,29 @@
         }
 
         function handleTap() {
-            if (!myAddress) return;
+            if (!myAddress || isClickOnCooldown) return;
 
             const currentReward = calculateReward(currentArch);
-            const limit = currentArch === 64 ? LIMIT_64 : LIMIT_32;
+            const limit = currentArch === 64 ? Number(LIMIT_64) : LIMIT_32;
 
             if (myBalance + currentReward > limit) {
                 alert("Достигнут лимит архитектуры! Переключитесь на 64-бит.");
                 return;
             }
 
+            // Задержка 1 секунда
+            isClickOnCooldown = true;
+            const btn = document.getElementById('lizaButton');
+            btn.disabled = true;
+
             myBalance += currentReward;
             db.ref('users/' + myAddress + '/balance').set(myBalance);
             updateUI();
+
+            setTimeout(() => {
+                isClickOnCooldown = false;
+                btn.disabled = false;
+            }, 1000);
         }
     </script>
 </body>
