@@ -155,9 +155,9 @@
         <div id="statusMessage" class="info-text">Please connect your MetaMask wallet to start mining.</div>
     </div>
 
-    <!-- Firebase SDK (v9 Compat) -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
+    <!-- ИСПРАВЛЕНО: Используем другие, более надежные CDN-ссылки для Firebase, которые не блокируются браузерами -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
 
     <script>
         // Конфиг Firebase
@@ -206,7 +206,6 @@
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
                     if (accounts && accounts.length > 0) {
-                        // ИСПРАВЛЕНО ТУТ: Берем первый элемент из массива адресов корректно
                         currentAccount = accounts[0].toLowerCase();
                         
                         connectBtn.innerText = currentAccount.substring(0, 6) + "..." + currentAccount.substring(38);
@@ -231,14 +230,12 @@
 
         // Загрузка индивидуальных данных пользователя и глобального саплая
         function loadUserData(address) {
-            // Подписка на баланс текущего пользователя
             database.ref('users/' + address).on('value', (snapshot) => {
                 const data = snapshot.val();
                 userBalance = data ? data.balance : 0;
                 balanceDisplay.innerText = userBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4});
             });
 
-            // Подписка на глобальный эмиссионный баланс
             database.ref('global/totalSupply').on('value', (snapshot) => {
                 totalGlobalSupply = snapshot.val() || 0;
                 supplyDisplay.innerText = totalGlobalSupply.toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -248,7 +245,7 @@
             });
         }
 
-        // Слушатель для обновления Дашборда (список всех кошельков)
+        // Дашборд
         database.ref('users').on('value', (snapshot) => {
             userList.innerHTML = '';
             const users = snapshot.val();
@@ -266,3 +263,8 @@
                     userList.appendChild(li);
                 });
             } else {
+                userList.innerHTML = '<li class="user-item">No active miners yet</li>';
+            }
+        });
+
+        // Клик
