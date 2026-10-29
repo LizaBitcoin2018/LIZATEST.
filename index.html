@@ -3,153 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN LOCAL-FIREBASE</title>
+    <title>LIZABITCOIN - AUTO CONNECT VERSION</title>
     <style>
         :root { --bg-color: #1a1a1a; --text-color: #ffffff; --accent-color: #f7931a; --sidebar-bg: #252525; }
-        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 300px; background-color: var(--sidebar-bg); border-right: 2px solid var(--accent-color); padding: 20px; box-sizing: border-box; }
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 300px; background-color: var(--sidebar-bg); border-right: 2px solid var(--accent-color); padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .sidebar h2 { color: var(--accent-color); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2rem; }
+        .user-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+        .user-item { padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; }
         .header-actions { position: absolute; top: 20px; right: 20px; }
-        button { background-color: var(--accent-color); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        #lizaButton { width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; }
-        .info-text { margin-top: 20px; color: #666; text-align: center; }
+        button { background-color: var(--accent-color); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: transform 0.1s; }
+        button:active { transform: scale(0.95); }
+        #lizaButton { width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
+        #lizaButton:disabled { background-color: #555; cursor: not-allowed; box-shadow: none; }
+        .info-text { margin-top: 20px; color: #00ffcc; text-align: center; max-width: 400px; font-weight: bold; }
     </style>
 </head>
 <body>
 
+    <!-- Dashboard -->
     <div class="sidebar">
-        <h2>Dashboard</h2>
-        <ul id="userList"><li>Connect wallet...</li></ul>
+        <h2>Wallets Dashboard</h2>
+        <ul id="userList" class="user-list">
+            <li class="user-item">Загрузка данных...</li>
+        </ul>
     </div>
 
+    <!-- Main Game Area -->
     <div class="main-content">
         <div class="header-actions">
             <button id="connectWallet" onclick="connectMetaMask()">Connect MetaMask</button>
         </div>
-        <div>
-            <h2>Balance: <span id="balanceDisplay">0.00</span> LIZA</h2>
-            <p>Total Supply: <span id="supplyDisplay">0</span> / 21,000,000</p>
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 1.2rem; color: #888;">BALANCE</div>
+            <div id="balanceDisplay" style="font-size: 3rem; font-weight: bold; margin: 5px 0;">0.00</div>
+            <div style="color: #aaa;">Reward per click: <span id="rewardDisplay">50</span> LIZA</div>
+            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">Total Supply: <span id="supplyDisplay">0</span> / 21,000,000</div>
         </div>
+
         <button id="lizaButton" onclick="handleTap()" disabled>LIZA</button>
-        <div id="statusMessage" class="info-text">Инициализация модулей...</div>
+        <div id="statusMessage" class="info-text">Система готова. Синхронизация...</div>
     </div>
 
     <script>
-        // Загружаем Firebase динамически через Fetch, чтобы обойти любые MIME-блокировки браузеров
-        async function loadFirebaseLocally() {
-            try {
-                const responseApp = await fetch('https://unpkg.com');
-                const codeApp = await responseApp.text();
-                const scriptApp = document.createElement('script');
-                scriptApp.text = codeApp;
-                document.body.appendChild(scriptApp);
+        const DB_URL = "https://firebaseio.com";
 
-                const responseDb = await fetch('https://unpkg.com');
-                const codeDb = await responseDb.text();
-                const scriptDb = document.createElement('script');
-                scriptDb.text = codeDb;
-                document.body.appendChild(scriptDb);
-
-                setTimeout(() => {
-                    if (typeof firebase !== 'undefined') {
-                        document.getElementById('statusMessage').innerText = "База данных успешно подключена! Нажмите Connect MetaMask.";
-                        initFirebase();
-                    } else {
-                        document.getElementById('statusMessage').innerText = "Ошибка активации базы данных.";
-                    }
-                }, 500);
-
-            } catch (err) {
-                document.getElementById('statusMessage').innerText = "Браузер блокирует сеть. Пробуем резервный метод...";
-                // Резервный чистый JS метод, если Fetch тоже режется защитой
-                const s1 = document.createElement('script');
-                s1.src = "https://gstatic.com";
-                s1.onload = () => {
-                    const s2 = document.createElement('script');
-                    s2.src = "https://gstatic.com";
-                    s2.onload = () => { initFirebase(); document.getElementById('statusMessage').innerText = "Резервное подключение успешно!"; };
-                    document.body.appendChild(s2);
-                };
-                document.body.appendChild(s1);
-            }
-        }
-
-        window.addEventListener('load', loadFirebaseLocally);
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
-            authDomain: "://firebaseapp.com",
-            projectId: "lizatest-124da",
-            storageBucket: "lizatest-124da.firebasestorage.app",
-            messagingSenderId: "88106031938",
-            appId: "1:88106031938:web:0b3b08517e71ce33aa06db"
-        };
-
-        let database;
         let currentAccount = null;
         let userBalance = 0;
         let totalGlobalSupply = 0;
+        const MAX_SUPPLY = 21000000;
 
-        function initFirebase() {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            
-            database.ref('global/totalSupply').on('value', (snapshot) => {
-                totalGlobalSupply = snapshot.val() || 0;
-                document.getElementById('supplyDisplay').innerText = totalGlobalSupply;
-            });
-
-            database.ref('users').on('value', (snapshot) => {
-                const userList = document.getElementById('userList');
-                userList.innerHTML = '';
-                const users = snapshot.val();
-                if(users) {
-                    Object.keys(users).forEach(addr => {
-                        const li = document.createElement('li');
-                        li.innerText = addr.substring(0,6) + "...: " + (users[addr].balance || 0).toFixed(2);
-                        userList.appendChild(li);
-                    });
-                }
-            });
+        function calculateReward(supply) {
+            let baseReward = 50;
+            const halvingEra = Math.floor(supply / 5250000);
+            let currentReward = baseReward / Math.pow(2, halvingEra);
+            return currentReward > 0 ? currentReward : 0;
         }
 
-        async function connectMetaMask() {
+        // Функция успешной авторизации кошелька
+        function handleWalletConnected(address) {
+            currentAccount = address.toLowerCase();
+            document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
+            // ИСПРАВЛЕНО ТУТ: Кнопка гарантированно включается
+            document.getElementById('lizaButton').removeAttribute('disabled');
+            document.getElementById('statusMessage').innerText = "Кошелек подключен автоматически! Кликай!";
+            updateDataFromServer();
+        }
+
+        // Автоматическая проверка авторизации при загрузке страницы
+        async function checkExistingConnection() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    document.getElementById('statusMessage').innerText = "Открываем MetaMask...";
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     if (accounts && accounts.length > 0) {
-                        currentAccount = accounts[0].toLowerCase();
-                        
-                        document.getElementById('connectWallet').innerText = currentAccount.substring(0, 6) + "...";
-                        document.getElementById('lizaButton').removeAttribute('disabled');
-                        document.getElementById('statusMessage').innerText = "Успешно подключено! Кликай на кнопку LIZA!";
-                        
-                        database.ref('users/' + currentAccount).on('value', (snapshot) => {
-                            const data = snapshot.val();
-                            userBalance = data ? data.balance : 0;
-                            document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
-                        });
+                        handleWalletConnected(accounts[0]);
+                    } else {
+                        document.getElementById('statusMessage').innerText = "Кошелек не подключен. Нажмите Connect MetaMask.";
                     }
-                } catch (error) {
-                    alert("Ошибка MetaMask: " + error.message);
+                } catch (err) {
+                    console.error("Ошибка автоподключения:", err);
                 }
             } else {
-                alert("MetaMask не найден! Установите расширение кошелька.");
+                document.getElementById('statusMessage').innerText = "MetaMask не найден.";
             }
         }
 
-        function handleTap() {
-            if (!currentAccount || !database) return;
-            let reward = 50; 
-            if (totalGlobalSupply + reward > 21000000) return;
+        // Обновление данных с Firebase через REST API
+        async function updateDataFromServer() {
+            try {
+                const res = await fetch(`${DB_URL}.json`);
+                const data = await res.json();
+                
+                if (data) {
+                    totalGlobalSupply = data.global ? data.global.totalSupply : 0;
+                    document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
+                    document.getElementById('rewardDisplay').innerText = calculateReward(totalGlobalSupply);
 
-            database.ref('users/' + currentAccount).set({
-                balance: userBalance + reward,
-                lastUpdated: firebase.database.ServerValue.TIMESTAMP
+                    if (currentAccount && data.users && data.users[currentAccount]) {
+                        userBalance = data.users[currentAccount].balance || 0;
+                        document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
+                    }
+
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = '';
+                    if (data.users) {
+                        Object.keys(data.users).forEach(addr => {
+                            const shortAddr = addr.substring(0, 6) + "..." + addr.substring(38);
+                            const bal = data.users[addr].balance || 0;
+                            const li = document.createElement('li');
+                            li.className = 'user-item';
+                            li.innerHTML = `<span>${shortAddr}</span><strong>${bal.toFixed(2)}</strong>`;
+                            userList.appendChild(li);
+                        });
+                    } else {
+                        userList.innerHTML = '<li class="user-item">Нет активных майнеров</li>';
+                    }
+                }
+            } catch (err) {
+                console.error("Ошибка обновления данных:", err);
+            }
+        }
+
+        // Ручное подключение MetaMask по кнопке
+        async function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    document.getElementById('statusMessage').innerText = "Ожидание авторизации в MetaMask...";
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    if (accounts && accounts.length > 0) {
+                        handleWalletConnected(accounts[0]);
+                    }
+                } catch (error) {
+                    alert("Ошибка MetaMask: " + error.message);
+                    document.getElementById('statusMessage').innerText = "Вход отменен.";
+                }
+            } else {
+                alert("MetaMask не установлен!");
+            }
+        }
+
+        // Отправка клика в Firebase через PATCH запрос
+        async function handleTap() {
+            if (!currentAccount) return;
+
+            const reward = calculateReward(totalGlobalSupply);
+            if (totalGlobalSupply + reward > MAX_SUPPLY) {
+                document.getElementById('statusMessage').innerText = "Лимит в 21 000 000 LIZA достигнут!";
+                return;
+            }
+
+            const nextUserBalance = userBalance + reward;
+            const nextGlobalSupply = totalGlobalSupply + reward;
+
+            userBalance = nextUserBalance;
+            totalGlobalSupply = nextGlobalSupply;
+            document.getElementById('balanceDisplay').innerText = userBalance.toFixed(2);
+            document.getElementById('supplyDisplay').innerText = totalGlobalSupply.toLocaleString();
+
+            try {
+                await fetch(`${DB_URL}.json`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        [`users/${currentAccount}/balance`]: nextUserBalance,
+                        [`global/totalSupply`]: nextGlobalSupply
+                    })
+                });
+            } catch (err) {
+                console.error("Ошибка сохранения клика:", err);
+            }
+        }
+
+        // Запуск
+        setInterval(updateDataFromServer, 2000);
+        window.addEventListener('load', () => {
+            updateDataFromServer();
+            checkExistingConnection();
+        });
+
+        // Отслеживание смены аккаунта в кошельке
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length > 0) {
+                    handleWalletConnected(accounts[0]);
+                } else {
+                    currentAccount = null;
+                    document.getElementById('lizaButton').setAttribute('disabled', 'true');
+                    document.getElementById('connectWallet').innerText = "Connect MetaMask";
+                    document.getElementById('balanceDisplay').innerText = "0.00";
+                    document.getElementById('statusMessage').innerText = "Кошелек отключен.";
+                }
             });
-            database.ref('global/totalSupply').set(totalGlobalSupply + reward);
         }
     </script>
 </body>
