@@ -163,7 +163,7 @@
         // Конфиг Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
-            authDomain: "lizatest-124da.firebaseapp.com",
+            authDomain: "://firebaseapp.com",
             projectId: "lizatest-124da",
             storageBucket: "lizatest-124da.firebasestorage.app",
             messagingSenderId: "88106031938",
@@ -205,21 +205,27 @@
                     statusMessage.innerText = "Connecting to MetaMask...";
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
-                    // ИСПРАВЛЕНО: Берем первый элемент массива аккаунтов [0]
-                    currentAccount = accounts[0].toLowerCase();
-                    
-                    connectBtn.innerText = currentAccount.substring(0, 6) + "..." + currentAccount.substring(38);
-                    lizaBtn.removeAttribute('disabled');
-                    statusMessage.innerText = "Wallet connected successfully! Start tapping.";
-                    
-                    // Загружаем данные этого пользователя из Firebase
-                    loadUserData(currentAccount);
+                    if (accounts && accounts.length > 0) {
+                        // ИСПРАВЛЕНО ТУТ: Берем первый элемент из массива адресов корректно
+                        currentAccount = accounts[0].toLowerCase();
+                        
+                        connectBtn.innerText = currentAccount.substring(0, 6) + "..." + currentAccount.substring(38);
+                        lizaBtn.removeAttribute('disabled');
+                        statusMessage.innerText = "Wallet connected successfully! Start tapping.";
+                        
+                        // Загружаем данные этого пользователя из Firebase
+                        loadUserData(currentAccount);
+                    } else {
+                        alert("No accounts found in MetaMask.");
+                    }
                 } catch (error) {
                     console.error(error);
+                    alert("MetaMask Error: " + error.message);
                     statusMessage.innerText = "Error or rejection: " + error.message;
                 }
             } else {
-                statusMessage.innerText = "MetaMask not found! If you are on a phone, open this link inside the MetaMask built-in browser.";
+                alert("MetaMask extension not found! If you are using a mobile phone, open this page inside the MetaMask browser application.");
+                statusMessage.innerText = "MetaMask not found.";
             }
         }
 
@@ -260,14 +266,3 @@
                     userList.appendChild(li);
                 });
             } else {
-                userList.innerHTML = '<li class="user-item">No active miners yet</li>';
-            }
-        });
-
-        // Логика клика по кнопке LIZA
-        lizaBtn.addEventListener('click', () => {
-            if (!currentAccount) return;
-
-            const reward = calculateReward(totalGlobalSupply);
-
-            if (totalGlobalSupply + reward > MAX_SUPPLY) {
