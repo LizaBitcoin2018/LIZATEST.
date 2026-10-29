@@ -158,6 +158,7 @@
             <h1 style="font-size: 3rem; margin: 10px 0;"><span id="balanceDisplay">0</span> LIZA</h1>
             <p style="color:#aaa;">
                 За клик: +<span id="rewardDisplay">50</span> LIZA | 
+                Кликов: <span id="clicksDisplay">0</span> |
                 Лимит: <span id="maxSupplyDisplay">2,147,483,647</span>
             </p>
             
@@ -189,17 +190,16 @@
 
         let myAddress = "";
         let myBalance = 0;
+        let myClicks = 0;          // счётчик кликов
         let currentArch = 32;
-        let isClickOnCooldown = false;   // задержка 1 секунда
+        let isClickOnCooldown = false;
 
         const LIMIT_32 = 2147483647;
-        const LIMIT_64 = 9223372036854775807n; // BigInt для точности
+        const LIMIT_64 = 9223372036854775807n;
 
-        function calculateReward(arch) {
-            // Базовая награда + прибавка +50 за каждые 1000 LIZA
-            const base = arch === 64 ? 250 : 50;
-            const bonus = Math.floor(myBalance / 1000) * 50;
-            return base + bonus;
+        // Награда: 50 + 50 за каждые 10 кликов
+        function calculateReward() {
+            return 50 + Math.floor(myClicks / 10) * 50;
         }
 
         // Подключение MetaMask
@@ -216,28 +216,27 @@
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 myAddress = accounts[0].toLowerCase();
 
-                // Показываем игру
                 document.getElementById('authBlock').style.display = 'none';
                 document.getElementById('gameBlock').style.display = 'block';
                 document.getElementById('archPanel').style.display = 'flex';
                 document.getElementById('nameDisplay').innerText = shortAddress(myAddress);
 
-                // Загружаем или создаём игрока
                 const userRef = db.ref('users/' + myAddress);
                 userRef.once('value').then(snapshot => {
                     if (!snapshot.exists()) {
-                        userRef.set({ balance: 0, arch: 32 });
+                        userRef.set({ balance: 0, arch: 32, clicks: 0 });
                         currentArch = 32;
                         myBalance = 0;
+                        myClicks = 0;
                     } else {
                         const data = snapshot.val();
                         myBalance = data.balance || 0;
                         currentArch = data.arch || 32;
+                        myClicks = data.clicks || 0;
                     }
                     switchArch(currentArch);
                 });
 
-                // Слушаем всех игроков
                 db.ref('users').on('value', snapshot => {
                     updateDashboard(snapshot.val());
                 });
@@ -280,7 +279,8 @@
 
         function updateUI() {
             document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString();
-            document.getElementById('rewardDisplay').innerText = calculateReward(currentArch);
+            document.getElementById('rewardDisplay').innerText = calculateReward();
+            document.getElementById('clicksDisplay').innerText = myClicks.toLocaleString();
 
             const btn64 = document.getElementById('btn64');
             const upgradeHint = document.getElementById('upgradeHint');
@@ -322,7 +322,7 @@
         function handleTap() {
             if (!myAddress || isClickOnCooldown) return;
 
-            const currentReward = calculateReward(currentArch);
+            const currentReward = calculateReward();
             const limit = currentArch === 64 ? Number(LIMIT_64) : LIMIT_32;
 
             if (myBalance + currentReward > limit) {
@@ -335,8 +335,16 @@
             const btn = document.getElementById('lizaButton');
             btn.disabled = true;
 
+            // Увеличиваем клики и баланс
+            myClicks += 1;
             myBalance += currentReward;
-            db.ref('users/' + myAddress + '/balance').set(myBalance);
+
+            // Сохраняем оба значения
+            db.ref('users/' + myAddress).update({
+                balance: myBalance,
+                clicks: myClicks
+            });
+
             updateUI();
 
             setTimeout(() => {
