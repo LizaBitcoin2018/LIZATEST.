@@ -2,196 +2,226 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>LIZABITCOIN</title>
+    <title>LIZABITCOIN - MetaMask</title>
     <style>
         body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 250px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; }
+        .sidebar { width: 300px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .sidebar h3 { color:#f7931a; margin-top:0; }
+        .user-list { overflow-y: auto; flex-grow: 1; }
+        .user-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.85rem; display: flex; justify-content: space-between; gap: 10px; }
         .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
+        
         .arch-panel { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
         .arch-btn { background: #333; color: #888; border: 1px solid #555; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .arch-btn.active { background: #f7931a; color: white; border-color: #f7931a; }
-        #lizaButton { background: #f7931a; color: white; border: none; width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; cursor: pointer; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
+        .arch-btn.active { background: #f7931a; color: white; border-color: #f7931a; box-shadow: 0 0 10px rgba(247, 147, 26, 0.5); }
+        .arch-btn:disabled { background: #222; color: #444; border-color: #333; cursor: not-allowed; }
+
+        button.click-btn { background: #f7931a; color: white; border: none; padding: 14px 28px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        button.click-btn:hover { background: #e07b00; }
+
+        #lizaButton { background: #f7931a; color: white; border: none; width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
+        #lizaButton:active { transform: scale(0.95); }
         #lizaButton.mode-64 { background: #00ffcc; color: #1a1a1a; box-shadow: 0 0 25px rgba(0, 255, 204, 0.6); }
-        #lizaButton:disabled { background: #555 !important; color: #aaa !important; cursor: not-allowed; box-shadow: none !important; }
-        .heat-container { width: 200px; height: 6px; background: #333; border-radius: 3px; margin-top: 15px; display: none; overflow: hidden; }
-        .heat-bar { width: 0%; height: 100%; background: #00ffcc; }
-        input { padding: 12px; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: white; font-size: 1rem; text-align: center; margin-bottom: 10px; }
-        .user-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; }
+
+        .upgrade-text { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
+        .address { color: #00ffcc; font-family: monospace; }
     </style>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
     <div class="sidebar">
-        <h3 style="color:#f7931a; margin-top:0;">Dashboard</h3>
-        <div id="userList">Список пуст...</div>
+        <h3>Dashboard (Online)</h3>
+        <div id="userList" class="user-list">Подключите кошелёк...</div>
     </div>
 
     <div class="main-content">
         <div class="arch-panel" id="archPanel" style="display: none;">
-            <button id="btn32" class="arch-btn active" onclick="switchArch(32)">32-BIT</button>
+            <button id="btn32" class="arch-btn active" onclick="switchArch(32)">32-BIT MODE</button>
             <button id="btn64" class="arch-btn" onclick="switchArch(64)" disabled>64-BIT (LOCK)</button>
         </div>
 
         <div id="authBlock">
             <h2 style="color:#f7931a;">LIZABITCOIN</h2>
-            <input type="text" id="usernameInput" placeholder="Твой ник"><br>
-            <button style="background:#f7931a; color:white; border:none; padding:12px 24px; font-weight:bold; border-radius:8px; cursor:pointer;" onclick="login()">Войти</button>
+            <p>Подключи MetaMask, чтобы запустить ядро</p>
+            <br>
+            <button class="click-btn" onclick="connectMetaMask()">Подключить MetaMask</button>
+            <p id="errorText" style="color:#ff5555; margin-top:15px;"></p>
         </div>
 
         <div id="gameBlock" style="display: none;">
-            <p>Игрок: <strong id="nameDisplay" style="color:#f7931a;">-</strong> | Ядро: <strong id="archDisplay">32-разрядное</strong></p>
+            <p>Кошелёк: <strong class="address" id="nameDisplay">-</strong></p>
+            <p>Ядро: <strong id="archDisplay" style="color:#f7931a;">32-разрядное</strong></p>
             <h1 style="font-size: 3rem; margin: 10px 0;"><span id="balanceDisplay">0</span> LIZA</h1>
-            <p style="color:#aaa;">За клик: +<span id="rewardDisplay">50</span> LIZA | Лимит: <span id="maxDisplay">2,147,483,647</span></p>
+            <p style="color:#aaa;">За клик: +<span id="rewardDisplay">50</span> LIZA | Лимит: <span id="maxSupplyDisplay">2,147,483,647</span></p>
+            
             <button id="lizaButton" onclick="handleTap()">LIZA</button>
-            <div id="heatContainer" class="heat-container"><div id="heatBar" class="heat-bar"></div></div>
-            <div id="upgradeHint" style="font-size:0.85rem; color:#aaa; margin-top:10px;">Набери 1,000,000,000 LIZA для 64-бит!</div>
+            <div id="upgradeHint" class="upgrade-text">Накликай 1,000,000,000 LIZA, чтобы разблокировать 64-бит</div>
         </div>
     </div>
 
     <script>
-        let myName = "";
+        // Твой Firebase конфиг
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
+            authDomain: "lizatest-124da.firebaseapp.com",
+            databaseURL: "https://lizatest-124da-default-rtdb.firebaseio.com",
+            projectId: "lizatest-124da",
+            storageBucket: "lizatest-124da.firebasestorage.app",
+            messagingSenderId: "88106031938",
+            appId: "1:88106031938:web:0b3b08517e71ce33aa06db",
+            measurementId: "G-HT8D6XRFSY"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let myAddress = "";
         let myBalance = 0;
         let currentArch = 32;
-        let currentHeat = 0;
-        let isCoolingDown = false;
 
-        let audioCtx = null;
-        function playSound(freq, duration, type) {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e){}
+        const LIMIT_32 = 2147483647;
+        const LIMIT_64 = 9223372036854775807;
+
+        function calculateReward(arch) {
+            return arch === 64 ? 250 : 50;
         }
 
-        function login() {
-            let input = document.getElementById('usernameInput').value.trim();
-            if (!input) return alert("Введите ник!");
-            myName = input.replace(/[\.\$\#\[\]\/]/g, "_");
-            
-            document.getElementById('authBlock').style.display = 'none';
-            document.getElementById('gameBlock').style.display = 'block';
-            document.getElementById('archPanel').style.display = 'flex';
-            document.getElementById('nameDisplay').innerText = myName;
+        // Подключение MetaMask
+        async function connectMetaMask() {
+            const errorText = document.getElementById('errorText');
+            errorText.innerText = "";
 
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-            if (!usersData[myName]) {
-                usersData[myName] = { balance: 0, arch: 32 };
-                localStorage.setItem('local_users', JSON.stringify(usersData));
-            } else {
-                currentArch = usersData[myName].arch || 32;
+            if (typeof window.ethereum === 'undefined') {
+                errorText.innerText = "MetaMask не найден. Установите расширение MetaMask.";
+                return;
             }
 
-            switchArch(currentArch);
-            setInterval(updateData, 1000);
-            setInterval(() => {
-                if (currentArch === 64 && !isCoolingDown && currentHeat > 0) {
-                    currentHeat = Math.max(0, currentHeat - 5);
-                    document.getElementById('heatBar').style.width = currentHeat + "%";
-                }
-            }, 1000);
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                myAddress = accounts[0].toLowerCase();
+
+                // Показываем игру
+                document.getElementById('authBlock').style.display = 'none';
+                document.getElementById('gameBlock').style.display = 'block';
+                document.getElementById('archPanel').style.display = 'flex';
+                document.getElementById('nameDisplay').innerText = shortAddress(myAddress);
+
+                // Загружаем или создаём игрока
+                const userRef = db.ref('users/' + myAddress);
+                userRef.once('value').then(snapshot => {
+                    if (!snapshot.exists()) {
+                        userRef.set({ balance: 0, arch: 32 });
+                        currentArch = 32;
+                        myBalance = 0;
+                    } else {
+                        const data = snapshot.val();
+                        myBalance = data.balance || 0;
+                        currentArch = data.arch || 32;
+                    }
+                    switchArch(currentArch);
+                });
+
+                // Слушаем всех игроков
+                db.ref('users').on('value', snapshot => {
+                    updateDashboard(snapshot.val());
+                });
+
+            } catch (err) {
+                console.error(err);
+                errorText.innerText = "Ошибка подключения MetaMask";
+            }
+        }
+
+        function shortAddress(addr) {
+            return addr.slice(0, 6) + "..." + addr.slice(-4);
         }
 
         function switchArch(bits) {
-            if (isCoolingDown) return;
             currentArch = bits;
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-            usersData[myName].arch = bits;
-            localStorage.setItem('local_users', JSON.stringify(usersData));
+            db.ref('users/' + myAddress + '/arch').set(bits);
 
-            let lizaBtn = document.getElementById('lizaButton');
+            const btn32 = document.getElementById('btn32');
+            const btn64 = document.getElementById('btn64');
+            const lizaBtn = document.getElementById('lizaButton');
+            const archDisplay = document.getElementById('archDisplay');
+            const maxSupplyDisplay = document.getElementById('maxSupplyDisplay');
+
             if (bits === 64) {
-                document.getElementById('btn32').classList.remove('active');
-                document.getElementById('btn64').classList.add('active');
+                btn32.classList.remove('active');
+                btn64.classList.add('active');
                 lizaBtn.classList.add('mode-64');
-                document.getElementById('archDisplay').innerText = "64-разрядное INT64";
-                document.getElementById('maxDisplay').innerText = "9,223,372,036,854,775,807";
-                document.getElementById('heatContainer').style.display = "block";
+                archDisplay.innerText = "64-разрядное INT64";
+                maxSupplyDisplay.innerText = "9,223,372,036,854,775,807";
             } else {
-                document.getElementById('btn64').classList.remove('active');
-                document.getElementById('btn32').classList.add('active');
+                btn64.classList.remove('active');
+                btn32.classList.add('active');
                 lizaBtn.classList.remove('mode-64');
-                document.getElementById('archDisplay').innerText = "32-разрядное INT32";
-                document.getElementById('maxDisplay').innerText = "2,147,483,647";
-                document.getElementById('heatContainer').style.display = "none";
+                archDisplay.innerText = "32-разрядное INT32";
+                maxSupplyDisplay.innerText = "2,147,483,647";
             }
-            updateData();
+            updateUI();
         }
 
-        function updateData() {
-            if (!myName) return;
-            let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-            myBalance = usersData[myName] ? usersData[myName].balance : 0;
-            
+        function updateUI() {
             document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString();
-            document.getElementById('rewardDisplay').innerText = currentArch === 64 ? "250" : "50";
+            document.getElementById('rewardDisplay').innerText = calculateReward(currentArch);
 
-            let btn64 = document.getElementById('btn64');
-            let hint = document.getElementById('upgradeHint');
+            const btn64 = document.getElementById('btn64');
+            const upgradeHint = document.getElementById('upgradeHint');
+
             if (myBalance >= 1000000000) {
                 btn64.removeAttribute('disabled');
-                if (!isCoolingDown) {
-                    btn64.innerText = "64-BIT MODE";
-                    hint.innerText = "🔥 Доступен 64-битный режим! Переключись вверху.";
-                    hint.style.color = "#00ffcc";
-                }
+                upgradeHint.innerText = "🔥 64-бит доступен! Переключите режим справа сверху.";
+                upgradeHint.style.color = "#00ffcc";
             } else {
-                if (currentArch !== 64) {
-                    btn64.setAttribute('disabled', 'true');
-                    btn64.innerText = "64-BIT (LOCK)";
-                    hint.innerText = "Набери 1,000,000,000 LIZA для 64-бит!";
-                    hint.style.color = "#aaa";
-                }
+                btn64.setAttribute('disabled', true);
+                upgradeHint.innerText = "Накликай 1,000,000,000 LIZA, чтобы разблокировать 64-бит";
+                upgradeHint.style.color = "#aaa";
+            }
+        }
+
+        function updateDashboard(users) {
+            const listDiv = document.getElementById('userList');
+            listDiv.innerHTML = '';
+
+            if (!users) {
+                listDiv.innerHTML = 'Пока никого нет...';
+                return;
             }
 
-            let listDiv = document.getElementById('userList');
-            listDiv.innerHTML = '';
-            Object.keys(usersData).forEach(u => {
-                let div = document.createElement('div');
+            const sorted = Object.entries(users).sort((a, b) => (b[1].balance || 0) - (a[1].balance || 0));
+
+            sorted.forEach(([address, data]) => {
+                const div = document.createElement('div');
                 div.className = 'user-item';
-                div.innerHTML = "<span>" + u + " (" + (usersData[u].arch||32) + "-bit)</span><strong>" + (usersData[u].balance||0).toLocaleString() + "</strong>";
+                const userArch = data.arch ? data.arch + "-bit" : "32-bit";
+                div.innerHTML = `
+                    <span title="${address}">${shortAddress(address)} (${userArch})</span>
+                    <strong>${(data.balance || 0).toLocaleString()}</strong>
+                `;
                 listDiv.appendChild(div);
             });
         }
 
         function handleTap() {
-            if (!myName || isCoolingDown) return;
-            let reward = currentArch === 64 ? 250 : 50;
+            if (!myAddress) return;
 
-            if (currentArch === 64) {
-                playSound(800, 0.1, 'triangle');
-                currentHeat += 10;
-                document.getElementById('heatBar').style.width = currentHeat + "%";
-                if (currentHeat >= 100) {
-                    isCoolingDown = true;
-                    playSound(200, 0.4, 'sawtooth');
-                    document.getElementById('lizaButton').setAttribute('disabled', 'true');
-                    document.getElementById('btn64').innerText = "OVERHEAT";
-                    hint.innerText = "🚨 ПЕРЕГРЕВ! Охлаждение 10 секунд...";
-                    hint.style.color = "#ff3333";
-                    setTimeout(() => {
-                        isCoolingDown = false;
-                        currentHeat = 0;
-                        document.getElementById('heatBar').style.width = "0%";
-                        document.getElementById('lizaButton').removeAttribute('disabled');
-                        switchArch(32);
-                    }, 10000);
-                    return;
-}
-} else {
-playSound(500, 0.08, 'sine');
-}
-let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
-myBalance += reward;
-usersData[myName].balance = myBalance;
-localStorage.setItem('local_users', JSON.stringify(usersData));
-updateData();
-}
+            const currentReward = calculateReward(currentArch);
+            const limit = currentArch === 64 ? LIMIT_64 : LIMIT_32;
+
+            if (myBalance + currentReward > limit) {
+                alert("Достигнут лимит архитектуры! Переключитесь на 64-бит.");
+                return;
+            }
+
+            myBalance += currentReward;
+            db.ref('users/' + myAddress + '/balance').set(myBalance);
+            updateUI();
+        }
+    </script>
+</body>
+</html>
