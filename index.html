@@ -2,143 +2,79 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>LIZABITCOIN - Hardcore Edition</title>
+    <title>LIZABITCOIN</title>
     <style>
         body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 250px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
-        .sidebar h3 { color:#f7931a; margin-top:0; }
-        .user-list { overflow-y: auto; flex-grow: 1; }
-        .user-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .sidebar { width: 250px; background: #252525; border-right: 2px solid #f7931a; padding: 20px; box-sizing: border-box; }
         .main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
-        
         .arch-panel { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
         .arch-btn { background: #333; color: #888; border: 1px solid #555; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .arch-btn.active { background: #f7931a; color: white; border-color: #f7931a; box-shadow: 0 0 10px rgba(247, 147, 26, 0.5); }
-        .arch-btn:disabled { background: #222; color: #444; border-color: #333; cursor: not-allowed; }
-
-        button.click-btn { background: #f7931a; color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        
-        #lizaButton { background: #f7931a; color: white; border: none; width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; cursor: pointer; transition: all 0.1s; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
-        #lizaButton:active { transform: scale(0.92); }
-        #lizaButton:disabled { background: #555 !important; color: #aaa !important; cursor: not-allowed; box-shadow: none !important; }
-        
+        .arch-btn.active { background: #f7931a; color: white; border-color: #f7931a; }
+        #lizaButton { background: #f7931a; color: white; border: none; width: 200px; height: 200px; border-radius: 50%; font-size: 2rem; margin-top: 20px; cursor: pointer; box-shadow: 0 0 20px rgba(247, 147, 26, 0.4); }
         #lizaButton.mode-64 { background: #00ffcc; color: #1a1a1a; box-shadow: 0 0 25px rgba(0, 255, 204, 0.6); }
-        
+        #lizaButton:disabled { background: #555 !important; color: #aaa !important; cursor: not-allowed; box-shadow: none !important; }
         .heat-container { width: 200px; height: 6px; background: #333; border-radius: 3px; margin-top: 15px; display: none; overflow: hidden; }
-        .heat-bar { width: 0%; height: 100%; background: #00ffcc; transition: width 0.1s, background-color 0.2s; }
-        
+        .heat-bar { width: 0%; height: 100%; background: #00ffcc; }
         input { padding: 12px; border-radius: 6px; border: 1px solid #444; background: #1a1a1a; color: white; font-size: 1rem; text-align: center; margin-bottom: 10px; }
-        .upgrade-text { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
+        .user-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.9rem; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h3>Dashboard</h3>
-        <div id="userList" class="user-list">Список пуст...</div>
+        <h3 style="color:#f7931a; margin-top:0;">Dashboard</h3>
+        <div id="userList">Список пуст...</div>
     </div>
 
     <div class="main-content">
         <div class="arch-panel" id="archPanel" style="display: none;">
-            <button id="btn32" class="arch-btn active" onclick="switchArch(32)">32-BIT MODE</button>
+            <button id="btn32" class="arch-btn active" onclick="switchArch(32)">32-BIT</button>
             <button id="btn64" class="arch-btn" onclick="switchArch(64)" disabled>64-BIT (LOCK)</button>
         </div>
 
         <div id="authBlock">
             <h2 style="color:#f7931a;">LIZABITCOIN</h2>
-            <p>Введи свой никнейм для запуска ядра:</p>
             <input type="text" id="usernameInput" placeholder="Твой ник"><br>
-            <button class="click-btn" onclick="login()">Запустить ядро</button>
+            <button style="background:#f7931a; color:white; border:none; padding:12px 24px; font-weight:bold; border-radius:8px; cursor:pointer;" onclick="login()">Войти</button>
         </div>
 
         <div id="gameBlock" style="display: none;">
-            <p>Система: <strong id="nameDisplay" style="color:#f7931a;">-</strong> | Ядро: <strong id="archDisplay" style="color:#f7931a;">32-разрядное</strong></p>
+            <p>Игрок: <strong id="nameDisplay" style="color:#f7931a;">-</strong> | Ядро: <strong id="archDisplay">32-разрядное</strong></p>
             <h1 style="font-size: 3rem; margin: 10px 0;"><span id="balanceDisplay">0</span> LIZA</h1>
-            <p style="color:#aaa;">За клик: +<span id="rewardDisplay">50</span> LIZA | Лимит архитектуры: <span id="maxSupplyDisplay">2,147,483,647</span></p>
-            
+            <p style="color:#aaa;">За клик: +<span id="rewardDisplay">50</span> LIZA | Лимит: <span id="maxDisplay">2,147,483,647</span></p>
             <button id="lizaButton" onclick="handleTap()">LIZA</button>
-            
             <div id="heatContainer" class="heat-container"><div id="heatBar" class="heat-bar"></div></div>
-            
-            <div id="upgradeHint" class="upgrade-text">Накликай 1,000,000,000 LIZA, чтобы разблокировать 64-битный процессор!</div>
+            <div id="upgradeHint" style="font-size:0.85rem; color:#aaa; margin-top:10px;">Набери 1,000,000,000 LIZA для 64-бит!</div>
         </div>
     </div>
 
     <script>
         let myName = "";
         let myBalance = 0;
-        let globalSupply = 0;
         let currentArch = 32;
         let currentHeat = 0;
         let isCoolingDown = false;
 
-        const LIMIT_32 = 2147483647; 
-        const LIMIT_64 = 9223372036854775807; 
-
         let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        function playSound(type) {
-            initAudio();
-            if (!audioCtx) return;
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'click32') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        function playSound(freq, duration, type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.08);
-            } 
-            else if (type === 'click64') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
-            } 
-            else if (type === 'overheat') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(400, audioCtx.currentTime + 0.2);
-                osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.4);
-                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            }
-        }
-
-        function calculateReward(balance, arch) {
-            if (arch === 64) {
-                let baseReward = 250;
-                const halvingEra = Math.floor(balance / 50000000);
-                let currentReward = baseReward / Math.pow(2, halvingEra);
-                return currentReward >= 1 ? Math.floor(currentReward) : 1;
-            } else {
-                let baseReward = 50;
-                const halvingEra = Math.floor(balance / 536870911);
-                let currentReward = baseReward / Math.pow(2, halvingEra);
-                return currentReward >= 1 ? Math.floor(currentReward) : 1;
-            }
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
         }
 
         function login() {
-            const input = document.getElementById('usernameInput').value.trim();
-            if (!input) return alert("Ник не может быть пустым!");
+            let input = document.getElementById('usernameInput').value.trim();
+            if (!input) return alert("Введите ник!");
             myName = input.replace(/[\.\$\#\[\]\/]/g, "_");
             
             document.getElementById('authBlock').style.display = 'none';
@@ -156,44 +92,106 @@
 
             switchArch(currentArch);
             setInterval(updateData, 1000);
-            setInterval(coolDownProcess, 1000);
+            setInterval(() => {
+                if (currentArch === 64 && !isCoolingDown && currentHeat > 0) {
+                    currentHeat = Math.max(0, currentHeat - 5);
+                    document.getElementById('heatBar').style.width = currentHeat + "%";
+                }
+            }, 1000);
         }
 
         function switchArch(bits) {
-            if (isCoolingDown) return; 
+            if (isCoolingDown) return;
             currentArch = bits;
             let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
             usersData[myName].arch = bits;
             localStorage.setItem('local_users', JSON.stringify(usersData));
 
-            const btn32 = document.getElementById('btn32');
-            const btn64 = document.getElementById('btn64');
-            const lizaBtn = document.getElementById('lizaButton');
-            const archDisplay = document.getElementById('archDisplay');
-            const maxSupplyDisplay = document.getElementById('maxSupplyDisplay');
-            const heatContainer = document.getElementById('heatContainer');
-
-            playSound('click64');
-
+            let lizaBtn = document.getElementById('lizaButton');
             if (bits === 64) {
-                btn32.classList.remove('active');
-                btn64.classList.add('active');
+                document.getElementById('btn32').classList.remove('active');
+                document.getElementById('btn64').classList.add('active');
                 lizaBtn.classList.add('mode-64');
-                archDisplay.innerText = "64-разрядное INT64";
-                maxSupplyDisplay.innerText = "9,223,372,036,854,775,807";
-                heatContainer.style.display = "block";
+                document.getElementById('archDisplay').innerText = "64-разрядное INT64";
+                document.getElementById('maxDisplay').innerText = "9,223,372,036,854,775,807";
+                document.getElementById('heatContainer').style.display = "block";
             } else {
-                btn64.classList.remove('active');
-                btn32.classList.add('active');
+                document.getElementById('btn64').classList.remove('active');
+                document.getElementById('btn32').classList.add('active');
                 lizaBtn.classList.remove('mode-64');
-                archDisplay.innerText = "32-разрядное INT32";
-                maxSupplyDisplay.innerText = "2,147,483,647";
-                heatContainer.style.display = "none";
+                document.getElementById('archDisplay').innerText = "32-разрядное INT32";
+                document.getElementById('maxDisplay').innerText = "2,147,483,647";
+                document.getElementById('heatContainer').style.display = "none";
             }
             updateData();
         }
 
         function updateData() {
             if (!myName) return;
-            
             let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
+            myBalance = usersData[myName] ? usersData[myName].balance : 0;
+            
+            document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString();
+            document.getElementById('rewardDisplay').innerText = currentArch === 64 ? "250" : "50";
+
+            let btn64 = document.getElementById('btn64');
+            let hint = document.getElementById('upgradeHint');
+            if (myBalance >= 1000000000) {
+                btn64.removeAttribute('disabled');
+                if (!isCoolingDown) {
+                    btn64.innerText = "64-BIT MODE";
+                    hint.innerText = "🔥 Доступен 64-битный режим! Переключись вверху.";
+                    hint.style.color = "#00ffcc";
+                }
+            } else {
+                if (currentArch !== 64) {
+                    btn64.setAttribute('disabled', 'true');
+                    btn64.innerText = "64-BIT (LOCK)";
+                    hint.innerText = "Набери 1,000,000,000 LIZA для 64-бит!";
+                    hint.style.color = "#aaa";
+                }
+            }
+
+            let listDiv = document.getElementById('userList');
+            listDiv.innerHTML = '';
+            Object.keys(usersData).forEach(u => {
+                let div = document.createElement('div');
+                div.className = 'user-item';
+                div.innerHTML = "<span>" + u + " (" + (usersData[u].arch||32) + "-bit)</span><strong>" + (usersData[u].balance||0).toLocaleString() + "</strong>";
+                listDiv.appendChild(div);
+            });
+        }
+
+        function handleTap() {
+            if (!myName || isCoolingDown) return;
+            let reward = currentArch === 64 ? 250 : 50;
+
+            if (currentArch === 64) {
+                playSound(800, 0.1, 'triangle');
+                currentHeat += 10;
+                document.getElementById('heatBar').style.width = currentHeat + "%";
+                if (currentHeat >= 100) {
+                    isCoolingDown = true;
+                    playSound(200, 0.4, 'sawtooth');
+                    document.getElementById('lizaButton').setAttribute('disabled', 'true');
+                    document.getElementById('btn64').innerText = "OVERHEAT";
+                    hint.innerText = "🚨 ПЕРЕГРЕВ! Охлаждение 10 секунд...";
+                    hint.style.color = "#ff3333";
+                    setTimeout(() => {
+                        isCoolingDown = false;
+                        currentHeat = 0;
+                        document.getElementById('heatBar').style.width = "0%";
+                        document.getElementById('lizaButton').removeAttribute('disabled');
+                        switchArch(32);
+                    }, 10000);
+                    return;
+}
+} else {
+playSound(500, 0.08, 'sine');
+}
+let usersData = JSON.parse(localStorage.getItem('local_users')) || {};
+myBalance += reward;
+usersData[myName].balance = myBalance;
+localStorage.setItem('local_users', JSON.stringify(usersData));
+updateData();
+}
