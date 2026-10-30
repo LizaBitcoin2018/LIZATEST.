@@ -88,99 +88,51 @@
             100% { transform: translate(5vw, 80vh) rotate(10deg); }
         }
 
-        /* НЛО */
-        .ufo {
+        /* Летающие монетки Bitcoin */
+        .btc-coin {
             position: fixed;
-            font-size: 26px;
-            z-index: 6;
-            pointer-events: none;
-            filter: drop-shadow(0 0 6px #0ff);
+            font-size: 28px;
+            z-index: 7;
+            cursor: pointer;
+            user-select: none;
+            filter: drop-shadow(0 0 8px gold);
+            transition: transform 0.15s;
+            animation: coinFloat linear infinite;
         }
-        .ufo1 { animation: ufo1 18s linear infinite; }
-        .ufo2 { animation: ufo2 22s linear infinite; }
-        .ufo3 { animation: ufo3 20s linear infinite reverse; }
-
-        @keyframes ufo1 {
-            0%   { transform: translate(10vw, 30vh); }
-            25%  { transform: translate(40vw, 10vh); }
-            50%  { transform: translate(75vw, 40vh); }
-            75%  { transform: translate(50vw, 70vh); }
-            100% { transform: translate(10vw, 30vh); }
+        .btc-coin:hover {
+            transform: scale(1.3);
         }
-        @keyframes ufo2 {
-            0%   { transform: translate(80vw, 20vh); }
-            25%  { transform: translate(60vw, 50vh); }
-            50%  { transform: translate(20vw, 25vh); }
-            75%  { transform: translate(40vw, 80vh); }
-            100% { transform: translate(80vw, 20vh); }
+        @keyframes coinFloat {
+            0%   { transform: translateY(0) rotate(0deg); }
+            50%  { transform: translateY(-15px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
         }
-        @keyframes ufo3 {
-            0%   { transform: translate(50vw, 10vh); }
-            25%  { transform: translate(15vw, 40vh); }
-            50%  { transform: translate(70vw, 70vh); }
-            75%  { transform: translate(90vw, 30vh); }
-            100% { transform: translate(50vw, 10vh); }
+        .coin-explode {
+            animation: explode 0.5s forwards;
+        }
+        @keyframes explode {
+            0%   { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
 
-        /* Лазеры НЛО */
-        .laser {
-            position: fixed;
-            width: 3px;
-            height: 18px;
-            background: linear-gradient(#0ff, #f0f);
-            border-radius: 2px;
-            z-index: 5;
-            pointer-events: none;
-            opacity: 0;
-            box-shadow: 0 0 8px #0ff;
-        }
-
-        /* Киты */
-        .whale {
-            position: fixed;
-            font-size: 32px;
-            z-index: 5;
-            pointer-events: none;
-            filter: drop-shadow(0 0 6px rgba(100, 180, 255, 0.7));
-        }
-        .whale1 { animation: whale1 28s linear infinite; }
-        .whale2 { animation: whale2 32s linear infinite reverse; }
-        .whale3 { animation: whale3 26s linear infinite; }
-
-        @keyframes whale1 {
-            0%   { transform: translate(0vw, 60vh) scaleX(1); }
-            50%  { transform: translate(90vw, 30vh) scaleX(1); }
-            51%  { transform: translate(90vw, 30vh) scaleX(-1); }
-            100% { transform: translate(0vw, 60vh) scaleX(-1); }
-        }
-        @keyframes whale2 {
-            0%   { transform: translate(100vw, 40vh) scaleX(-1); }
-            50%  { transform: translate(5vw, 70vh) scaleX(-1); }
-            51%  { transform: translate(5vw, 70vh) scaleX(1); }
-            100% { transform: translate(100vw, 40vh) scaleX(1); }
-        }
-        @keyframes whale3 {
-            0%   { transform: translate(20vw, 15vh) scaleX(1); }
-            50%  { transform: translate(80vw, 80vh) scaleX(1); }
-            51%  { transform: translate(80vw, 80vh) scaleX(-1); }
-            100% { transform: translate(20vw, 15vh) scaleX(-1); }
-        }
-
-        /* Вайфу снизу */
+        /* Вайфу танцует внизу */
         .waifu {
             position: fixed;
-            bottom: 12px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 42px;
+            font-size: 48px;
             z-index: 8;
             pointer-events: none;
-            filter: drop-shadow(0 0 10px rgba(255, 150, 200, 0.6));
-            animation: waifuBob 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px rgba(255, 150, 200, 0.7));
+            animation: waifuDance 1.2s ease-in-out infinite;
         }
-        @keyframes waifuBob {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-8px); }
+        @keyframes waifuDance {
+            0%   { transform: translateX(-50%) translateY(0) rotate(-6deg); }
+            25%  { transform: translateX(-50%) translateY(-12px) rotate(6deg); }
+            50%  { transform: translateX(-50%) translateY(0) rotate(-6deg); }
+            75%  { transform: translateX(-50%) translateY(-12px) rotate(6deg); }
+            100% { transform: translateX(-50%) translateY(0) rotate(-6deg); }
         }
 
         .header, .main, #authBlock { position: relative; z-index: 10; }
@@ -294,10 +246,25 @@
             text-shadow: 0 0 8px rgba(0,255,136,0.6);
             z-index: 10;
         }
+        .float-plus-big {
+            position: fixed;
+            color: gold;
+            font-weight: bold;
+            font-size: 1.6rem;
+            pointer-events: none;
+            animation: floatUpBig 1.2s ease-out forwards;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+            z-index: 20;
+        }
         @keyframes floatUp {
             0%   { opacity: 1; transform: translateY(0) scale(1); }
             70%  { opacity: 1; transform: translateY(-28px) scale(1.15); }
             100% { opacity: 0; transform: translateY(-50px) scale(1); }
+        }
+        @keyframes floatUpBig {
+            0%   { opacity: 1; transform: translateY(0) scale(1); }
+            70%  { opacity: 1; transform: translateY(-40px) scale(1.3); }
+            100% { opacity: 0; transform: translateY(-70px) scale(1); }
         }
 
         .center-panel {
@@ -309,11 +276,13 @@
             background: rgba(5, 5, 20, 0.4);
         }
         .balance {
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             font-weight: bold;
             color: #f7931a;
             margin: 6px 0 4px;
             text-shadow: 0 0 20px rgba(247, 147, 26, 0.4);
+            word-break: break-all;
+            text-align: center;
         }
         .rank {
             font-size: 0.95rem;
@@ -528,20 +497,7 @@
         <div class="nebula" style="width:300px;height:300px;background:#ff20aa;top:30%;left:70%;animation-delay:10s;"></div>
     </div>
 
-    <!-- Фея -->
     <div class="fairy">🧚‍♀️</div>
-
-    <!-- 3 НЛО -->
-    <div class="ufo ufo1">🛸</div>
-    <div class="ufo ufo2">🛸</div>
-    <div class="ufo ufo3">🛸</div>
-
-    <!-- 3 кита -->
-    <div class="whale whale1">🐋</div>
-    <div class="whale whale2">🐋</div>
-    <div class="whale whale3">🐋</div>
-
-    <!-- Вайфу снизу -->
     <div class="waifu">👘</div>
 
     <div id="authBlock">
@@ -560,7 +516,7 @@
         <div class="left-panel">
             <h3>Мои майнеры</h3>
             <div class="buy-section">
-                <div>Цена: <strong id="minerPrice" class="highlight">102.4</strong> LIZA</div>
+                <div>Цена: <strong id="minerPrice" class="highlight">5600</strong> LIZA</div>
                 <div style="font-size:0.78rem; color:#999; margin-top:2px;">80% от награды</div>
                 <button class="buy-btn" id="buyBtn" onclick="buyMiner()">Купить майнер</button>
             </div>
@@ -574,7 +530,7 @@
             <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
 
             <div class="stats">
-                <p>Награда за 10 мин: <strong class="highlight">128</strong> LIZA</p>
+                <p>Награда за 10 мин: <strong class="highlight">7000</strong> LIZA</p>
                 <p>Всего добыто: <strong id="totalMinedDisplay">0</strong> / 9 223 372 036 854 775 807</p>
             </div>
 
@@ -623,34 +579,10 @@
             galaxy.appendChild(star);
         }
 
-        // Стрельба НЛО
-        function shootLaser() {
-            const ufos = document.querySelectorAll('.ufo');
-            const ufo = ufos[Math.floor(Math.random() * ufos.length)];
-            const rect = ufo.getBoundingClientRect();
-
-            const laser = document.createElement('div');
-            laser.className = 'laser';
-            laser.style.left = (rect.left + rect.width / 2) + 'px';
-            laser.style.top = (rect.top + rect.height) + 'px';
-            laser.style.opacity = '1';
-            document.body.appendChild(laser);
-
-            let pos = rect.top + rect.height;
-            const interval = setInterval(() => {
-                pos += 8;
-                laser.style.top = pos + 'px';
-                if (pos > window.innerHeight) {
-                    clearInterval(interval);
-                    laser.remove();
-                }
-            }, 20);
-        }
-        setInterval(shootLaser, 1800);
-
         const DONATION_BNB = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b";
         const MAX_BALANCE = 9223372036854775807n;
-        const REWARD = 128;
+        const REWARD = 7000;
+        const COIN_REWARD = 50000;
 
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
@@ -708,7 +640,7 @@
             const info = getRankInfo(myBalance);
             document.getElementById('rankDisplay').innerText = "Ранг: " + info.current.title;
             if (info.next) {
-                document.getElementById('nextRankDisplay').innerText = "Следующий: " + info.next.title + " (" + formatNum(info.next.min) + ")";
+                document.getElementById('nextRankDisplay').innerText = "Следующий: " + info.next.title + " (" + info.next.min.toLocaleString('ru') + ")";
             } else {
                 document.getElementById('nextRankDisplay').innerText = "Максимальный ранг достигнут";
             }
@@ -734,10 +666,55 @@
         function showFloatPlus(cardElement, amount) {
             const plus = document.createElement('div');
             plus.className = 'float-plus';
-            plus.innerText = `+${formatNum(amount)}`;
+            plus.innerText = `+${amount.toLocaleString('ru')}`;
             cardElement.appendChild(plus);
             setTimeout(() => plus.remove(), 1100);
         }
+
+        function showBigPlus(x, y, amount) {
+            const plus = document.createElement('div');
+            plus.className = 'float-plus-big';
+            plus.innerText = `+${amount.toLocaleString('ru')}`;
+            plus.style.left = x + 'px';
+            plus.style.top = y + 'px';
+            document.body.appendChild(plus);
+            setTimeout(() => plus.remove(), 1200);
+        }
+
+        // ===== Летающие монетки =====
+        function spawnCoin() {
+            const coin = document.createElement('div');
+            coin.className = 'btc-coin';
+            coin.innerText = '₿';
+            coin.style.left = Math.random() * 85 + 5 + 'vw';
+            coin.style.top = Math.random() * 60 + 10 + 'vh';
+            coin.style.animationDuration = (Math.random() * 3 + 2) + 's';
+
+            coin.onclick = function(e) {
+                if (!myAddress) return;
+
+                // Взрыв
+                coin.classList.add('coin-explode');
+                playCoinSound();
+                showBigPlus(e.clientX, e.clientY, COIN_REWARD);
+
+                myBalance = Math.min(Number(MAX_BALANCE), myBalance + COIN_REWARD);
+                saveUser();
+                updateUI();
+
+                setTimeout(() => coin.remove(), 500);
+            };
+
+            document.body.appendChild(coin);
+
+            // Автоудаление через 12-18 сек
+            setTimeout(() => {
+                if (coin.parentNode) coin.remove();
+            }, Math.random() * 6000 + 12000);
+        }
+
+        // Спавн монеток
+        setInterval(spawnCoin, 2200);
 
         async function connectMetaMask() {
             const errorText = document.getElementById('errorText');
@@ -776,7 +753,7 @@
 
                 db.ref('global/totalMined').on('value', snap => {
                     globalTotalMined = snap.val() || 0;
-                    document.getElementById('totalMinedDisplay').innerText = formatNum(globalTotalMined);
+                    document.getElementById('totalMinedDisplay').innerText = globalTotalMined.toLocaleString('ru');
                 });
                 db.ref('users').on('value', snap => renderLeaderboard(snap.val()));
                 db.ref('chat').orderByChild('time').limitToLast(50).on('value', snap => renderChat(snap.val()));
@@ -790,9 +767,9 @@
         }
 
         function buyMiner() {
-            const price = +(REWARD * 0.8).toFixed(4);
+            const price = REWARD * 0.8;
             if (myBalance < price || myMiners.length >= MAX_MINERS) return;
-            myBalance = +(myBalance - price).toFixed(4);
+            myBalance = myBalance - price;
             myMiners.push({ id: Date.now() + Math.random(), lastPayout: Date.now() });
             saveUser();
             renderMiners();
@@ -920,8 +897,9 @@
         }
 
         function updateUI() {
-            document.getElementById('balanceDisplay').innerText = formatNum(myBalance);
-            document.getElementById('minerPrice').innerText = formatNum(REWARD * 0.8);
+            // Полное число без сокращений
+            document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString('ru');
+            document.getElementById('minerPrice').innerText = (REWARD * 0.8).toLocaleString('ru');
             document.getElementById('buyBtn').disabled = !(myBalance >= REWARD * 0.8 && myMiners.length < MAX_MINERS);
             updateRank();
         }
@@ -976,20 +954,13 @@
                         <span class="lb-addr">${shortAddress(u.addr)}</span>
                         <span style="color:#666;font-size:0.8rem;"> (${u.miners})</span>
                     </span>
-                    <span class="lb-bal">${formatNum(u.balance)}</span>
+                    <span class="lb-bal">${u.balance.toLocaleString('ru')}</span>
                 </div>
             `).join('');
         }
 
         function shortAddress(addr) {
             return addr.slice(0, 6) + '...' + addr.slice(-4);
-        }
-        function formatNum(n) {
-            if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
-            if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
-            if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-            if (Number.isInteger(n)) return n.toLocaleString('ru');
-            return parseFloat(n.toFixed(4)).toLocaleString('ru');
         }
         function escapeHtml(text) {
             const d = document.createElement('div');
