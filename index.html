@@ -295,7 +295,7 @@
         .stats p { margin: 4px 0; font-size: 0.95rem; }
         .highlight { color: #00ffcc; }
 
-        /* ===== DICE ===== */
+        /* DICE */
         .dice-panel {
             background: rgba(20,20,40,0.9);
             border-radius: 12px;
@@ -618,7 +618,6 @@
                 </div>
 
                 <div class="dice-result" id="diceResult">Сделай ставку</div>
-
                 <div class="dice-history" id="diceHistory"></div>
             </div>
 
@@ -802,7 +801,7 @@
         setInterval(spawnCoin, 1800);
         setTimeout(() => { for(let i=0;i<3;i++) spawnCoin(); }, 800);
 
-        // ===== DICE =====
+        // ===== DICE (исправленный банк) =====
         function playDice(direction) {
             if (!myAddress) return alert("Сначала подключи MetaMask");
 
@@ -813,7 +812,6 @@
             if (bet > myBalance) return alert("Недостаточно LIZA");
             if (bet > diceBank) return alert("В банке недостаточно средств");
 
-            // Честный рандом 0.000 - 100.000
             const roll = Math.random() * 100;
             const rollFixed = roll.toFixed(3);
 
@@ -822,24 +820,39 @@
             if (direction === 'high' && roll > 52) win = true;
 
             const resultEl = document.getElementById('diceResult');
+            const profit = bet;
 
             if (win) {
-                const profit = bet; // x2 итого
                 myBalance += profit;
-                diceBank -= profit;
+
+                db.ref('global/diceBank').transaction((current) => {
+                    const bank = (current === null || current === undefined) ? START_BANK : current;
+                    return Math.max(0, bank - profit);
+                }).then((result) => {
+                    if (result.committed) {
+                        diceBank = result.snapshot.val();
+                        document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
+                    }
+                });
+
                 resultEl.innerHTML = `<span class="win">ВЫИГРЫШ! ${rollFixed} → +${profit.toLocaleString('ru')} LIZA</span>`;
                 playCoinSound();
             } else {
                 myBalance -= bet;
-                diceBank += bet;
+
+                db.ref('global/diceBank').transaction((current) => {
+                    const bank = (current === null || current === undefined) ? START_BANK : current;
+                    return bank + bet;
+                }).then((result) => {
+                    if (result.committed) {
+                        diceBank = result.snapshot.val();
+                        document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
+                    }
+                });
+
                 resultEl.innerHTML = `<span class="lose">ПРОИГРЫШ ${rollFixed} → -${bet.toLocaleString('ru')} LIZA</span>`;
             }
 
-            // Обновляем банк
-            db.ref('global/diceBank').set(diceBank);
-            document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
-
-            // История
             diceHistory.unshift({
                 roll: rollFixed,
                 dir: direction === 'low' ? '<48' : '>52',
@@ -900,15 +913,14 @@
 
                 // Банк дайса
                 db.ref('global/diceBank').on('value', snap => {
-                    diceBank = snap.val() || START_BANK;
-                    document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
-                });
-
-                // Если банка ещё нет — создаём
-                db.ref('global/diceBank').once('value').then(snap => {
-                    if (!snap.exists()) {
+                    const val = snap.val();
+                    if (val === null || val === undefined) {
                         db.ref('global/diceBank').set(START_BANK);
+                        diceBank = START_BANK;
+                    } else {
+                        diceBank = val;
                     }
+                    document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
                 });
 
                 db.ref('global/totalMined').on('value', snap => {
