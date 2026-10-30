@@ -121,7 +121,6 @@
             100% { transform: translateX(-50%) translateY(0) rotate(-8deg); }
         }
 
-        /* ===== LAYOUT ===== */
         .header {
             position: relative;
             z-index: 10;
@@ -149,7 +148,6 @@
             height: calc(100vh - 44px);
         }
 
-        /* Верхний ряд */
         .top-row {
             display: grid;
             grid-template-columns: 240px 1fr 280px;
@@ -157,7 +155,6 @@
             min-height: 0;
         }
 
-        /* Нижний ряд */
         .bottom-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -182,7 +179,6 @@
             flex-shrink: 0;
         }
 
-        /* Майнеры */
         .buy-section {
             background: rgba(30,30,50,0.7);
             margin: 8px;
@@ -273,7 +269,6 @@
             100% { opacity: 0; transform: translateY(-70px) scale(1); }
         }
 
-        /* Центр верхнего ряда */
         .center-top {
             display: flex;
             flex-direction: column;
@@ -311,7 +306,6 @@
         .stats p { margin: 3px 0; font-size: 0.9rem; }
         .highlight { color: #00ffcc; }
 
-        /* Dice */
         .dice-panel {
             background: rgba(20,20,40,0.85);
             border-radius: 10px;
@@ -332,7 +326,7 @@
             color: #ffcc00;
             margin-bottom: 6px;
         }
-        .dice-controls input {
+        .dice-controls input, #diceBet {
             width: 100%;
             background: #1a1a2e;
             border: 1px solid #444;
@@ -381,7 +375,6 @@
         .win { color: #00ff88; }
         .lose { color: #ff5555; }
 
-        /* Правая колонка верхнего ряда */
         .side-actions {
             padding: 10px;
             display: flex;
@@ -434,7 +427,6 @@
         }
         .donate-btn:hover { filter: brightness(1.1); }
 
-        /* Нижний ряд */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -486,11 +478,11 @@
         .lb-addr { color: #00ffcc; }
         .lb-bal { font-weight: bold; }
 
-        /* Логин */
+        /* ===== АВТОРИЗАЦИЯ ===== */
         #authBlock {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.93);
+            background: rgba(0,0,0,0.94);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -498,24 +490,24 @@
             z-index: 100;
         }
         .auth-box {
-            background: rgba(20,20,40,0.95);
+            background: rgba(20,20,40,0.97);
             border: 1px solid #f7931a;
             border-radius: 14px;
             padding: 28px 32px;
-            width: 320px;
+            width: 340px;
             text-align: center;
         }
         .auth-box h1 {
             color: #f7931a;
             font-size: 1.8rem;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         .auth-box input {
             width: 100%;
             background: #1a1a2e;
-            border: 1px solid #444;
+            border: 1px solid #555;
             color: white;
-            padding: 11px 14px;
+            padding: 12px 14px;
             border-radius: 8px;
             margin-bottom: 12px;
             font-size: 1rem;
@@ -527,22 +519,30 @@
             background: #f7931a;
             color: white;
             border: none;
-            padding: 12px;
+            padding: 13px;
             border-radius: 8px;
             font-weight: bold;
             font-size: 1.05rem;
             cursor: pointer;
-            margin-top: 4px;
+            margin-top: 6px;
         }
         .auth-btn:hover { background: #e07b00; }
         .auth-switch {
-            margin-top: 14px;
-            font-size: 0.85rem;
+            margin-top: 16px;
+            font-size: 0.9rem;
             color: #aaa;
             cursor: pointer;
         }
-        .auth-switch span { color: #00aaff; text-decoration: underline; }
-        .error { color: #ff5555; margin-top: 10px; font-size: 0.9rem; }
+        .auth-switch span {
+            color: #00aaff;
+            text-decoration: underline;
+        }
+        .error {
+            color: #ff5555;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -559,23 +559,28 @@
     <div class="fairy">🧚‍♀️</div>
     <div class="waifu">👘</div>
 
-    <!-- ===== ВХОД ===== -->
+    <!-- ===== ВХОД / РЕГИСТРАЦИЯ ===== -->
     <div id="authBlock">
         <div class="auth-box">
             <h1>LIZABITCOIN</h1>
+
+            <!-- Форма входа -->
             <div id="loginForm">
-                <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20">
-                <input type="password" id="passInput" placeholder="Пароль" maxlength="30">
-                <button class="auth-btn" onclick="doLogin()">Войти</button>
-                <div class="auth-switch" onclick="toggleAuth()">Нет аккаунта? <span>Зарегистрироваться</span></div>
+                <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20" autocomplete="username">
+                <input type="password" id="passInput" placeholder="Пароль" maxlength="30" autocomplete="current-password">
+                <button type="button" class="auth-btn" id="loginBtn">Войти</button>
+                <div class="auth-switch" id="toRegister">Нет аккаунта? <span>Зарегистрироваться</span></div>
             </div>
+
+            <!-- Форма регистрации -->
             <div id="registerForm" style="display:none;">
-                <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
-                <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
-                <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30">
-                <button class="auth-btn" onclick="doRegister()">Создать аккаунт</button>
-                <div class="auth-switch" onclick="toggleAuth()">Уже есть аккаунт? <span>Войти</span></div>
+                <input type="text" id="regNick" placeholder="Никнейм" maxlength="20" autocomplete="username">
+                <input type="password" id="regPass" placeholder="Пароль" maxlength="30" autocomplete="new-password">
+                <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30" autocomplete="new-password">
+                <button type="button" class="auth-btn" id="registerBtn">Создать аккаунт</button>
+                <div class="auth-switch" id="toLogin">Уже есть аккаунт? <span>Войти</span></div>
             </div>
+
             <p id="errorText" class="error"></p>
         </div>
     </div>
@@ -587,19 +592,16 @@
     </div>
 
     <div class="main" id="game" style="display:none;">
-        <!-- Верхний ряд -->
         <div class="top-row">
-            <!-- Майнеры -->
             <div class="panel">
                 <h3>Мои майнеры</h3>
                 <div class="buy-section">
                     <div>Цена: <strong id="minerPrice" class="highlight">5600</strong> LIZA</div>
-                    <button class="buy-btn" id="buyBtn" onclick="buyMiner()">Купить майнер</button>
+                    <button class="buy-btn" id="buyBtn">Купить майнер</button>
                 </div>
                 <div class="miners-list" id="minersList"></div>
             </div>
 
-            <!-- Центр -->
             <div class="panel center-top">
                 <div style="color:#aaa; font-size:0.85rem;">Твой баланс</div>
                 <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
@@ -616,36 +618,29 @@
                     <div class="dice-bank">Банк: <strong id="diceBank">100 000 000 000 000</strong></div>
                     <input type="number" id="diceBet" placeholder="Ставка" value="1000" min="1">
                     <div class="dice-buttons">
-                        <button class="dice-btn low" onclick="playDice('low')">Roll &lt; 48</button>
-                        <button class="dice-btn high" onclick="playDice('high')">Roll &gt; 52</button>
+                        <button class="dice-btn low" id="diceLow">Roll &lt; 48</button>
+                        <button class="dice-btn high" id="diceHigh">Roll &gt; 52</button>
                     </div>
                     <div class="dice-result" id="diceResult">Сделай ставку</div>
                     <div class="dice-history" id="diceHistory"></div>
                 </div>
             </div>
 
-            <!-- Правые кнопки -->
             <div class="panel side-actions">
-                <button class="yo-btn" onclick="clickYO()">YO</button>
+                <button class="yo-btn" id="yoBtn">YO</button>
                 <div class="yo-info">+128 • каждые 3 клика ещё +128</div>
-
-                <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
-                    Торговать на Yobit
-                </a>
-
-                <button class="donate-btn" onclick="alert('Донат временно отключён')">Донат 0.0025 BNB</button>
+                <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">Торговать на Yobit</a>
+                <button class="donate-btn" id="donateBtn">Донат 0.0025 BNB</button>
             </div>
         </div>
 
-        <!-- Нижний ряд -->
         <div class="bottom-row">
             <div class="panel">
                 <h3>Чат майнеров</h3>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Сообщение..." maxlength="200"
-                           onkeydown="if(event.key==='Enter')sendChat()">
-                    <button onclick="sendChat()">➤</button>
+                    <input type="text" id="chatInput" placeholder="Сообщение..." maxlength="200">
+                    <button id="chatBtn">➤</button>
                 </div>
             </div>
 
@@ -657,7 +652,7 @@
             <div class="panel" style="padding:12px; font-size:0.85rem; color:#aaa; line-height:1.5;">
                 <h3 style="margin:-12px -12px 10px -12px;">Инфо</h3>
                 <p>• Майнеры дают 7000 LIZA каждые 10 минут</p>
-                <p>• Кликай по золотым ₿ монеткам = +250 000</p>
+                <p>• Кликай по золотым ₿ = +250 000</p>
                 <p>• YO кнопка — быстрые монеты</p>
                 <p>• Dice — удвой свою ставку</p>
                 <p style="margin-top:10px; color:#f7931a;">Удачной игры!</p>
@@ -666,25 +661,7 @@
     </div>
 
     <script>
-        const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 140; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 2.2 + 0.4;
-            star.style.width = size + 'px';
-            star.style.height = size + 'px';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.setProperty('--dur', (Math.random() * 4 + 2) + 's');
-            star.style.animationDelay = (Math.random() * 5) + 's';
-            galaxy.appendChild(star);
-        }
-
-        const MAX_BALANCE = 9223372036854775807n;
-        const REWARD = 7000;
-        const COIN_REWARD = 250000;
-        const START_BANK = 100000000000000;
-
+        // ===== Firebase =====
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
             authDomain: "lizatest-124da.firebaseapp.com",
@@ -695,10 +672,14 @@
             appId: "1:88106031938:web:0b3b08517e71ce33aa06db",
             measurementId: "G-HT8D6XRFSY"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // ===== Константы =====
+        const MAX_BALANCE = 9223372036854775807n;
+        const REWARD = 7000;
+        const COIN_REWARD = 250000;
+        const START_BANK = 100000000000000;
         const CYCLE_MS = 10 * 60 * 1000;
         const MAX_MINERS = 300;
 
@@ -709,7 +690,6 @@
         let yoClicks = 0;
         let diceBank = START_BANK;
         let diceHistory = [];
-        let isRegister = false;
 
         const RANKS = [
             { min: 0, title: "Новичок" },
@@ -728,58 +708,123 @@
             { min: 1e16, title: "Создатель Реальности" }
         ];
 
-        function toggleAuth() {
-            isRegister = !isRegister;
-            document.getElementById('loginForm').style.display = isRegister ? 'none' : 'block';
-            document.getElementById('registerForm').style.display = isRegister ? 'block' : 'none';
-            document.getElementById('errorText').innerText = '';
+        // ===== Звёзды =====
+        const galaxy = document.getElementById('galaxy');
+        for (let i = 0; i < 140; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2.2 + 0.4;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--dur', (Math.random() * 4 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            galaxy.appendChild(star);
+        }
+
+        // ===== АВТОРИЗАЦИЯ (исправлено) =====
+        const errorText = document.getElementById('errorText');
+
+        document.getElementById('toRegister').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            errorText.innerText = '';
+        });
+
+        document.getElementById('toLogin').addEventListener('click', () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            errorText.innerText = '';
+        });
+
+        // Кнопка Войти
+        document.getElementById('loginBtn').addEventListener('click', doLogin);
+        document.getElementById('passInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        // Кнопка Регистрации
+        document.getElementById('registerBtn').addEventListener('click', doRegister);
+        document.getElementById('regPass2').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doRegister();
+        });
+
+        function doLogin() {
+            const nick = document.getElementById('nickInput').value.trim().toLowerCase();
+            const pass = document.getElementById('passInput').value;
+
+            if (!nick || !pass) {
+                errorText.innerText = "Заполни все поля";
+                return;
+            }
+
+            errorText.innerText = "Проверяем...";
+
+            db.ref('users/' + nick).once('value')
+                .then(snap => {
+                    if (!snap.exists()) {
+                        errorText.innerText = "Пользователь не найден";
+                        return;
+                    }
+                    const data = snap.val();
+                    if (data.password !== pass) {
+                        errorText.innerText = "Неверный пароль";
+                        return;
+                    }
+                    startGame(nick, data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    errorText.innerText = "Ошибка соединения";
+                });
         }
 
         function doRegister() {
             const nick = document.getElementById('regNick').value.trim().toLowerCase();
             const pass = document.getElementById('regPass').value;
             const pass2 = document.getElementById('regPass2').value;
-            const err = document.getElementById('errorText');
 
-            if (!nick || nick.length < 3) return err.innerText = "Ник минимум 3 символа";
-            if (!pass || pass.length < 4) return err.innerText = "Пароль минимум 4 символа";
-            if (pass !== pass2) return err.innerText = "Пароли не совпадают";
+            if (!nick || nick.length < 3) {
+                errorText.innerText = "Ник минимум 3 символа";
+                return;
+            }
+            if (!/^[a-z0-9_]+$/.test(nick)) {
+                errorText.innerText = "Только латиница, цифры и _";
+                return;
+            }
+            if (!pass || pass.length < 4) {
+                errorText.innerText = "Пароль минимум 4 символа";
+                return;
+            }
+            if (pass !== pass2) {
+                errorText.innerText = "Пароли не совпадают";
+                return;
+            }
 
-            db.ref('users/' + nick).once('value').then(snap => {
-                if (snap.exists()) {
-                    err.innerText = "Такой ник уже занят";
-                    return;
-                }
-                const data = {
-                    password: pass,
-                    balance: 0,
-                    miners: [{ id: Date.now(), lastPayout: Date.now() }]
-                };
-                db.ref('users/' + nick).set(data).then(() => {
-                    startGame(nick, data);
+            errorText.innerText = "Создаём аккаунт...";
+
+            db.ref('users/' + nick).once('value')
+                .then(snap => {
+                    if (snap.exists()) {
+                        errorText.innerText = "Такой ник уже занят";
+                        return;
+                    }
+
+                    const data = {
+                        password: pass,
+                        balance: 0,
+                        miners: [{ id: Date.now(), lastPayout: Date.now() }]
+                    };
+
+                    return db.ref('users/' + nick).set(data).then(() => {
+                        startGame(nick, data);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    errorText.innerText = "Ошибка: " + (err.message || "неизвестно");
                 });
-            });
-        }
-
-        function doLogin() {
-            const nick = document.getElementById('nickInput').value.trim().toLowerCase();
-            const pass = document.getElementById('passInput').value;
-            const err = document.getElementById('errorText');
-
-            if (!nick || !pass) return err.innerText = "Заполни все поля";
-
-            db.ref('users/' + nick).once('value').then(snap => {
-                if (!snap.exists()) {
-                    err.innerText = "Пользователь не найден";
-                    return;
-                }
-                const data = snap.val();
-                if (data.password !== pass) {
-                    err.innerText = "Неверный пароль";
-                    return;
-                }
-                startGame(nick, data);
-            });
         }
 
         function startGame(nick, data) {
@@ -792,7 +837,7 @@
             document.getElementById('game').style.display = 'grid';
             document.getElementById('userDisplay').innerText = myNick;
 
-            // Слушатели
+            // Слушатели Firebase
             db.ref('global/diceBank').on('value', snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
@@ -815,8 +860,20 @@
             renderMiners();
             updateUI();
             setInterval(renderMiners, 1000);
+
+            // Навешиваем остальные кнопки
+            document.getElementById('buyBtn').onclick = buyMiner;
+            document.getElementById('yoBtn').onclick = clickYO;
+            document.getElementById('diceLow').onclick = () => playDice('low');
+            document.getElementById('diceHigh').onclick = () => playDice('high');
+            document.getElementById('chatBtn').onclick = sendChat;
+            document.getElementById('chatInput').addEventListener('keydown', e => {
+                if (e.key === 'Enter') sendChat();
+            });
+            document.getElementById('donateBtn').onclick = () => alert('Донат временно отключён');
         }
 
+        // ===== Остальные функции =====
         function getRankInfo(balance) {
             let current = RANKS[0];
             let next = RANKS[1] || null;
@@ -1030,9 +1087,10 @@
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;">
                         <div class="timer">${mins}:${secs.toString().padStart(2,'0')}</div>
-                        <button class="claim-btn" onclick="claimMiner(${i})" ${canClaim ? '' : 'disabled'}>Claim</button>
+                        <button class="claim-btn" ${canClaim ? '' : 'disabled'}>Claim</button>
                     </div>
                 `;
+                div.querySelector('.claim-btn').onclick = () => claimMiner(i);
                 list.appendChild(div);
             });
             list.scrollTop = scrollPos;
