@@ -128,7 +128,6 @@
             100% { transform: translateX(-50%) translateY(0) rotate(-8deg); }
         }
 
-        /* Header */
         .header {
             position: relative;
             z-index: 10;
@@ -143,7 +142,6 @@
         .header h1 { color: #f7931a; font-size: 1.3rem; }
         .user-info { color: #00ffcc; font-size: 0.95rem; }
 
-        /* Основной контент */
         .content {
             position: relative;
             z-index: 10;
@@ -151,7 +149,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 16px 40px;
+            padding: 20px 16px 50px;
             max-width: 520px;
             margin: 0 auto;
             width: 100%;
@@ -166,7 +164,7 @@
             font-size: 0.95rem;
         }
         .balance {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             font-weight: bold;
             color: #f7931a;
             text-shadow: 0 0 20px rgba(247,147,26,0.45);
@@ -180,41 +178,27 @@
         .next-rank {
             font-size: 0.8rem;
             color: #88aaff;
-            margin-bottom: 16px;
-        }
-
-        .stats {
-            background: rgba(20,20,40,0.85);
-            border-radius: 12px;
-            padding: 14px 20px;
-            width: 100%;
             margin-bottom: 20px;
-            border: 1px solid rgba(100,100,255,0.2);
         }
-        .stats p {
-            margin: 5px 0;
-            font-size: 1rem;
-        }
-        .highlight { color: #00ffcc; }
 
-        /* Круглая YO */
+        /* Круглая YO (чуть больше) */
         .yo-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 10px 0 24px;
+            margin: 10px 0 28px;
         }
         .yo-btn {
-            width: 140px;
-            height: 140px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             background: linear-gradient(145deg, #00c6ff, #0072ff);
             border: none;
             color: white;
             font-weight: bold;
-            font-size: 2.3rem;
+            font-size: 2.6rem;
             cursor: pointer;
-            box-shadow: 0 0 35px rgba(0,150,255,0.65), inset 0 0 18px rgba(255,255,255,0.15);
+            box-shadow: 0 0 40px rgba(0,150,255,0.7), inset 0 0 20px rgba(255,255,255,0.15);
             transition: transform 0.15s, box-shadow 0.15s;
             display: flex;
             align-items: center;
@@ -225,10 +209,10 @@
             transform: scale(0.93);
         }
         .yo-info {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #88ccff;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 12px;
             line-height: 1.4;
         }
 
@@ -317,7 +301,6 @@
             margin-bottom: 24px;
         }
 
-        /* Статистика внизу */
         .bottom-stats {
             width: 100%;
             background: rgba(15,15,30,0.9);
@@ -344,7 +327,6 @@
         .lb-addr { color: #00ffcc; }
         .lb-bal { font-weight: bold; }
 
-        /* Авторизация */
         #authBlock {
             position: fixed;
             inset: 0;
@@ -473,17 +455,12 @@
             <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
         </div>
 
-        <div class="stats">
-            <p>Награда за 10 мин: <strong class="highlight">7000</strong> LIZA</p>
-            <p>Всего добыто: <strong id="totalMinedDisplay">0</strong></p>
-        </div>
-
-        <!-- Круглая YO -->
+        <!-- Круглая YO (увеличенная) -->
         <div class="yo-wrap">
             <button class="yo-btn" id="yoBtn">YO</button>
             <div class="yo-info">
                 +17 000 за клик<br>
-                каждый 50-й клик: <b>+1 700 000</b>
+                каждый 10-й клик: <b>+1 700 000</b>
             </div>
         </div>
 
@@ -531,7 +508,6 @@
 
         let myNick = "";
         let myBalance = 0;
-        let globalTotalMined = 0;
         let yoClicks = 0;
         let diceBank = START_BANK;
         let diceHistory = [];
@@ -615,10 +591,7 @@
             db.ref('users/' + nick).once('value').then(snap => {
                 if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
 
-                const data = {
-                    password: pass,
-                    balance: 0
-                };
+                const data = { password: pass, balance: 0 };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
             }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
         }
@@ -639,11 +612,6 @@
                     diceBank = START_BANK;
                 } else diceBank = val;
                 document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
-            });
-
-            db.ref('global/totalMined').on('value', snap => {
-                globalTotalMined = snap.val() || 0;
-                document.getElementById('totalMinedDisplay').innerText = globalTotalMined.toLocaleString('ru');
             });
 
             db.ref('users').on('value', snap => renderLeaderboard(snap.val()));
@@ -701,12 +669,13 @@
             setTimeout(() => plus.remove(), 1300);
         }
 
+        // Монетки (в 5 раз больше)
         function spawnCoin() {
             const coin = document.createElement('div');
             coin.className = 'btc-coin';
             coin.innerHTML = '₿';
-            coin.style.left = (Math.random() * 80 + 10) + 'vw';
-            coin.style.top = (Math.random() * 55 + 12) + 'vh';
+            coin.style.left = (Math.random() * 85 + 5) + 'vw';
+            coin.style.top = (Math.random() * 70 + 8) + 'vh';
             coin.onclick = function(e) {
                 if (!myNick) return;
                 coin.classList.add('coin-explode');
@@ -718,16 +687,17 @@
                 setTimeout(() => coin.remove(), 450);
             };
             document.body.appendChild(coin);
-            setTimeout(() => { if (coin.parentNode && !coin.classList.contains('coin-explode')) coin.remove(); }, 14000 + Math.random()*4000);
+            setTimeout(() => { if (coin.parentNode && !coin.classList.contains('coin-explode')) coin.remove(); }, 12000 + Math.random()*5000);
         }
-        setInterval(spawnCoin, 1800);
-        setTimeout(() => { for(let i=0;i<3;i++) spawnCoin(); }, 800);
+        // Спавним чаще и больше
+        setInterval(spawnCoin, 400);          // каждые 0.4 сек
+        setTimeout(() => { for(let i=0;i<12;i++) spawnCoin(); }, 600);
 
-        // YO
+        // YO — каждый 10-й клик 1.7M
         function clickYO() {
             yoClicks++;
             let add = 17000;
-            if (yoClicks % 50 === 0) add = 1700000;
+            if (yoClicks % 10 === 0) add = 1700000;
 
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
             saveUser();
