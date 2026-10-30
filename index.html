@@ -73,21 +73,40 @@
         .miners-list {
             flex: 1;
             overflow-y: auto;
-            padding: 0 12px 12px;
+            padding: 0 10px 10px;
         }
         .miner-card {
             background: #252525;
-            border-radius: 6px;
-            padding: 7px 10px;
-            margin-bottom: 6px;
+            border-radius: 5px;
+            padding: 5px 8px;
+            margin-bottom: 5px;
             border-left: 3px solid #f7931a;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 6px;
+            min-height: 42px;
         }
-        .miner-card .title { font-weight: 600; font-size: 0.85rem; }
-        .miner-card .timer { color: #00ffcc; font-size: 0.9rem; font-weight: bold; }
-        .miner-card .status { font-size: 0.7rem; color: #888; }
+        .miner-card .title { font-weight: 600; font-size: 0.78rem; }
+        .miner-card .timer { color: #00ffcc; font-size: 0.82rem; font-weight: bold; }
+        .miner-card .status { font-size: 0.65rem; color: #888; }
+        .claim-btn {
+            background: #00aa77;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .claim-btn:hover:not(:disabled) { background: #008855; }
+        .claim-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
 
         .center-panel {
             display: flex;
@@ -108,7 +127,7 @@
             border-radius: 12px;
             padding: 16px 24px;
             min-width: 320px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .stats p { margin: 6px 0; font-size: 0.98rem; }
         .highlight { color: #00ffcc; }
@@ -130,8 +149,8 @@
             display: block;
             width: 100%;
             max-width: 320px;
-            margin: 0 auto 20px;
-            padding: 14px;
+            margin: 0 auto 12px;
+            padding: 13px;
             background: linear-gradient(90deg, #f7931a, #ffb347);
             border: none;
             border-radius: 10px;
@@ -142,9 +161,40 @@
             text-align: center;
             text-decoration: none;
         }
-        .yobit-btn:hover {
-            filter: brightness(1.1);
+        .yobit-btn:hover { filter: brightness(1.1); }
+
+        .donate-box {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 16px;
+            text-align: center;
         }
+        .donate-box h4 {
+            color: #f7931a;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        .donate-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .donate-btn {
+            padding: 10px 6px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: white;
+        }
+        .donate-btn.bnb { background: #f0b90b; color: #000; }
+        .donate-btn.bnb:hover { filter: brightness(1.1); }
+        .donate-btn.sol { background: #9945FF; }
+        .donate-btn.sol:hover { filter: brightness(1.15); }
 
         .leaderboard {
             background: #1a1a1a;
@@ -252,8 +302,7 @@
 </head>
 <body>
 
-    <!-- Звук -->
-    <audio id="coinSound" src="payment.mp3" preload="auto"></audio>
+    <audio id="coinSound" src="payment-2.mp3" preload="auto"></audio>
 
     <div id="authBlock">
         <h1 style="color:#f7931a; font-size:2.4rem;">LIZABITCOIN</h1>
@@ -292,10 +341,19 @@
                 <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
             </div>
 
-            <!-- Кнопка Yobit -->
+            <!-- Yobit -->
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
                 Торговать LIZA на Yobit
             </a>
+
+            <!-- Донаты -->
+            <div class="donate-box">
+                <h4>Поддержать проект</h4>
+                <div class="donate-buttons">
+                    <button class="donate-btn bnb" onclick="donateBNB()">0.01 BNB</button>
+                    <button class="donate-btn sol" onclick="donateSOL()">0.01 SOL</button>
+                </div>
+            </div>
 
             <div class="leaderboard">
                 <h4>Топ кошельков</h4>
@@ -315,6 +373,12 @@
     </div>
 
     <script>
+        // ================== НАСТРОЙКИ ДОНАТА ==================
+        // ←←← ЗАМЕНИ НА СВОИ АДРЕСА
+        const DONATION_BNB = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b"; // твой BNB адрес
+        const DONATION_SOL = "ВашSolanaАдресСюда111111111111111111111111111"; // твой SOL адрес
+        // ======================================================
+
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
             authDomain: "lizatest-124da.firebaseapp.com",
@@ -339,7 +403,6 @@
         let globalTotalMined = 0;
         let currentReward = 50;
 
-        // Звук при начислении
         function playCoinSound() {
             const sound = document.getElementById('coinSound');
             if (sound) {
@@ -350,12 +413,10 @@
 
         function getRewardInfo(totalMined) {
             if (totalMined >= TOTAL_SUPPLY) return { reward: 0, era: 34, nextHalving: 0, progress: 100 };
-
             let remaining = totalMined;
             let reward = 50;
             let era = 1;
             let eraSupply = 10500000;
-
             while (remaining >= eraSupply && reward > 0) {
                 remaining -= eraSupply;
                 reward /= 2;
@@ -373,13 +434,11 @@
         function updateRewardInfo() {
             const info = getRewardInfo(globalTotalMined);
             currentReward = info.reward;
-
             document.getElementById('rewardDisplay').innerText = formatNum(currentReward);
             document.getElementById('totalMinedDisplay').innerText = formatNum(globalTotalMined);
             document.getElementById('nextHalvingDisplay').innerText = formatNum(Math.ceil(info.nextHalving));
             document.getElementById('progressFill').style.width = info.progress + '%';
             document.getElementById('eraInfo').innerText = `Эра ${info.era} • Награда ${formatNum(currentReward)} LIZA`;
-
             const price = +(currentReward * 0.8).toFixed(4);
             document.getElementById('minerPrice').innerText = formatNum(price);
             document.getElementById('buyBtn').disabled = !(myBalance >= price && currentReward > 0 && myMiners.length < MAX_MINERS);
@@ -388,12 +447,10 @@
         async function connectMetaMask() {
             const errorText = document.getElementById('errorText');
             errorText.innerText = "";
-
             if (typeof window.ethereum === 'undefined') {
                 errorText.innerText = "MetaMask не найден";
                 return;
             }
-
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 myAddress = accounts[0].toLowerCase();
@@ -404,7 +461,6 @@
                 document.getElementById('walletDisplay').innerText = shortAddress(myAddress);
 
                 const userRef = db.ref('users/' + myAddress);
-
                 userRef.once('value').then(snap => {
                     if (!snap.exists()) {
                         const firstMiner = { id: Date.now(), lastPayout: Date.now() };
@@ -416,13 +472,10 @@
                         myBalance = data.balance || 0;
                         myMiners = data.miners || [];
                     }
-
                     if (myMiners.length === 0) {
-                        const freeMiner = { id: Date.now(), lastPayout: Date.now() };
-                        myMiners = [freeMiner];
+                        myMiners = [{ id: Date.now(), lastPayout: Date.now() }];
                         saveUser();
                     }
-
                     renderMiners();
                     updateUI();
                 });
@@ -431,16 +484,10 @@
                     globalTotalMined = snap.val() || 0;
                     updateRewardInfo();
                 });
+                db.ref('users').on('value', snap => renderLeaderboard(snap.val()));
+                db.ref('chat').orderByChild('time').limitToLast(50).on('value', snap => renderChat(snap.val()));
 
-                db.ref('users').on('value', snap => {
-                    renderLeaderboard(snap.val());
-                });
-
-                db.ref('chat').orderByChild('time').limitToLast(50).on('value', snap => {
-                    renderChat(snap.val());
-                });
-
-                setInterval(checkPayouts, 1000);
+                setInterval(renderMiners, 1000);
 
             } catch (err) {
                 console.error(err);
@@ -451,85 +498,144 @@
         function buyMiner() {
             const price = +(currentReward * 0.8).toFixed(4);
             if (myBalance < price || currentReward <= 0 || myMiners.length >= MAX_MINERS) return;
-
             myBalance = +(myBalance - price).toFixed(4);
-            myMiners.push({
-                id: Date.now() + Math.random(),
-                lastPayout: Date.now()
-            });
+            myMiners.push({ id: Date.now() + Math.random(), lastPayout: Date.now() });
             saveUser();
             renderMiners();
             updateUI();
-
-            const list = document.getElementById('minersList');
-            list.scrollTop = list.scrollHeight;
+            document.getElementById('minersList').scrollTop = 99999;
         }
 
-        function checkPayouts() {
-            if (!myAddress || myMiners.length === 0) return;
-
-            let totalEarned = 0;
-            let changed = false;
+        // ===== CLAIM =====
+        function claimMiner(index) {
+            if (!myAddress || index < 0 || index >= myMiners.length) return;
+            const miner = myMiners[index];
             const now = Date.now();
+            const periods = Math.floor((now - miner.lastPayout) / CYCLE_MS);
+            if (periods <= 0) return;
 
-            myMiners.forEach(miner => {
-                const periods = Math.floor((now - miner.lastPayout) / CYCLE_MS);
-                if (periods > 0 && periods < 1000) {
-                    totalEarned += periods * currentReward;
-                    miner.lastPayout += periods * CYCLE_MS;
-                    changed = true;
-                }
-            });
+            const safePeriods = Math.min(periods, 500);
+            const earned = +(safePeriods * currentReward).toFixed(4);
+            if (earned <= 0) return;
 
-            if (changed && totalEarned > 0) {
-                myBalance = +(myBalance + totalEarned).toFixed(4);
+            myBalance = +(myBalance + earned).toFixed(4);
+            miner.lastPayout += safePeriods * CYCLE_MS;
 
-                db.ref('global/totalMined').transaction(cur => {
-                    return (cur || 0) + totalEarned;
-                });
-
-                saveUser();
-                updateUI();
-
-                // Звук при начислении монет
-                playCoinSound();
-            }
+            db.ref('global/totalMined').transaction(cur => (cur || 0) + earned);
+            saveUser();
+            updateUI();
             renderMiners();
+
+            // Звук
+            playCoinSound();
         }
 
         function renderMiners() {
             const list = document.getElementById('minersList');
             const scrollPos = list.scrollTop;
             list.innerHTML = '';
-
             if (myMiners.length === 0) {
                 list.innerHTML = '<div style="color:#666;text-align:center;margin-top:30px;">Нет майнеров</div>';
                 return;
             }
-
             const now = Date.now();
             myMiners.forEach((miner, i) => {
-                const left = CYCLE_MS - ((now - miner.lastPayout) % CYCLE_MS);
+                const elapsed = now - miner.lastPayout;
+                const left = CYCLE_MS - (elapsed % CYCLE_MS);
                 const mins = Math.floor(left / 60000);
                 const secs = Math.floor((left % 60000) / 1000);
+                const periods = Math.floor(elapsed / CYCLE_MS);
+                const canClaim = periods > 0;
 
                 const div = document.createElement('div');
                 div.className = 'miner-card';
                 div.innerHTML = `
                     <div>
                         <div class="title">Майнер #${i + 1}</div>
-                        <div class="status">до выплаты</div>
+                        <div class="status">${canClaim ? `Готово (${periods}×)` : 'до выплаты'}</div>
                     </div>
-                    <div class="timer">${mins}:${secs.toString().padStart(2,'0')}</div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <div class="timer">${mins}:${secs.toString().padStart(2,'0')}</div>
+                        <button class="claim-btn" onclick="claimMiner(${i})" ${canClaim ? '' : 'disabled'}>Claim</button>
+                    </div>
                 `;
                 list.appendChild(div);
             });
             list.scrollTop = scrollPos;
         }
 
+        // ===== ДОНАТЫ =====
+        async function donateBNB() {
+            if (!window.ethereum) {
+                alert("Установи MetaMask");
+                return;
+            }
+            try {
+                // Переключаем на BNB Smart Chain (56) или Testnet (97) — сейчас mainnet
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x38' }] // BNB Mainnet
+                }).catch(async (e) => {
+                    if (e.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x38',
+                                chainName: 'BNB Smart Chain',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                blockExplorerUrls: ['https://bscscan.com/']
+                            }]
+                        });
+                    }
+                });
+
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const from = accounts[0];
+
+                const value = '0x' + BigInt(Math.floor(0.01 * 1e18)).toString(16); // 0.01 BNB
+
+                await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [{
+                        from: from,
+                        to: DONATION_BNB,
+                        value: value
+                    }]
+                });
+                alert("Спасибо за донат 0.01 BNB!");
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка: " + (err.message || err));
+            }
+        }
+
+        async function donateSOL() {
+            try {
+                const provider = window.solana || window.solflare || window.phantom?.solana;
+                if (!provider) {
+                    alert("Установи Phantom или другой Solana-кошелёк");
+                    return;
+                }
+
+                await provider.connect();
+                const from = provider.publicKey.toString();
+
+                // Для простоты открываем Phantom с готовой суммой (самый надёжный способ без библиотек)
+                const url = `https://phantom.app/ul/v1/transfer?recipient=${DONATION_SOL}&amount=10000000&label=LIZABITCOIN%20Donation`;
+                // 0.01 SOL = 10_000_000 lamports
+                window.open(`https://phantom.app/ul/browse/${encodeURIComponent(window.location.href)}?ref=https://phantom.app`, '_blank');
+
+                // Альтернатива — просто сообщаем адрес
+                alert(`Отправь 0.01 SOL на адрес:\n\n${DONATION_SOL}\n\nСпасибо за поддержку!`);
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка Solana: " + (err.message || err));
+            }
+        }
+
         function saveUser() {
             if (myBalance > 50000000) myBalance = 50000000;
-
             db.ref('users/' + myAddress).set({
                 balance: myBalance,
                 miners: myMiners
@@ -545,17 +651,12 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text || !myAddress) return;
-
             db.ref('chat').push({
                 user: shortAddress(myAddress),
                 text: text,
                 time: Date.now()
-            }).then(() => {
-                input.value = '';
-            }).catch(err => {
-                console.error(err);
-                alert('Ошибка отправки. Проверь Rules в Firebase.');
-            });
+            }).then(() => input.value = '')
+              .catch(() => alert('Ошибка отправки'));
         }
 
         function renderChat(messages) {
@@ -565,20 +666,13 @@
                 box.innerHTML = '<div style="color:#666;text-align:center;margin-top:40px;">Пока нет сообщений</div>';
                 return;
             }
-
-            Object.values(messages)
-                .sort((a, b) => a.time - b.time)
-                .forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = 'chat-msg';
-                    const time = new Date(msg.time).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-                    div.innerHTML = `
-                        <span class="author">${msg.user}</span>
-                        <span class="time">${time}</span><br>
-                        ${escapeHtml(msg.text)}
-                    `;
-                    box.appendChild(div);
-                });
+            Object.values(messages).sort((a, b) => a.time - b.time).forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'chat-msg';
+                const time = new Date(msg.time).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+                div.innerHTML = `<span class="author">${msg.user}</span><span class="time">${time}</span><br>${escapeHtml(msg.text)}`;
+                box.appendChild(div);
+            });
             box.scrollTop = box.scrollHeight;
         }
 
@@ -588,7 +682,6 @@
                 box.innerHTML = 'Пока никого нет';
                 return;
             }
-
             const sorted = Object.entries(users)
                 .map(([addr, data]) => ({
                     addr,
@@ -597,7 +690,6 @@
                 }))
                 .sort((a, b) => b.balance - a.balance)
                 .slice(0, 15);
-
             box.innerHTML = sorted.map((u, i) => `
                 <div class="lb-item">
                     <span>
