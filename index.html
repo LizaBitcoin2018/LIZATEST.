@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>LIZABITCOIN - Mining</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -107,7 +108,7 @@
             bottom: 6px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 48px;
+            font-size: 46px;
             z-index: 8;
             pointer-events: none;
             filter: drop-shadow(0 0 14px rgba(255,120,180,0.8));
@@ -130,7 +131,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 44px;
+            height: 46px;
             flex-shrink: 0;
         }
         .header h1 { color: #f7931a; font-size: 1.25rem; }
@@ -141,51 +142,30 @@
             z-index: 10;
             flex: 1;
             display: grid;
-            grid-template-rows: 1fr 1fr;
-            gap: 8px;
-            padding: 8px;
+            grid-template-columns: 250px 1fr 300px;
             overflow: hidden;
-            height: calc(100vh - 44px);
+            height: calc(100vh - 46px);
         }
 
-        .top-row {
-            display: grid;
-            grid-template-columns: 240px 1fr 280px;
-            gap: 8px;
-            min-height: 0;
-        }
-
-        .bottom-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            min-height: 0;
-        }
-
-        .panel {
+        /* Левая панель */
+        .left-panel {
             background: rgba(15,15,30,0.88);
-            border-radius: 10px;
-            border: 1px solid rgba(100,100,255,0.15);
+            border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(6px);
         }
-        .panel h3 {
+        .left-panel h3 {
             color: #f7931a;
-            padding: 8px 12px;
-            font-size: 0.95rem;
-            border-bottom: 1px solid #333;
-            flex-shrink: 0;
+            padding: 10px 12px 6px;
+            font-size: 1rem;
         }
-
         .buy-section {
             background: rgba(30,30,50,0.7);
-            margin: 8px;
+            margin: 0 10px 8px;
             border-radius: 8px;
             padding: 8px;
             text-align: center;
-            flex-shrink: 0;
         }
         .buy-btn {
             background: #f7931a;
@@ -205,7 +185,7 @@
         .miners-list {
             flex: 1;
             overflow-y: auto;
-            padding: 0 8px 8px;
+            padding: 0 10px 10px;
         }
         .miner-card {
             background: rgba(30,30,50,0.75);
@@ -269,85 +249,129 @@
             100% { opacity: 0; transform: translateY(-70px) scale(1); }
         }
 
-        .center-top {
+        /* Центр */
+        .center-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            padding: 12px 16px;
             overflow-y: auto;
-            gap: 8px;
+            background: rgba(5,5,20,0.35);
         }
         .balance {
-            font-size: 1.9rem;
+            font-size: 2rem;
             font-weight: bold;
             color: #f7931a;
             text-shadow: 0 0 18px rgba(247,147,26,0.4);
             word-break: break-all;
             text-align: center;
+            margin: 4px 0;
         }
         .rank {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #00d4ff;
             text-align: center;
         }
         .next-rank {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             color: #88aaff;
             text-align: center;
-            margin-bottom: 4px;
+            margin-bottom: 10px;
         }
         .stats {
-            background: rgba(20,20,40,0.7);
-            border-radius: 10px;
-            padding: 10px 16px;
+            background: rgba(20,20,40,0.8);
+            border-radius: 12px;
+            padding: 12px 18px;
             width: 100%;
-            max-width: 340px;
+            max-width: 380px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(100,100,255,0.15);
         }
-        .stats p { margin: 3px 0; font-size: 0.9rem; }
+        .stats p { margin: 4px 0; font-size: 0.95rem; }
         .highlight { color: #00ffcc; }
 
+        /* Круглая кнопка YO по центру */
+        .yo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0 16px;
+        }
+        .yo-btn {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #00c6ff, #0072ff);
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 2.1rem;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(0,150,255,0.6), inset 0 0 15px rgba(255,255,255,0.15);
+            transition: transform 0.15s, box-shadow 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .yo-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 45px rgba(0,180,255,0.8), inset 0 0 15px rgba(255,255,255,0.2);
+        }
+        .yo-btn:active {
+            transform: scale(0.95);
+        }
+        .yo-info {
+            font-size: 0.8rem;
+            color: #88ccff;
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.3;
+        }
+
+        /* Dice */
         .dice-panel {
             background: rgba(20,20,40,0.85);
-            border-radius: 10px;
-            padding: 10px 14px;
+            border-radius: 12px;
+            padding: 12px 16px;
             width: 100%;
-            max-width: 340px;
+            max-width: 380px;
+            margin-bottom: 12px;
             border: 1px solid rgba(0,150,255,0.3);
         }
         .dice-panel h4 {
             color: #00aaff;
             margin-bottom: 6px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             text-align: center;
         }
         .dice-bank {
             text-align: center;
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             color: #ffcc00;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
-        .dice-controls input, #diceBet {
+        #diceBet {
             width: 100%;
             background: #1a1a2e;
             border: 1px solid #444;
             color: white;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border-radius: 6px;
-            font-size: 0.9rem;
-            margin-bottom: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
         }
         .dice-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 6px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .dice-btn {
-            padding: 9px 0;
+            padding: 10px 0;
             border: none;
-            border-radius: 7px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
             color: white;
         }
@@ -356,15 +380,15 @@
         .dice-btn:hover { filter: brightness(1.15); }
         .dice-result {
             text-align: center;
-            font-size: 0.95rem;
-            min-height: 22px;
-            margin-bottom: 4px;
+            font-size: 1rem;
+            min-height: 24px;
+            margin-bottom: 6px;
             font-weight: bold;
         }
         .dice-history {
-            max-height: 70px;
+            max-height: 80px;
             overflow-y: auto;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
         }
         .dice-history-item {
             display: flex;
@@ -375,66 +399,46 @@
         .win { color: #00ff88; }
         .lose { color: #ff5555; }
 
-        .side-actions {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            overflow-y: auto;
-        }
-        .yo-btn {
-            padding: 11px;
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0,150,255,0.4);
-        }
-        .yo-btn:hover { filter: brightness(1.15); }
-        .yo-info {
-            font-size: 0.72rem;
-            color: #88ccff;
-            text-align: center;
-            margin-top: -4px;
-        }
         .yobit-btn {
             display: block;
-            padding: 10px;
+            width: 100%;
+            max-width: 380px;
+            padding: 11px;
             background: linear-gradient(90deg, #f7931a, #ffb347);
             border: none;
             border-radius: 8px;
             color: #000;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
+            margin-bottom: 10px;
         }
         .yobit-btn:hover { filter: brightness(1.1); }
-        .donate-btn {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            cursor: pointer;
-            background: #f0b90b;
-            color: #000;
-        }
-        .donate-btn:hover { filter: brightness(1.1); }
 
+        /* Правая панель */
+        .right-panel {
+            background: rgba(15,15,30,0.88);
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .right-panel h3 {
+            color: #f7931a;
+            padding: 10px 12px;
+            border-bottom: 1px solid #333;
+            font-size: 1rem;
+        }
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 12px;
+            padding: 10px 12px;
         }
         .chat-msg {
             margin-bottom: 8px;
-            font-size: 0.84rem;
+            font-size: 0.85rem;
             line-height: 1.3;
         }
         .chat-msg .author { color: #f7931a; font-weight: bold; }
@@ -444,17 +448,15 @@
             border-top: 1px solid #333;
             display: flex;
             gap: 6px;
-            flex-shrink: 0;
         }
         .chat-input-area input {
             flex: 1;
             background: #252525;
             border: 1px solid #444;
             color: white;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border-radius: 6px;
             outline: none;
-            font-size: 0.9rem;
         }
         .chat-input-area button {
             background: #f7931a;
@@ -466,25 +468,33 @@
             font-weight: bold;
         }
 
+        .leaderboard {
+            max-height: 180px;
+            overflow-y: auto;
+            border-top: 1px solid #333;
+        }
+        .leaderboard h4 {
+            color: #f7931a;
+            padding: 8px 12px 4px;
+            font-size: 0.9rem;
+        }
         .lb-item {
             display: flex;
             justify-content: space-between;
-            padding: 4px 10px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
             border-bottom: 1px solid #2a2a2a;
-            font-size: 0.82rem;
         }
-        .lb-item:last-child { border-bottom: none; }
-        .lb-rank { color: #888; width: 22px; }
+        .lb-rank { color: #888; width: 20px; }
         .lb-addr { color: #00ffcc; }
         .lb-bal { font-weight: bold; }
 
-        /* ===== АВТОРИЗАЦИЯ ===== */
+        /* Авторизация */
         #authBlock {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.94);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 100;
@@ -533,15 +543,33 @@
             color: #aaa;
             cursor: pointer;
         }
-        .auth-switch span {
-            color: #00aaff;
-            text-decoration: underline;
-        }
+        .auth-switch span { color: #00aaff; text-decoration: underline; }
         .error {
             color: #ff5555;
             margin-top: 12px;
             font-size: 0.9rem;
             min-height: 20px;
+        }
+
+        /* Мобильная версия */
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+                height: auto;
+                overflow-y: auto;
+            }
+            .left-panel, .right-panel {
+                max-height: 280px;
+            }
+            .yo-btn {
+                width: 110px;
+                height: 110px;
+                font-size: 1.8rem;
+            }
+            .center-panel {
+                order: -1;
+            }
         }
     </style>
 
@@ -559,109 +587,100 @@
     <div class="fairy">🧚‍♀️</div>
     <div class="waifu">👘</div>
 
-    <!-- ===== ВХОД / РЕГИСТРАЦИЯ ===== -->
+    <!-- Авторизация -->
     <div id="authBlock">
         <div class="auth-box">
             <h1>LIZABITCOIN</h1>
-
-            <!-- Форма входа -->
             <div id="loginForm">
-                <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20" autocomplete="username">
-                <input type="password" id="passInput" placeholder="Пароль" maxlength="30" autocomplete="current-password">
+                <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20">
+                <input type="password" id="passInput" placeholder="Пароль" maxlength="30">
                 <button type="button" class="auth-btn" id="loginBtn">Войти</button>
                 <div class="auth-switch" id="toRegister">Нет аккаунта? <span>Зарегистрироваться</span></div>
             </div>
-
-            <!-- Форма регистрации -->
             <div id="registerForm" style="display:none;">
-                <input type="text" id="regNick" placeholder="Никнейм" maxlength="20" autocomplete="username">
-                <input type="password" id="regPass" placeholder="Пароль" maxlength="30" autocomplete="new-password">
-                <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30" autocomplete="new-password">
+                <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
+                <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
+                <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30">
                 <button type="button" class="auth-btn" id="registerBtn">Создать аккаунт</button>
                 <div class="auth-switch" id="toLogin">Уже есть аккаунт? <span>Войти</span></div>
             </div>
-
             <p id="errorText" class="error"></p>
         </div>
     </div>
 
-    <!-- ===== ИГРА ===== -->
+    <!-- Игра -->
     <div class="header" id="header" style="display:none;">
         <h1>LIZABITCOIN</h1>
         <div class="user-info" id="userDisplay">-</div>
     </div>
 
     <div class="main" id="game" style="display:none;">
-        <div class="top-row">
-            <div class="panel">
-                <h3>Мои майнеры</h3>
-                <div class="buy-section">
-                    <div>Цена: <strong id="minerPrice" class="highlight">5600</strong> LIZA</div>
-                    <button class="buy-btn" id="buyBtn">Купить майнер</button>
-                </div>
-                <div class="miners-list" id="minersList"></div>
+        <!-- Левая панель - майнеры -->
+        <div class="left-panel">
+            <h3>Мои майнеры</h3>
+            <div class="buy-section">
+                <div>Цена: <strong id="minerPrice" class="highlight">5600</strong> LIZA</div>
+                <button class="buy-btn" id="buyBtn">Купить майнер</button>
             </div>
-
-            <div class="panel center-top">
-                <div style="color:#aaa; font-size:0.85rem;">Твой баланс</div>
-                <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
-                <div class="rank" id="rankDisplay">Ранг: Новичок</div>
-                <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
-
-                <div class="stats">
-                    <p>Награда за 10 мин: <strong class="highlight">7000</strong> LIZA</p>
-                    <p>Всего добыто: <strong id="totalMinedDisplay">0</strong></p>
-                </div>
-
-                <div class="dice-panel">
-                    <h4>DICE — Удвой LIZA</h4>
-                    <div class="dice-bank">Банк: <strong id="diceBank">100 000 000 000 000</strong></div>
-                    <input type="number" id="diceBet" placeholder="Ставка" value="1000" min="1">
-                    <div class="dice-buttons">
-                        <button class="dice-btn low" id="diceLow">Roll &lt; 48</button>
-                        <button class="dice-btn high" id="diceHigh">Roll &gt; 52</button>
-                    </div>
-                    <div class="dice-result" id="diceResult">Сделай ставку</div>
-                    <div class="dice-history" id="diceHistory"></div>
-                </div>
-            </div>
-
-            <div class="panel side-actions">
-                <button class="yo-btn" id="yoBtn">YO</button>
-                <div class="yo-info">+128 • каждые 3 клика ещё +128</div>
-                <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">Торговать на Yobit</a>
-                <button class="donate-btn" id="donateBtn">Донат 0.0025 BNB</button>
-            </div>
+            <div class="miners-list" id="minersList"></div>
         </div>
 
-        <div class="bottom-row">
-            <div class="panel">
-                <h3>Чат майнеров</h3>
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Сообщение..." maxlength="200">
-                    <button id="chatBtn">➤</button>
+        <!-- Центр -->
+        <div class="center-panel">
+            <div style="color:#aaa; font-size:0.9rem;">Твой баланс</div>
+            <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
+            <div class="rank" id="rankDisplay">Ранг: Новичок</div>
+            <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
+
+            <div class="stats">
+                <p>Награда за 10 мин: <strong class="highlight">7000</strong> LIZA</p>
+                <p>Всего добыто: <strong id="totalMinedDisplay">0</strong></p>
+            </div>
+
+            <!-- Круглая YO по центру -->
+            <div class="yo-wrap">
+                <button class="yo-btn" id="yoBtn">YO</button>
+                <div class="yo-info">
+                    +17 000 за клик<br>
+                    каждый 50-й клик: <b>+1 700 000</b>
                 </div>
             </div>
 
-            <div class="panel">
-                <h3>Топ игроков</h3>
-                <div id="leaderboardList" style="overflow-y:auto; flex:1; padding:6px 0;"></div>
+            <!-- Dice -->
+            <div class="dice-panel">
+                <h4>DICE — Удвой LIZA</h4>
+                <div class="dice-bank">Банк: <strong id="diceBank">100 000 000 000 000</strong></div>
+                <input type="number" id="diceBet" placeholder="Ставка" value="1000" min="1">
+                <div class="dice-buttons">
+                    <button class="dice-btn low" id="diceLow">Roll &lt; 48</button>
+                    <button class="dice-btn high" id="diceHigh">Roll &gt; 52</button>
+                </div>
+                <div class="dice-result" id="diceResult">Сделай ставку</div>
+                <div class="dice-history" id="diceHistory"></div>
             </div>
 
-            <div class="panel" style="padding:12px; font-size:0.85rem; color:#aaa; line-height:1.5;">
-                <h3 style="margin:-12px -12px 10px -12px;">Инфо</h3>
-                <p>• Майнеры дают 7000 LIZA каждые 10 минут</p>
-                <p>• Кликай по золотым ₿ = +250 000</p>
-                <p>• YO кнопка — быстрые монеты</p>
-                <p>• Dice — удвой свою ставку</p>
-                <p style="margin-top:10px; color:#f7931a;">Удачной игры!</p>
+            <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
+                Торговать LIZA на Yobit
+            </a>
+        </div>
+
+        <!-- Правая панель -->
+        <div class="right-panel">
+            <h3>Чат майнеров</h3>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Сообщение..." maxlength="200">
+                <button id="chatBtn">➤</button>
+            </div>
+
+            <div class="leaderboard">
+                <h4>Топ игроков</h4>
+                <div id="leaderboardList"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== Firebase =====
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
             authDomain: "lizatest-124da.firebaseapp.com",
@@ -675,7 +694,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ===== Константы =====
         const MAX_BALANCE = 9223372036854775807n;
         const REWARD = 7000;
         const COIN_REWARD = 250000;
@@ -708,7 +726,7 @@
             { min: 1e16, title: "Создатель Реальности" }
         ];
 
-        // ===== Звёзды =====
+        // Звёзды
         const galaxy = document.getElementById('galaxy');
         for (let i = 0; i < 140; i++) {
             const star = document.createElement('div');
@@ -723,61 +741,37 @@
             galaxy.appendChild(star);
         }
 
-        // ===== АВТОРИЗАЦИЯ (исправлено) =====
+        // ===== Авторизация =====
         const errorText = document.getElementById('errorText');
 
-        document.getElementById('toRegister').addEventListener('click', () => {
+        document.getElementById('toRegister').onclick = () => {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
             errorText.innerText = '';
-        });
-
-        document.getElementById('toLogin').addEventListener('click', () => {
+        };
+        document.getElementById('toLogin').onclick = () => {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
             errorText.innerText = '';
-        });
+        };
 
-        // Кнопка Войти
-        document.getElementById('loginBtn').addEventListener('click', doLogin);
-        document.getElementById('passInput').addEventListener('keydown', e => {
-            if (e.key === 'Enter') doLogin();
-        });
-
-        // Кнопка Регистрации
-        document.getElementById('registerBtn').addEventListener('click', doRegister);
-        document.getElementById('regPass2').addEventListener('keydown', e => {
-            if (e.key === 'Enter') doRegister();
-        });
+        document.getElementById('loginBtn').onclick = doLogin;
+        document.getElementById('passInput').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+        document.getElementById('registerBtn').onclick = doRegister;
+        document.getElementById('regPass2').onkeydown = e => { if (e.key === 'Enter') doRegister(); };
 
         function doLogin() {
             const nick = document.getElementById('nickInput').value.trim().toLowerCase();
             const pass = document.getElementById('passInput').value;
-
-            if (!nick || !pass) {
-                errorText.innerText = "Заполни все поля";
-                return;
-            }
+            if (!nick || !pass) return errorText.innerText = "Заполни все поля";
 
             errorText.innerText = "Проверяем...";
-
-            db.ref('users/' + nick).once('value')
-                .then(snap => {
-                    if (!snap.exists()) {
-                        errorText.innerText = "Пользователь не найден";
-                        return;
-                    }
-                    const data = snap.val();
-                    if (data.password !== pass) {
-                        errorText.innerText = "Неверный пароль";
-                        return;
-                    }
-                    startGame(nick, data);
-                })
-                .catch(err => {
-                    console.error(err);
-                    errorText.innerText = "Ошибка соединения";
-                });
+            db.ref('users/' + nick).once('value').then(snap => {
+                if (!snap.exists()) return errorText.innerText = "Пользователь не найден";
+                const data = snap.val();
+                if (data.password !== pass) return errorText.innerText = "Неверный пароль";
+                startGame(nick, data);
+            }).catch(() => errorText.innerText = "Ошибка соединения");
         }
 
         function doRegister() {
@@ -785,46 +779,22 @@
             const pass = document.getElementById('regPass').value;
             const pass2 = document.getElementById('regPass2').value;
 
-            if (!nick || nick.length < 3) {
-                errorText.innerText = "Ник минимум 3 символа";
-                return;
-            }
-            if (!/^[a-z0-9_]+$/.test(nick)) {
-                errorText.innerText = "Только латиница, цифры и _";
-                return;
-            }
-            if (!pass || pass.length < 4) {
-                errorText.innerText = "Пароль минимум 4 символа";
-                return;
-            }
-            if (pass !== pass2) {
-                errorText.innerText = "Пароли не совпадают";
-                return;
-            }
+            if (!nick || nick.length < 3) return errorText.innerText = "Ник минимум 3 символа";
+            if (!/^[a-z0-9_]+$/.test(nick)) return errorText.innerText = "Только латиница, цифры и _";
+            if (!pass || pass.length < 4) return errorText.innerText = "Пароль минимум 4 символа";
+            if (pass !== pass2) return errorText.innerText = "Пароли не совпадают";
 
             errorText.innerText = "Создаём аккаунт...";
+            db.ref('users/' + nick).once('value').then(snap => {
+                if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
 
-            db.ref('users/' + nick).once('value')
-                .then(snap => {
-                    if (snap.exists()) {
-                        errorText.innerText = "Такой ник уже занят";
-                        return;
-                    }
-
-                    const data = {
-                        password: pass,
-                        balance: 0,
-                        miners: [{ id: Date.now(), lastPayout: Date.now() }]
-                    };
-
-                    return db.ref('users/' + nick).set(data).then(() => {
-                        startGame(nick, data);
-                    });
-                })
-                .catch(err => {
-                    console.error(err);
-                    errorText.innerText = "Ошибка: " + (err.message || "неизвестно");
-                });
+                const data = {
+                    password: pass,
+                    balance: 0,
+                    miners: [{ id: Date.now(), lastPayout: Date.now() }]
+                };
+                return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
+            }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
         }
 
         function startGame(nick, data) {
@@ -837,15 +807,12 @@
             document.getElementById('game').style.display = 'grid';
             document.getElementById('userDisplay').innerText = myNick;
 
-            // Слушатели Firebase
             db.ref('global/diceBank').on('value', snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
                     db.ref('global/diceBank').set(START_BANK);
                     diceBank = START_BANK;
-                } else {
-                    diceBank = val;
-                }
+                } else diceBank = val;
                 document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
             });
 
@@ -861,22 +828,16 @@
             updateUI();
             setInterval(renderMiners, 1000);
 
-            // Навешиваем остальные кнопки
             document.getElementById('buyBtn').onclick = buyMiner;
             document.getElementById('yoBtn').onclick = clickYO;
             document.getElementById('diceLow').onclick = () => playDice('low');
             document.getElementById('diceHigh').onclick = () => playDice('high');
             document.getElementById('chatBtn').onclick = sendChat;
-            document.getElementById('chatInput').addEventListener('keydown', e => {
-                if (e.key === 'Enter') sendChat();
-            });
-            document.getElementById('donateBtn').onclick = () => alert('Донат временно отключён');
+            document.getElementById('chatInput').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
         }
 
-        // ===== Остальные функции =====
         function getRankInfo(balance) {
-            let current = RANKS[0];
-            let next = RANKS[1] || null;
+            let current = RANKS[0], next = RANKS[1] || null;
             for (let i = 0; i < RANKS.length; i++) {
                 if (balance >= RANKS[i].min) {
                     current = RANKS[i];
@@ -889,11 +850,9 @@
         function updateRank() {
             const info = getRankInfo(myBalance);
             document.getElementById('rankDisplay').innerText = "Ранг: " + info.current.title;
-            if (info.next) {
-                document.getElementById('nextRankDisplay').innerText = "Следующий: " + info.next.title + " (" + info.next.min.toLocaleString('ru') + ")";
-            } else {
-                document.getElementById('nextRankDisplay').innerText = "Максимальный ранг";
-            }
+            document.getElementById('nextRankDisplay').innerText = info.next
+                ? "Следующий: " + info.next.title + " (" + info.next.min.toLocaleString('ru') + ")"
+                : "Максимальный ранг";
         }
 
         function playCoinSound() {
@@ -910,14 +869,14 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
                 osc.start();
                 osc.stop(ctx.currentTime + 0.12);
-            } catch (e) {}
+            } catch(e) {}
         }
 
-        function showFloatPlus(cardElement, amount) {
+        function showFloatPlus(el, amount) {
             const plus = document.createElement('div');
             plus.className = 'float-plus';
             plus.innerText = `+${amount.toLocaleString('ru')}`;
-            cardElement.appendChild(plus);
+            el.appendChild(plus);
             setTimeout(() => plus.remove(), 1100);
         }
 
@@ -936,33 +895,37 @@
             coin.className = 'btc-coin';
             coin.innerHTML = '₿';
             coin.style.left = (Math.random() * 80 + 10) + 'vw';
-            coin.style.top  = (Math.random() * 55 + 12) + 'vh';
-
-            coin.addEventListener('click', function(e) {
-                e.stopPropagation();
+            coin.style.top = (Math.random() * 55 + 12) + 'vh';
+            coin.onclick = function(e) {
                 if (!myNick) return;
-
                 coin.classList.add('coin-explode');
                 playCoinSound();
                 showBigPlus(e.clientX, e.clientY, COIN_REWARD);
-
                 myBalance = Math.min(Number(MAX_BALANCE), myBalance + COIN_REWARD);
                 saveUser();
                 updateUI();
                 setTimeout(() => coin.remove(), 450);
-            });
-
+            };
             document.body.appendChild(coin);
-            setTimeout(() => {
-                if (coin.parentNode && !coin.classList.contains('coin-explode')) coin.remove();
-            }, 14000 + Math.random() * 4000);
+            setTimeout(() => { if (coin.parentNode && !coin.classList.contains('coin-explode')) coin.remove(); }, 14000 + Math.random()*4000);
         }
         setInterval(spawnCoin, 1800);
         setTimeout(() => { for(let i=0;i<3;i++) spawnCoin(); }, 800);
 
+        // ===== YO (новые значения) =====
+        function clickYO() {
+            yoClicks++;
+            let add = 17000;
+            if (yoClicks % 50 === 0) add = 1700000;   // каждый 50-й клик
+
+            myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
+            saveUser();
+            updateUI();
+            playCoinSound();
+        }
+
         function playDice(direction) {
             if (!myNick) return;
-
             const bet = parseFloat(document.getElementById('diceBet').value);
             if (isNaN(bet) || bet <= 0) return alert("Введите ставку");
             if (bet > myBalance) return alert("Недостаточно LIZA");
@@ -970,34 +933,19 @@
 
             const roll = Math.random() * 100;
             const rollFixed = roll.toFixed(3);
-            let win = (direction === 'low' && roll < 48) || (direction === 'high' && roll > 52);
-            const profit = bet;
+            const win = (direction === 'low' && roll < 48) || (direction === 'high' && roll > 52);
             const resultEl = document.getElementById('diceResult');
 
             if (win) {
-                myBalance += profit;
-                db.ref('global/diceBank').transaction(cur => {
-                    const bank = (cur === null || cur === undefined) ? START_BANK : cur;
-                    return Math.max(0, bank - profit);
-                }).then(res => {
-                    if (res.committed) {
-                        diceBank = res.snapshot.val();
-                        document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
-                    }
-                });
-                resultEl.innerHTML = `<span class="win">ВЫИГРЫШ! ${rollFixed} → +${profit.toLocaleString('ru')}</span>`;
+                myBalance += bet;
+                db.ref('global/diceBank').transaction(cur => Math.max(0, (cur ?? START_BANK) - bet))
+                    .then(res => { if (res.committed) { diceBank = res.snapshot.val(); document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru'); }});
+                resultEl.innerHTML = `<span class="win">ВЫИГРЫШ! ${rollFixed} → +${bet.toLocaleString('ru')}</span>`;
                 playCoinSound();
             } else {
                 myBalance -= bet;
-                db.ref('global/diceBank').transaction(cur => {
-                    const bank = (cur === null || cur === undefined) ? START_BANK : cur;
-                    return bank + bet;
-                }).then(res => {
-                    if (res.committed) {
-                        diceBank = res.snapshot.val();
-                        document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
-                    }
-                });
+                db.ref('global/diceBank').transaction(cur => (cur ?? START_BANK) + bet)
+                    .then(res => { if (res.committed) { diceBank = res.snapshot.val(); document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru'); }});
                 resultEl.innerHTML = `<span class="lose">ПРОИГРЫШ ${rollFixed} → -${bet.toLocaleString('ru')}</span>`;
             }
 
@@ -1028,16 +976,13 @@
         }
 
         function claimMiner(index) {
-            if (!myNick || index < 0 || index >= myMiners.length) return;
+            if (!myNick || index >= myMiners.length) return;
             const miner = myMiners[index];
-            const now = Date.now();
-            const periods = Math.floor((now - miner.lastPayout) / CYCLE_MS);
+            const periods = Math.floor((Date.now() - miner.lastPayout) / CYCLE_MS);
             if (periods <= 0) return;
 
             const safePeriods = Math.min(periods, 500);
             const earned = safePeriods * REWARD;
-            if (earned <= 0) return;
-
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
             miner.lastPayout += safePeriods * CYCLE_MS;
 
@@ -1051,21 +996,11 @@
             renderMiners();
         }
 
-        function clickYO() {
-            yoClicks++;
-            let add = 128;
-            if (yoClicks % 3 === 0) add += 128;
-            myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
-            saveUser();
-            updateUI();
-            playCoinSound();
-        }
-
         function renderMiners() {
             const list = document.getElementById('minersList');
             const scrollPos = list.scrollTop;
             list.innerHTML = '';
-            if (myMiners.length === 0) {
+            if (!myMiners.length) {
                 list.innerHTML = '<div style="color:#666;text-align:center;margin-top:20px;">Нет майнеров</div>';
                 return;
             }
@@ -1082,14 +1017,13 @@
                 div.className = 'miner-card';
                 div.innerHTML = `
                     <div>
-                        <div class="title">Майнер #${i + 1}</div>
+                        <div class="title">Майнер #${i+1}</div>
                         <div class="status">${canClaim ? `Готово (${periods}×)` : 'до выплаты'}</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;">
                         <div class="timer">${mins}:${secs.toString().padStart(2,'0')}</div>
                         <button class="claim-btn" ${canClaim ? '' : 'disabled'}>Claim</button>
-                    </div>
-                `;
+                    </div>`;
                 div.querySelector('.claim-btn').onclick = () => claimMiner(i);
                 list.appendChild(div);
             });
@@ -1097,10 +1031,7 @@
         }
 
         function saveUser() {
-            db.ref('users/' + myNick).update({
-                balance: myBalance,
-                miners: myMiners
-            });
+            db.ref('users/' + myNick).update({ balance: myBalance, miners: myMiners });
         }
 
         function updateUI() {
@@ -1114,11 +1045,7 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text || !myNick) return;
-            db.ref('chat').push({
-                user: myNick,
-                text: text,
-                time: Date.now()
-            }).then(() => input.value = '');
+            db.ref('chat').push({ user: myNick, text, time: Date.now() }).then(() => input.value = '');
         }
 
         function renderChat(messages) {
@@ -1128,10 +1055,10 @@
                 box.innerHTML = '<div style="color:#666;text-align:center;margin-top:30px;">Пока нет сообщений</div>';
                 return;
             }
-            Object.values(messages).sort((a, b) => a.time - b.time).forEach(msg => {
+            Object.values(messages).sort((a,b) => a.time - b.time).forEach(msg => {
                 const div = document.createElement('div');
                 div.className = 'chat-msg';
-                const time = new Date(msg.time).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+                const time = new Date(msg.time).toLocaleTimeString('ru', {hour:'2-digit', minute:'2-digit'});
                 div.innerHTML = `<span class="author">${msg.user}</span><span class="time">${time}</span><br>${escapeHtml(msg.text)}`;
                 box.appendChild(div);
             });
@@ -1141,25 +1068,17 @@
         function renderLeaderboard(users) {
             const box = document.getElementById('leaderboardList');
             if (!users) {
-                box.innerHTML = '<div style="padding:10px;color:#666;">Пока никого нет</div>';
+                box.innerHTML = '<div style="padding:8px;color:#666;">Пока никого нет</div>';
                 return;
             }
             const sorted = Object.entries(users)
-                .map(([nick, data]) => ({
-                    nick,
-                    balance: data.balance || 0,
-                    miners: (data.miners || []).length
-                }))
-                .sort((a, b) => b.balance - a.balance)
-                .slice(0, 15);
+                .map(([nick, data]) => ({ nick, balance: data.balance || 0, miners: (data.miners||[]).length }))
+                .sort((a,b) => b.balance - a.balance)
+                .slice(0, 12);
 
-            box.innerHTML = sorted.map((u, i) => `
+            box.innerHTML = sorted.map((u,i) => `
                 <div class="lb-item">
-                    <span>
-                        <span class="lb-rank">${i + 1}.</span>
-                        <span class="lb-addr">${u.nick}</span>
-                        <span style="color:#666;font-size:0.75rem;"> (${u.miners})</span>
-                    </span>
+                    <span><span class="lb-rank">${i+1}.</span> <span class="lb-addr">${u.nick}</span></span>
                     <span class="lb-bal">${u.balance.toLocaleString('ru')}</span>
                 </div>
             `).join('');
