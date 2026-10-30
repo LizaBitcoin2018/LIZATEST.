@@ -9,13 +9,75 @@
             height: 100%;
             overflow: hidden;
             font-family: 'Segoe UI', sans-serif;
-            background: #0f0f0f;
+            background: #000;
             color: #eee;
         }
-        body { display: flex; flex-direction: column; }
+        body { display: flex; flex-direction: column; position: relative; }
+
+        /* ===== Галактический фон ===== */
+        #galaxy {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse at center, #0a0a2a 0%, #000 70%);
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur) infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .galaxy-arm {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140vmax;
+            height: 140vmax;
+            margin: -70vmax;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(100, 80, 255, 0.08) 40deg,
+                rgba(180, 100, 255, 0.15) 80deg,
+                transparent 120deg,
+                rgba(80, 150, 255, 0.1) 180deg,
+                transparent 220deg,
+                rgba(150, 80, 255, 0.12) 280deg,
+                transparent 360deg
+            );
+            border-radius: 50%;
+            animation: rotateGalaxy 120s linear infinite;
+            filter: blur(40px);
+        }
+        @keyframes rotateGalaxy {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.25;
+            animation: pulse 15s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.2); opacity: 0.35; }
+        }
+
+        /* Остальные стили поверх фона */
+        .header, .main, #authBlock {
+            position: relative;
+            z-index: 10;
+        }
 
         .header {
-            background: #1a1a1a;
+            background: rgba(15, 15, 25, 0.85);
             border-bottom: 2px solid #f7931a;
             padding: 10px 20px;
             display: flex;
@@ -23,6 +85,7 @@
             align-items: center;
             flex-shrink: 0;
             height: 48px;
+            backdrop-filter: blur(8px);
         }
         .header h1 { color: #f7931a; font-size: 1.3rem; }
 
@@ -35,11 +98,12 @@
         }
 
         .left-panel {
-            background: #1a1a1a;
+            background: rgba(15, 15, 30, 0.82);
             border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            backdrop-filter: blur(6px);
         }
         .left-panel h3 {
             color: #f7931a;
@@ -48,7 +112,7 @@
             flex-shrink: 0;
         }
         .buy-section {
-            background: #252525;
+            background: rgba(30, 30, 50, 0.7);
             margin: 0 12px 10px;
             border-radius: 8px;
             padding: 10px;
@@ -76,7 +140,7 @@
             padding: 0 10px 10px;
         }
         .miner-card {
-            background: #252525;
+            background: rgba(30, 30, 50, 0.75);
             border-radius: 5px;
             padding: 5px 8px;
             margin-bottom: 5px;
@@ -90,7 +154,7 @@
         }
         .miner-card .title { font-weight: 600; font-size: 0.78rem; }
         .miner-card .timer { color: #00ffcc; font-size: 0.82rem; font-weight: bold; }
-        .miner-card .status { font-size: 0.65rem; color: #888; }
+        .miner-card .status { font-size: 0.65rem; color: #aaa; }
         .claim-btn {
             background: #00aa77;
             color: white;
@@ -133,13 +197,14 @@
             align-items: center;
             padding: 20px;
             overflow-y: auto;
-            background: linear-gradient(180deg, #0f0f0f 0%, #151515 100%);
+            background: rgba(5, 5, 20, 0.4);
         }
         .balance {
-            font-size: 2.6rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: #f7931a;
             margin: 6px 0 4px;
+            text-shadow: 0 0 20px rgba(247, 147, 26, 0.4);
         }
         .rank {
             font-size: 0.95rem;
@@ -147,20 +212,23 @@
             margin-bottom: 12px;
             text-align: center;
             min-height: 22px;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
         }
         .stats {
-            background: #1a1a1a;
+            background: rgba(20, 20, 40, 0.8);
             border-radius: 12px;
             padding: 16px 24px;
             min-width: 320px;
             margin-bottom: 16px;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(100, 100, 255, 0.15);
         }
         .stats p { margin: 6px 0; font-size: 0.98rem; }
         .highlight { color: #00ffcc; }
         .progress-bar {
             width: 100%;
             height: 10px;
-            background: #333;
+            background: #222;
             border-radius: 5px;
             margin-top: 8px;
             overflow: hidden;
@@ -185,11 +253,11 @@
             font-size: 1.15rem;
             cursor: pointer;
             text-align: center;
-            box-shadow: 0 0 15px rgba(0, 150, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.5);
         }
         .yo-btn:hover {
             filter: brightness(1.15);
-            box-shadow: 0 0 25px rgba(0, 150, 255, 0.6);
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.7);
         }
         .yo-info {
             font-size: 0.78rem;
@@ -217,13 +285,14 @@
         .yobit-btn:hover { filter: brightness(1.1); }
 
         .donate-box {
-            background: #1a1a1a;
+            background: rgba(20, 20, 40, 0.8);
             border-radius: 12px;
             padding: 14px;
             width: 100%;
             max-width: 320px;
             margin-bottom: 16px;
             text-align: center;
+            border: 1px solid rgba(100, 100, 255, 0.15);
         }
         .donate-box h4 {
             color: #f7931a;
@@ -244,11 +313,12 @@
         .donate-btn:hover { filter: brightness(1.1); }
 
         .leaderboard {
-            background: #1a1a1a;
+            background: rgba(20, 20, 40, 0.8);
             border-radius: 12px;
             padding: 14px 18px;
             width: 100%;
             max-width: 420px;
+            border: 1px solid rgba(100, 100, 255, 0.15);
         }
         .leaderboard h4 {
             color: #f7931a;
@@ -268,11 +338,12 @@
         .lb-bal { font-weight: bold; }
 
         .right-panel {
-            background: #1a1a1a;
+            background: rgba(15, 15, 30, 0.82);
             border-left: 1px solid #333;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            backdrop-filter: blur(6px);
         }
         .right-panel h3 {
             color: #f7931a;
@@ -322,7 +393,7 @@
         #authBlock {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.93);
+            background: rgba(0,0,0,0.92);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -349,7 +420,13 @@
 </head>
 <body>
 
-    <audio id="coinSound" src="payment-2.mp3" preload="auto"></audio>
+    <!-- Галактический фон -->
+    <div id="galaxy">
+        <div class="galaxy-arm"></div>
+        <div class="nebula" style="width:400px;height:400px;background:#5a20ff;top:10%;left:15%;"></div>
+        <div class="nebula" style="width:500px;height:300px;background:#2040ff;top:60%;left:60%;animation-delay:5s;"></div>
+        <div class="nebula" style="width:300px;height:300px;background:#ff20aa;top:30%;left:70%;animation-delay:10s;"></div>
+    </div>
 
     <div id="authBlock">
         <h1 style="color:#f7931a; font-size:2.4rem;">LIZABITCOIN</h1>
@@ -389,7 +466,6 @@
                 <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
             </div>
 
-            <!-- Кнопка YO -->
             <button class="yo-btn" onclick="clickYO()">YO</button>
             <div class="yo-info">+128 за клик • каждые 3 клика ещё +128</div>
 
@@ -420,7 +496,23 @@
     </div>
 
     <script>
+        // ===== Генерация звёзд =====
+        const galaxy = document.getElementById('galaxy');
+        for (let i = 0; i < 180; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2.2 + 0.4;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--dur', (Math.random() * 4 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            galaxy.appendChild(star);
+        }
+
         const DONATION_BNB = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b";
+        const MAX_BALANCE = 9223372036854775807; // 9 223 372 036 854 775 807
 
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
@@ -447,7 +539,6 @@
         let currentReward = 50;
         let yoClicks = 0;
 
-        // ===== Ранги (космическая / квантовая тема) =====
         const RANKS = [
             { min: 0,            title: "Новичок" },
             { min: 10000,        title: "Квантовая Пылинка" },
@@ -477,12 +568,22 @@
             document.getElementById('rankDisplay').innerText = "Ранг: " + getRank(myBalance);
         }
 
+        // ===== Встроенный звук (не нужен файл) =====
         function playCoinSound() {
-            const sound = document.getElementById('coinSound');
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(() => {});
-            }
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {}
         }
 
         function showFloatPlus(cardElement, amount) {
@@ -598,7 +699,7 @@
             const earned = +(safePeriods * currentReward).toFixed(4);
             if (earned <= 0) return;
 
-            myBalance = +(myBalance + earned).toFixed(4);
+            myBalance = Math.min(MAX_BALANCE, +(myBalance + earned).toFixed(4));
             miner.lastPayout += safePeriods * CYCLE_MS;
 
             db.ref('global/totalMined').transaction(cur => (cur || 0) + earned);
@@ -612,13 +713,12 @@
             renderMiners();
         }
 
-        // ===== Кнопка YO =====
         function clickYO() {
             yoClicks++;
             let add = 128;
-            if (yoClicks % 3 === 0) add += 128; // каждые 3 клика ещё +128
+            if (yoClicks % 3 === 0) add += 128;
 
-            myBalance = +(myBalance + add).toFixed(4);
+            myBalance = Math.min(MAX_BALANCE, +(myBalance + add).toFixed(4));
             saveUser();
             updateUI();
             playCoinSound();
@@ -701,7 +801,7 @@
         }
 
         function saveUser() {
-            if (myBalance > 50000000) myBalance = 50000000;
+            if (myBalance > MAX_BALANCE) myBalance = MAX_BALANCE;
             db.ref('users/' + myAddress).set({
                 balance: myBalance,
                 miners: myMiners
@@ -773,7 +873,9 @@
             return addr.slice(0, 6) + '...' + addr.slice(-4);
         }
         function formatNum(n) {
-            if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+            if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+            if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
             if (Number.isInteger(n)) return n.toLocaleString('ru');
             return parseFloat(n.toFixed(4)).toLocaleString('ru');
         }
