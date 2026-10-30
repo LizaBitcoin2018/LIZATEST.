@@ -372,11 +372,11 @@
                 <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
             </div>
 
-            <!-- ===== DEX / СТАКАН ===== -->
+            <!-- DEX / Стакан -->
             <div class="dex-panel">
                 <h4>
                     <span>DEX / Стакан</span>
-                    <span style="font-size:0.8rem;color:#888;" id="pairStatus">LIZA / BNB</span>
+                    <span style="font-size:0.8rem;color:#888;">LIZA / BNB</span>
                 </h4>
                 
                 <div class="price-line">
@@ -389,7 +389,7 @@
                     <button class="dex-btn liq" onclick="openAddLiquidity()">+ Добавить ликвидность LIZA + BNB</button>
                 </div>
                 <div class="dex-note">
-                    Откроется PancakeSwap Testnet • После добавления ликвидности появится цена и стакан
+                    Откроется официальный PancakeSwap Testnet
                 </div>
             </div>
 
@@ -434,7 +434,7 @@
         const CONTRACT_ADDRESS = "0xde311F87C04d59DaA7Ab2a31C8e5ab00F8622da3";
         const OWNER_ADDRESS   = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b".toLowerCase();
         const WBNB            = "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd";
-        const ROUTER          = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1"; // PancakeSwap Testnet Router
+        const ROUTER          = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1";
 
         const TOKEN_ABI = [
             "function balanceOf(address) view returns (uint256)",
@@ -471,17 +471,17 @@
         let globalTotalMined = 0;
         let currentReward = 50;
 
-        // ===== DEX ссылки =====
+        // ===== Правильные ссылки на PancakeSwap Testnet =====
         function openBuy() {
-            const url = `https://pancake.kiemtienonline360.com/#/swap?outputCurrency=${CONTRACT_ADDRESS}`;
+            const url = `https://pancakeswap.finance/swap?outputCurrency=${CONTRACT_ADDRESS}&chain=bscTestnet`;
             window.open(url, '_blank');
         }
         function openSell() {
-            const url = `https://pancake.kiemtienonline360.com/#/swap?inputCurrency=${CONTRACT_ADDRESS}&outputCurrency=BNB`;
+            const url = `https://pancakeswap.finance/swap?inputCurrency=${CONTRACT_ADDRESS}&outputCurrency=BNB&chain=bscTestnet`;
             window.open(url, '_blank');
         }
         function openAddLiquidity() {
-            const url = `https://pancake.kiemtienonline360.com/#/add/BNB/${CONTRACT_ADDRESS}`;
+            const url = `https://pancakeswap.finance/add/BNB/${CONTRACT_ADDRESS}?chain=bscTestnet`;
             window.open(url, '_blank');
         }
 
@@ -492,7 +492,6 @@
                 return;
             }
             try {
-                // 1 LIZA → сколько BNB
                 const amountIn = ethers.parseUnits("1", tokenDecimals);
                 const path = [CONTRACT_ADDRESS, WBNB];
                 const amounts = await routerContract.getAmountsOut(amountIn, path);
