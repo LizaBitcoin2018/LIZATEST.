@@ -14,7 +14,7 @@
         }
         body { display: flex; flex-direction: column; position: relative; }
 
-        /* ===== Галактический фон ===== */
+        /* Галактический фон */
         #galaxy {
             position: fixed;
             inset: 0;
@@ -70,11 +70,25 @@
             50% { transform: scale(1.2); opacity: 0.35; }
         }
 
-        /* Остальные стили поверх фона */
-        .header, .main, #authBlock {
-            position: relative;
-            z-index: 10;
+        /* Фея */
+        .fairy {
+            position: fixed;
+            font-size: 28px;
+            z-index: 5;
+            pointer-events: none;
+            filter: drop-shadow(0 0 8px rgba(255, 150, 255, 0.8));
+            animation: fairyFly 25s linear infinite;
         }
+        @keyframes fairyFly {
+            0%   { transform: translate(5vw, 80vh) rotate(10deg); }
+            20%  { transform: translate(30vw, 20vh) rotate(-15deg); }
+            40%  { transform: translate(70vw, 60vh) rotate(20deg); }
+            60%  { transform: translate(85vw, 15vh) rotate(-10deg); }
+            80%  { transform: translate(40vw, 75vh) rotate(15deg); }
+            100% { transform: translate(5vw, 80vh) rotate(10deg); }
+        }
+
+        .header, .main, #authBlock { position: relative; z-index: 10; }
 
         .header {
             background: rgba(15, 15, 25, 0.85);
@@ -209,10 +223,15 @@
         .rank {
             font-size: 0.95rem;
             color: #00d4ff;
+            margin-bottom: 4px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+        }
+        .next-rank {
+            font-size: 0.8rem;
+            color: #88aaff;
             margin-bottom: 12px;
             text-align: center;
-            min-height: 22px;
-            text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
         }
         .stats {
             background: rgba(20, 20, 40, 0.8);
@@ -225,19 +244,6 @@
         }
         .stats p { margin: 6px 0; font-size: 0.98rem; }
         .highlight { color: #00ffcc; }
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #222;
-            border-radius: 5px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #f7931a, #ffb347);
-            transition: width 0.5s;
-        }
 
         .yo-btn {
             display: block;
@@ -420,13 +426,15 @@
 </head>
 <body>
 
-    <!-- Галактический фон -->
     <div id="galaxy">
         <div class="galaxy-arm"></div>
         <div class="nebula" style="width:400px;height:400px;background:#5a20ff;top:10%;left:15%;"></div>
         <div class="nebula" style="width:500px;height:300px;background:#2040ff;top:60%;left:60%;animation-delay:5s;"></div>
         <div class="nebula" style="width:300px;height:300px;background:#ff20aa;top:30%;left:70%;animation-delay:10s;"></div>
     </div>
+
+    <!-- Фея -->
+    <div class="fairy">🧚‍♀️</div>
 
     <div id="authBlock">
         <h1 style="color:#f7931a; font-size:2.4rem;">LIZABITCOIN</h1>
@@ -444,8 +452,8 @@
         <div class="left-panel">
             <h3>Мои майнеры</h3>
             <div class="buy-section">
-                <div>Цена: <strong id="minerPrice" class="highlight">40</strong> LIZA</div>
-                <div style="font-size:0.78rem; color:#999; margin-top:2px;">80% от текущей награды</div>
+                <div>Цена: <strong id="minerPrice" class="highlight">102.4</strong> LIZA</div>
+                <div style="font-size:0.78rem; color:#999; margin-top:2px;">80% от награды</div>
                 <button class="buy-btn" id="buyBtn" onclick="buyMiner()">Купить майнер</button>
             </div>
             <div class="miners-list" id="minersList"></div>
@@ -455,15 +463,11 @@
             <div style="color:#aaa; font-size:1rem;">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
             <div class="rank" id="rankDisplay">Ранг: Новичок</div>
+            <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
 
             <div class="stats">
-                <p>Награда за 10 мин: <strong id="rewardDisplay" class="highlight">50</strong> LIZA</p>
-                <p>Всего добыто: <strong id="totalMinedDisplay">0</strong> / 21 000 000</p>
-                <p>До халвинга: <strong id="nextHalvingDisplay">10.50M</strong> LIZA</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
-                </div>
-                <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
+                <p>Награда за 10 мин: <strong class="highlight">128</strong> LIZA</p>
+                <p>Всего добыто: <strong id="totalMinedDisplay">0</strong> / 9 223 372 036 854 775 807</p>
             </div>
 
             <button class="yo-btn" onclick="clickYO()">YO</button>
@@ -496,7 +500,7 @@
     </div>
 
     <script>
-        // ===== Генерация звёзд =====
+        // Звёзды
         const galaxy = document.getElementById('galaxy');
         for (let i = 0; i < 180; i++) {
             const star = document.createElement('div');
@@ -512,7 +516,8 @@
         }
 
         const DONATION_BNB = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b";
-        const MAX_BALANCE = 9223372036854775807; // 9 223 372 036 854 775 807
+        const MAX_BALANCE = 9223372036854775807n; // BigInt
+        const REWARD = 128; // фиксированная награда
 
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
@@ -528,7 +533,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const TOTAL_SUPPLY = 21000000;
         const CYCLE_MS = 10 * 60 * 1000;
         const MAX_MINERS = 300;
 
@@ -536,7 +540,6 @@
         let myBalance = 0;
         let myMiners = [];
         let globalTotalMined = 0;
-        let currentReward = 50;
         let yoClicks = 0;
 
         const RANKS = [
@@ -556,19 +559,28 @@
             { min: 1e16,         title: "Создатель Реальности" }
         ];
 
-        function getRank(balance) {
-            let current = RANKS[0].title;
-            for (let r of RANKS) {
-                if (balance >= r.min) current = r.title;
+        function getRankInfo(balance) {
+            let current = RANKS[0];
+            let next = RANKS[1] || null;
+            for (let i = 0; i < RANKS.length; i++) {
+                if (balance >= RANKS[i].min) {
+                    current = RANKS[i];
+                    next = RANKS[i + 1] || null;
+                }
             }
-            return current;
+            return { current, next };
         }
 
         function updateRank() {
-            document.getElementById('rankDisplay').innerText = "Ранг: " + getRank(myBalance);
+            const info = getRankInfo(myBalance);
+            document.getElementById('rankDisplay').innerText = "Ранг: " + info.current.title;
+            if (info.next) {
+                document.getElementById('nextRankDisplay').innerText = "Следующий: " + info.next.title + " (" + formatNum(info.next.min) + ")";
+            } else {
+                document.getElementById('nextRankDisplay').innerText = "Максимальный ранг достигнут";
+            }
         }
 
-        // ===== Встроенный звук (не нужен файл) =====
         function playCoinSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -592,39 +604,6 @@
             plus.innerText = `+${formatNum(amount)}`;
             cardElement.appendChild(plus);
             setTimeout(() => plus.remove(), 1100);
-        }
-
-        function getRewardInfo(totalMined) {
-            if (totalMined >= TOTAL_SUPPLY) return { reward: 0, era: 34, nextHalving: 0, progress: 100 };
-            let remaining = totalMined;
-            let reward = 50;
-            let era = 1;
-            let eraSupply = 10500000;
-            while (remaining >= eraSupply && reward > 0) {
-                remaining -= eraSupply;
-                reward /= 2;
-                eraSupply /= 2;
-                era++;
-            }
-            return {
-                reward,
-                era,
-                nextHalving: eraSupply - remaining,
-                progress: (remaining / eraSupply) * 100
-            };
-        }
-
-        function updateRewardInfo() {
-            const info = getRewardInfo(globalTotalMined);
-            currentReward = info.reward;
-            document.getElementById('rewardDisplay').innerText = formatNum(currentReward);
-            document.getElementById('totalMinedDisplay').innerText = formatNum(globalTotalMined);
-            document.getElementById('nextHalvingDisplay').innerText = formatNum(Math.ceil(info.nextHalving));
-            document.getElementById('progressFill').style.width = info.progress + '%';
-            document.getElementById('eraInfo').innerText = `Эра ${info.era} • Награда ${formatNum(currentReward)} LIZA`;
-            const price = +(currentReward * 0.8).toFixed(4);
-            document.getElementById('minerPrice').innerText = formatNum(price);
-            document.getElementById('buyBtn').disabled = !(myBalance >= price && currentReward > 0 && myMiners.length < MAX_MINERS);
         }
 
         async function connectMetaMask() {
@@ -664,7 +643,7 @@
 
                 db.ref('global/totalMined').on('value', snap => {
                     globalTotalMined = snap.val() || 0;
-                    updateRewardInfo();
+                    document.getElementById('totalMinedDisplay').innerText = formatNum(globalTotalMined);
                 });
                 db.ref('users').on('value', snap => renderLeaderboard(snap.val()));
                 db.ref('chat').orderByChild('time').limitToLast(50).on('value', snap => renderChat(snap.val()));
@@ -678,8 +657,8 @@
         }
 
         function buyMiner() {
-            const price = +(currentReward * 0.8).toFixed(4);
-            if (myBalance < price || currentReward <= 0 || myMiners.length >= MAX_MINERS) return;
+            const price = +(REWARD * 0.8).toFixed(4);
+            if (myBalance < price || myMiners.length >= MAX_MINERS) return;
             myBalance = +(myBalance - price).toFixed(4);
             myMiners.push({ id: Date.now() + Math.random(), lastPayout: Date.now() });
             saveUser();
@@ -696,10 +675,10 @@
             if (periods <= 0) return;
 
             const safePeriods = Math.min(periods, 500);
-            const earned = +(safePeriods * currentReward).toFixed(4);
+            const earned = safePeriods * REWARD;
             if (earned <= 0) return;
 
-            myBalance = Math.min(MAX_BALANCE, +(myBalance + earned).toFixed(4));
+            myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
             miner.lastPayout += safePeriods * CYCLE_MS;
 
             db.ref('global/totalMined').transaction(cur => (cur || 0) + earned);
@@ -718,7 +697,7 @@
             let add = 128;
             if (yoClicks % 3 === 0) add += 128;
 
-            myBalance = Math.min(MAX_BALANCE, +(myBalance + add).toFixed(4));
+            myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
             saveUser();
             updateUI();
             playCoinSound();
@@ -801,7 +780,6 @@
         }
 
         function saveUser() {
-            if (myBalance > MAX_BALANCE) myBalance = MAX_BALANCE;
             db.ref('users/' + myAddress).set({
                 balance: myBalance,
                 miners: myMiners
@@ -810,7 +788,8 @@
 
         function updateUI() {
             document.getElementById('balanceDisplay').innerText = formatNum(myBalance);
-            updateRewardInfo();
+            document.getElementById('minerPrice').innerText = formatNum(REWARD * 0.8);
+            document.getElementById('buyBtn').disabled = !(myBalance >= REWARD * 0.8 && myMiners.length < MAX_MINERS);
             updateRank();
         }
 
