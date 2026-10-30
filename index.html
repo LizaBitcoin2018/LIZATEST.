@@ -149,7 +149,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 16px 50px;
+            padding: 20px 16px 40px;
             max-width: 520px;
             margin: 0 auto;
             width: 100%;
@@ -157,14 +157,11 @@
 
         .balance-block {
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-        .balance-label {
-            color: #aaa;
-            font-size: 0.95rem;
-        }
+        .balance-label { color: #aaa; font-size: 0.95rem; }
         .balance {
-            font-size: 2.3rem;
+            font-size: 2.2rem;
             font-weight: bold;
             color: #f7931a;
             text-shadow: 0 0 20px rgba(247,147,26,0.45);
@@ -178,15 +175,65 @@
         .next-rank {
             font-size: 0.8rem;
             color: #88aaff;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
 
-        /* Круглая YO (чуть больше) */
+        /* Майнер */
+        .miner-card {
+            background: rgba(30,30,50,0.85);
+            border-radius: 10px;
+            padding: 12px 16px;
+            width: 100%;
+            margin-bottom: 18px;
+            border-left: 4px solid #f7931a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .miner-card .title { font-weight: 600; font-size: 1rem; }
+        .miner-card .status { font-size: 0.8rem; color: #aaa; margin-top: 2px; }
+        .miner-card .timer { color: #00ffcc; font-size: 1.1rem; font-weight: bold; }
+        .claim-btn {
+            background: #00aa77;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .claim-btn:hover:not(:disabled) { background: #008855; }
+        .claim-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .float-plus {
+            position: absolute;
+            right: 70px;
+            top: 8px;
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 1.1rem;
+            pointer-events: none;
+            animation: floatUp 1.1s ease-out forwards;
+            text-shadow: 0 0 8px rgba(0,255,136,0.6);
+            z-index: 10;
+        }
+        @keyframes floatUp {
+            0%   { opacity: 1; transform: translateY(0) scale(1); }
+            70%  { opacity: 1; transform: translateY(-28px) scale(1.15); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1); }
+        }
+
+        /* YO */
         .yo-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 10px 0 28px;
+            margin: 6px 0 12px;
         }
         .yo-btn {
             width: 160px;
@@ -199,21 +246,35 @@
             font-size: 2.6rem;
             cursor: pointer;
             box-shadow: 0 0 40px rgba(0,150,255,0.7), inset 0 0 20px rgba(255,255,255,0.15);
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition: transform 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
         }
-        .yo-btn:active {
-            transform: scale(0.93);
-        }
+        .yo-btn:active { transform: scale(0.93); }
         .yo-info {
             font-size: 0.9rem;
             color: #88ccff;
             text-align: center;
-            margin-top: 12px;
+            margin-top: 10px;
             line-height: 1.4;
+        }
+
+        .yobit-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #f7931a, #ffb347);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 18px;
         }
 
         /* Dice */
@@ -222,7 +283,7 @@
             border-radius: 12px;
             padding: 16px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             border: 1px solid rgba(0,150,255,0.35);
         }
         .dice-panel h4 {
@@ -272,7 +333,7 @@
             font-weight: bold;
         }
         .dice-history {
-            max-height: 100px;
+            max-height: 90px;
             overflow-y: auto;
             font-size: 0.82rem;
         }
@@ -285,29 +346,68 @@
         .win { color: #00ff88; }
         .lose { color: #ff5555; }
 
-        .yobit-btn {
-            display: block;
+        /* Чат */
+        .chat-panel {
             width: 100%;
-            padding: 13px;
-            background: linear-gradient(90deg, #f7931a, #ffb347);
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            font-weight: bold;
+            background: rgba(15,15,30,0.9);
+            border-radius: 12px;
+            border: 1px solid rgba(100,100,255,0.2);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 18px;
+            min-height: 220px;
+        }
+        .chat-panel h3 {
+            color: #f7931a;
+            padding: 10px 14px;
             font-size: 1rem;
+            border-bottom: 1px solid #333;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 14px;
+            max-height: 180px;
+        }
+        .chat-msg {
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+            line-height: 1.35;
+        }
+        .chat-msg .author { color: #f7931a; font-weight: bold; }
+        .chat-msg .time { color: #666; font-size: 0.72rem; margin-left: 5px; }
+        .chat-input-area {
+            padding: 8px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 6px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            background: #252525;
+            border: 1px solid #444;
+            color: white;
+            padding: 9px 12px;
+            border-radius: 6px;
+            outline: none;
+        }
+        .chat-input-area button {
+            background: #f7931a;
+            border: none;
+            color: white;
+            padding: 0 14px;
+            border-radius: 6px;
             cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            margin-bottom: 24px;
+            font-weight: bold;
         }
 
+        /* Топ */
         .bottom-stats {
             width: 100%;
             background: rgba(15,15,30,0.9);
             border-radius: 12px;
             border: 1px solid rgba(100,100,255,0.2);
             overflow: hidden;
-            margin-top: 10px;
         }
         .bottom-stats h3 {
             color: #f7931a;
@@ -327,6 +427,7 @@
         .lb-addr { color: #00ffcc; }
         .lb-bal { font-weight: bold; }
 
+        /* Авторизация */
         #authBlock {
             position: fixed;
             inset: 0;
@@ -455,7 +556,19 @@
             <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
         </div>
 
-        <!-- Круглая YO (увеличенная) -->
+        <!-- Майнер -->
+        <div class="miner-card" id="minerCard">
+            <div>
+                <div class="title">Майнер</div>
+                <div class="status" id="minerStatus">до выплаты</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="timer" id="minerTimer">1:00</div>
+                <button class="claim-btn" id="claimBtn" disabled>Claim</button>
+            </div>
+        </div>
+
+        <!-- YO -->
         <div class="yo-wrap">
             <button class="yo-btn" id="yoBtn">YO</button>
             <div class="yo-info">
@@ -463,6 +576,11 @@
                 каждый 10-й клик: <b>+1 700 000</b>
             </div>
         </div>
+
+        <!-- Кнопка Yobit под YO -->
+        <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
+            Торговать LIZA на Yobit
+        </a>
 
         <!-- Dice -->
         <div class="dice-panel">
@@ -477,11 +595,17 @@
             <div class="dice-history" id="diceHistory"></div>
         </div>
 
-        <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
-            Торговать LIZA на Yobit
-        </a>
+        <!-- Чат -->
+        <div class="chat-panel">
+            <h3>Чат майнеров</h3>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Написать сообщение..." maxlength="200">
+                <button id="chatBtn">➤</button>
+            </div>
+        </div>
 
-        <!-- Статистика внизу -->
+        <!-- Топ -->
         <div class="bottom-stats">
             <h3>Топ игроков</h3>
             <div id="leaderboardList"></div>
@@ -505,9 +629,12 @@
         const MAX_BALANCE = 9223372036854775807n;
         const COIN_REWARD = 250000;
         const START_BANK = 100000000000000;
+        const MINER_REWARD = 17000000;      // 17 миллионов
+        const CYCLE_MS = 60 * 1000;         // 1 минута
 
         let myNick = "";
         let myBalance = 0;
+        let minerLastPayout = Date.now();
         let yoClicks = 0;
         let diceBank = START_BANK;
         let diceHistory = [];
@@ -531,7 +658,7 @@
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 130; i++) {
+        for (let i = 0; i < 120; i++) {
             const star = document.createElement('div');
             star.className = 'star';
             const size = Math.random() * 2.2 + 0.4;
@@ -591,7 +718,11 @@
             db.ref('users/' + nick).once('value').then(snap => {
                 if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
 
-                const data = { password: pass, balance: 0 };
+                const data = {
+                    password: pass,
+                    balance: 0,
+                    minerLastPayout: Date.now()
+                };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
             }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
         }
@@ -599,6 +730,7 @@
         function startGame(nick, data) {
             myNick = nick;
             myBalance = data.balance || 0;
+            minerLastPayout = data.minerLastPayout || Date.now();
 
             document.getElementById('authBlock').style.display = 'none';
             document.getElementById('header').style.display = 'flex';
@@ -615,12 +747,59 @@
             });
 
             db.ref('users').on('value', snap => renderLeaderboard(snap.val()));
+            db.ref('chat').orderByChild('time').limitToLast(40).on('value', snap => renderChat(snap.val()));
 
             updateUI();
+            updateMinerUI();
+            setInterval(updateMinerUI, 1000);
 
             document.getElementById('yoBtn').onclick = clickYO;
+            document.getElementById('claimBtn').onclick = claimMiner;
             document.getElementById('diceLow').onclick = () => playDice('low');
             document.getElementById('diceHigh').onclick = () => playDice('high');
+            document.getElementById('chatBtn').onclick = sendChat;
+            document.getElementById('chatInput').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+        }
+
+        // ===== Майнер =====
+        function updateMinerUI() {
+            const now = Date.now();
+            const elapsed = now - minerLastPayout;
+            const left = CYCLE_MS - (elapsed % CYCLE_MS);
+            const mins = Math.floor(left / 60000);
+            const secs = Math.floor((left % 60000) / 1000);
+            const periods = Math.floor(elapsed / CYCLE_MS);
+            const canClaim = periods > 0;
+
+            document.getElementById('minerTimer').innerText = `${mins}:${secs.toString().padStart(2,'0')}`;
+            document.getElementById('minerStatus').innerText = canClaim ? `Готово (${periods}×)` : 'до выплаты';
+            document.getElementById('claimBtn').disabled = !canClaim;
+        }
+
+        function claimMiner() {
+            if (!myNick) return;
+            const now = Date.now();
+            const periods = Math.floor((now - minerLastPayout) / CYCLE_MS);
+            if (periods <= 0) return;
+
+            const safePeriods = Math.min(periods, 100);
+            const earned = safePeriods * MINER_REWARD;
+
+            myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
+            minerLastPayout += safePeriods * CYCLE_MS;
+
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            playCoinSound();
+
+            // Анимация
+            const card = document.getElementById('minerCard');
+            const plus = document.createElement('div');
+            plus.className = 'float-plus';
+            plus.innerText = `+${earned.toLocaleString('ru')}`;
+            card.appendChild(plus);
+            setTimeout(() => plus.remove(), 1100);
         }
 
         function getRankInfo(balance) {
@@ -669,7 +848,7 @@
             setTimeout(() => plus.remove(), 1300);
         }
 
-        // Монетки (в 5 раз больше)
+        // Монетки
         function spawnCoin() {
             const coin = document.createElement('div');
             coin.className = 'btc-coin';
@@ -689,11 +868,10 @@
             document.body.appendChild(coin);
             setTimeout(() => { if (coin.parentNode && !coin.classList.contains('coin-explode')) coin.remove(); }, 12000 + Math.random()*5000);
         }
-        // Спавним чаще и больше
-        setInterval(spawnCoin, 400);          // каждые 0.4 сек
+        setInterval(spawnCoin, 400);
         setTimeout(() => { for(let i=0;i<12;i++) spawnCoin(); }, 600);
 
-        // YO — каждый 10-й клик 1.7M
+        // YO
         function clickYO() {
             yoClicks++;
             let add = 17000;
@@ -747,12 +925,43 @@
         }
 
         function saveUser() {
-            db.ref('users/' + myNick).update({ balance: myBalance });
+            db.ref('users/' + myNick).update({
+                balance: myBalance,
+                minerLastPayout: minerLastPayout
+            });
         }
 
         function updateUI() {
             document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString('ru');
             updateRank();
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !myNick) return;
+            db.ref('chat').push({
+                user: myNick,
+                text: text,
+                time: Date.now()
+            }).then(() => input.value = '');
+        }
+
+        function renderChat(messages) {
+            const box = document.getElementById('chatMessages');
+            box.innerHTML = '';
+            if (!messages) {
+                box.innerHTML = '<div style="color:#666;text-align:center;margin-top:30px;">Пока нет сообщений</div>';
+                return;
+            }
+            Object.values(messages).sort((a,b) => a.time - b.time).forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'chat-msg';
+                const time = new Date(msg.time).toLocaleTimeString('ru', {hour:'2-digit', minute:'2-digit'});
+                div.innerHTML = `<span class="author">${msg.user}</span><span class="time">${time}</span><br>${escapeHtml(msg.text)}`;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
         }
 
         function renderLeaderboard(users) {
@@ -772,6 +981,12 @@
                     <span class="lb-bal">${u.balance.toLocaleString('ru')}</span>
                 </div>
             `).join('');
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.innerText = text;
+            return d.innerHTML;
         }
     </script>
 </body>
