@@ -457,6 +457,66 @@
             }
         }
 
+        // ===== Главная логика: при отправке токенов владельцем — вычитаем из игрового баланса =====
+        async function handlePotentialPayout(from, to, value, txHash) {
+            if (!txHash) return;
+
+            from = (from || "").toLowerCase();
+            to = (to || "").toLowerCase();
+
+            // Только переводы от владельца
+            if (from !== OWNER_ADDRESS) return;
+            if (to === OWNER_ADDRESS || !to) return;
+
+            const amount = parseFloat(ethers.formatUnits(value, tokenDecimals));
+            if (amount <= 0) return;
+
+            const processedRef = db.ref('processedTx/' + txHash);
+            const already = await processedRef.once('value');
+            if (already.exists()) return; // уже обработали
+
+            const userRef = db.ref('users/' + to);
+            const userSnap = await userRef.once('value');
+
+            if (!userSnap.exists()) {
+                // Игрок ещё не регистрировался — просто помечаем tx
+                await processedRef.set({ skipped: true, reason: "no user", time: Date.now() });
+                return;
+            }
+
+            const data = userSnap.val();
+            let bal = Number(data.balance) || 0;
+
+            if (bal <= 0) {
+                await processedRef.set({ skipped: true, reason: "zero balance", time: Date.now() });
+                return;
+            }
+
+            const deduct = Math.min(bal, amount);
+            const newBal = Math.max(0, +(bal - deduct).toFixed(4));
+
+            // Безопасное обновление баланса
+            await userRef.child('balance').transaction(current => {
+                const cur = Number(current) || 0;
+                return Math.max(0, +(cur - deduct).toFixed(4));
+            });
+
+            await processedRef.set({
+                amount: deduct,
+                sent: amount,
+                to: to,
+                time: Date.now()
+            });
+
+            // Если это текущий пользователь — обновляем локально
+            if (to === myAddress) {
+                myBalance = newBal;
+                updateUI();
+            }
+
+            console.log(`[PAYOUT] ${shortAddress(to)} списано ${deduct} LIZA (tx: ${txHash.slice(0,10)}...)`);
+        }
+
         async function loadTransactions() {
             const box = document.getElementById('txList');
             if (!tokenContract || !provider) {
@@ -465,10 +525,24 @@
             }
             try {
                 const currentBlock = await provider.getBlockNumber();
-                const fromBlock = Math.max(0, currentBlock - 3000);
+                const fromBlock = Math.max(0, currentBlock - 4000);
                 const filter = tokenContract.filters.Transfer();
                 const events = await tokenContract.queryFilter(filter, fromBlock, "latest");
-                const recent = events.slice(-20).reverse();
+                const recent = events.slice(-25).reverse();
+
+                // Обрабатываем возможные выплаты (старые тоже)
+                for (const ev of events) {
+                    try {
+                        await handlePotentialPayout(
+                            ev.args.from,
+                            ev.args.to,
+                            ev.args.value,
+                            ev.log.transactionHash
+                        );
+                    } catch (e) {
+                        console.warn("Ошибка обработки tx:", e);
+                    }
+                }
 
                 if (recent.length === 0) {
                     box.innerHTML = '<div style="color:#666">Транзакций пока нет</div>';
@@ -479,10 +553,11 @@
                     const amount = parseFloat(ethers.formatUnits(ev.args.value, tokenDecimals));
                     const from = shortAddress(ev.args.from);
                     const to = shortAddress(ev.args.to);
+                    const isPayout = (ev.args.from || "").toLowerCase() === OWNER_ADDRESS;
                     return `
                         <div class="tx-item">
-                            <span class="tx-fromto">${from} → ${to}</span>
-                            <span class="tx-amount">+${formatNum(amount)} LIZA</span>
+                            <span class="tx-fromto">${from} → ${to}${isPayout ? ' 💸' : ''}</span>
+                            <span class="tx-amount">${isPayout ? '' : '+'}${formatNum(amount)} LIZA</span>
                         </div>
                     `;
                 }).join('');
@@ -502,7 +577,6 @@
             }
 
             try {
-                // Переключаем на BSC Testnet
                 await switchToBSCTestnet();
 
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -518,7 +592,6 @@
                     tokenDecimals = 18;
                 }
 
-                // Проверяем сеть
                 const network = await provider.getNetwork();
                 const netEl = document.getElementById('networkStatus');
                 if (Number(network.chainId) === 97) {
@@ -533,6 +606,15 @@
                 document.getElementById('header').style.display = 'flex';
                 document.getElementById('game').style.display = 'grid';
                 document.getElementById('walletDisplay').innerText = shortAddress(myAddress);
+
+                // Слушаем новые Transfer в реальном времени
+                tokenContract.on("Transfer", async (from, to, value, event) => {
+                    const txHash = event?.log?.transactionHash || event?.transactionHash;
+                    await handlePotentialPayout(from, to, value, txHash);
+                    // Обновляем список транзакций
+                    loadTransactions();
+                    updateRealBalance();
+                });
 
                 const userRef = db.ref('users/' + myAddress);
 
@@ -560,6 +642,18 @@
                     loadTransactions();
                 });
 
+                // Слушаем изменения своего баланса в реальном времени (на случай списания)
+                userRef.on('value', snap => {
+                    if (snap.exists() && myAddress) {
+                        const data = snap.val();
+                        const newBal = data.balance || 0;
+                        if (newBal !== myBalance) {
+                            myBalance = newBal;
+                            updateUI();
+                        }
+                    }
+                });
+
                 db.ref('global/totalMined').on('value', snap => {
                     globalTotalMined = snap.val() || 0;
                     updateRewardInfo();
@@ -573,7 +667,6 @@
                     renderChat(snap.val());
                 });
 
-                // Обновление таймеров и реального баланса
                 setInterval(() => {
                     renderMiners();
                 }, 1000);
@@ -581,9 +674,8 @@
                 setInterval(() => {
                     updateRealBalance();
                     loadTransactions();
-                }, 20000);
+                }, 25000);
 
-                // Слушаем смену аккаунта / сети
                 window.ethereum.on('accountsChanged', () => location.reload());
                 window.ethereum.on('chainChanged', () => location.reload());
 
@@ -610,7 +702,6 @@
             list.scrollTop = list.scrollHeight;
         }
 
-        // ===== CLAIM по каждому майнеру =====
         function claimMiner(index) {
             if (!myAddress || index < 0 || index >= myMiners.length) return;
 
@@ -620,7 +711,6 @@
 
             if (periods <= 0) return;
 
-            // Защита от огромных начислений
             const safePeriods = Math.min(periods, 500);
             const earned = +(safePeriods * currentReward).toFixed(4);
 
@@ -629,7 +719,6 @@
             myBalance = +(myBalance + earned).toFixed(4);
             miner.lastPayout += safePeriods * CYCLE_MS;
 
-            // Увеличиваем общий mined
             db.ref('global/totalMined').transaction(cur => {
                 return (cur || 0) + earned;
             });
@@ -638,7 +727,6 @@
             updateUI();
             renderMiners();
 
-            // Логируем клейм (можно потом смотреть в Firebase)
             db.ref('claims').push({
                 user: myAddress,
                 amount: earned,
