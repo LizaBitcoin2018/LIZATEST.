@@ -88,6 +88,101 @@
             100% { transform: translate(5vw, 80vh) rotate(10deg); }
         }
 
+        /* НЛО */
+        .ufo {
+            position: fixed;
+            font-size: 26px;
+            z-index: 6;
+            pointer-events: none;
+            filter: drop-shadow(0 0 6px #0ff);
+        }
+        .ufo1 { animation: ufo1 18s linear infinite; }
+        .ufo2 { animation: ufo2 22s linear infinite; }
+        .ufo3 { animation: ufo3 20s linear infinite reverse; }
+
+        @keyframes ufo1 {
+            0%   { transform: translate(10vw, 30vh); }
+            25%  { transform: translate(40vw, 10vh); }
+            50%  { transform: translate(75vw, 40vh); }
+            75%  { transform: translate(50vw, 70vh); }
+            100% { transform: translate(10vw, 30vh); }
+        }
+        @keyframes ufo2 {
+            0%   { transform: translate(80vw, 20vh); }
+            25%  { transform: translate(60vw, 50vh); }
+            50%  { transform: translate(20vw, 25vh); }
+            75%  { transform: translate(40vw, 80vh); }
+            100% { transform: translate(80vw, 20vh); }
+        }
+        @keyframes ufo3 {
+            0%   { transform: translate(50vw, 10vh); }
+            25%  { transform: translate(15vw, 40vh); }
+            50%  { transform: translate(70vw, 70vh); }
+            75%  { transform: translate(90vw, 30vh); }
+            100% { transform: translate(50vw, 10vh); }
+        }
+
+        /* Лазеры НЛО */
+        .laser {
+            position: fixed;
+            width: 3px;
+            height: 18px;
+            background: linear-gradient(#0ff, #f0f);
+            border-radius: 2px;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            box-shadow: 0 0 8px #0ff;
+        }
+
+        /* Киты */
+        .whale {
+            position: fixed;
+            font-size: 32px;
+            z-index: 5;
+            pointer-events: none;
+            filter: drop-shadow(0 0 6px rgba(100, 180, 255, 0.7));
+        }
+        .whale1 { animation: whale1 28s linear infinite; }
+        .whale2 { animation: whale2 32s linear infinite reverse; }
+        .whale3 { animation: whale3 26s linear infinite; }
+
+        @keyframes whale1 {
+            0%   { transform: translate(0vw, 60vh) scaleX(1); }
+            50%  { transform: translate(90vw, 30vh) scaleX(1); }
+            51%  { transform: translate(90vw, 30vh) scaleX(-1); }
+            100% { transform: translate(0vw, 60vh) scaleX(-1); }
+        }
+        @keyframes whale2 {
+            0%   { transform: translate(100vw, 40vh) scaleX(-1); }
+            50%  { transform: translate(5vw, 70vh) scaleX(-1); }
+            51%  { transform: translate(5vw, 70vh) scaleX(1); }
+            100% { transform: translate(100vw, 40vh) scaleX(1); }
+        }
+        @keyframes whale3 {
+            0%   { transform: translate(20vw, 15vh) scaleX(1); }
+            50%  { transform: translate(80vw, 80vh) scaleX(1); }
+            51%  { transform: translate(80vw, 80vh) scaleX(-1); }
+            100% { transform: translate(20vw, 15vh) scaleX(-1); }
+        }
+
+        /* Вайфу снизу */
+        .waifu {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 42px;
+            z-index: 8;
+            pointer-events: none;
+            filter: drop-shadow(0 0 10px rgba(255, 150, 200, 0.6));
+            animation: waifuBob 3s ease-in-out infinite;
+        }
+        @keyframes waifuBob {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-8px); }
+        }
+
         .header, .main, #authBlock { position: relative; z-index: 10; }
 
         .header {
@@ -436,6 +531,19 @@
     <!-- Фея -->
     <div class="fairy">🧚‍♀️</div>
 
+    <!-- 3 НЛО -->
+    <div class="ufo ufo1">🛸</div>
+    <div class="ufo ufo2">🛸</div>
+    <div class="ufo ufo3">🛸</div>
+
+    <!-- 3 кита -->
+    <div class="whale whale1">🐋</div>
+    <div class="whale whale2">🐋</div>
+    <div class="whale whale3">🐋</div>
+
+    <!-- Вайфу снизу -->
+    <div class="waifu">👘</div>
+
     <div id="authBlock">
         <h1 style="color:#f7931a; font-size:2.4rem;">LIZABITCOIN</h1>
         <p style="margin-top:8px; color:#aaa;">Подключи MetaMask, чтобы начать майнить</p>
@@ -502,7 +610,7 @@
     <script>
         // Звёзды
         const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 180; i++) {
+        for (let i = 0; i < 160; i++) {
             const star = document.createElement('div');
             star.className = 'star';
             const size = Math.random() * 2.2 + 0.4;
@@ -515,9 +623,34 @@
             galaxy.appendChild(star);
         }
 
+        // Стрельба НЛО
+        function shootLaser() {
+            const ufos = document.querySelectorAll('.ufo');
+            const ufo = ufos[Math.floor(Math.random() * ufos.length)];
+            const rect = ufo.getBoundingClientRect();
+
+            const laser = document.createElement('div');
+            laser.className = 'laser';
+            laser.style.left = (rect.left + rect.width / 2) + 'px';
+            laser.style.top = (rect.top + rect.height) + 'px';
+            laser.style.opacity = '1';
+            document.body.appendChild(laser);
+
+            let pos = rect.top + rect.height;
+            const interval = setInterval(() => {
+                pos += 8;
+                laser.style.top = pos + 'px';
+                if (pos > window.innerHeight) {
+                    clearInterval(interval);
+                    laser.remove();
+                }
+            }, 20);
+        }
+        setInterval(shootLaser, 1800);
+
         const DONATION_BNB = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b";
-        const MAX_BALANCE = 9223372036854775807n; // BigInt
-        const REWARD = 128; // фиксированная награда
+        const MAX_BALANCE = 9223372036854775807n;
+        const REWARD = 128;
 
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
