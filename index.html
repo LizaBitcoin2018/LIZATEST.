@@ -163,6 +163,26 @@
             text-shadow: 0 0 20px rgba(247,147,26,0.45);
             word-break: break-all;
         }
+
+        /* Синяя кнопка AIRDROP */
+        .airdrop-btn {
+            display: inline-block;
+            margin: 12px 0 10px;
+            padding: 10px 22px;
+            background: linear-gradient(90deg, #0066ff, #00aaff);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0 0 18px rgba(0, 150, 255, 0.5);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .airdrop-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 180, 255, 0.7);
+        }
+
         .rank { font-size: 0.95rem; color: #00d4ff; margin-top: 4px; }
         .next-rank { font-size: 0.8rem; color: #88aaff; margin-bottom: 14px; }
 
@@ -251,7 +271,7 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1); }
         }
 
-        /* YO кнопка (ещё больше) */
+        /* YO кнопка */
         .yo-wrap {
             display: flex;
             flex-direction: column;
@@ -557,11 +577,17 @@
         <div class="balance-block">
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
+
+            <!-- Синяя кнопка AIRDROP -->
+            <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="airdrop-btn">
+                AIRDROP 27.12.2026
+            </a>
+
             <div class="rank" id="rankDisplay">Ранг: Новичок</div>
             <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
         </div>
 
-        <!-- Майнер с отображением накопленного -->
+        <!-- Майнер -->
         <div class="miner-card" id="minerCard">
             <div>
                 <div class="title">Майнер</div>
@@ -742,7 +768,6 @@
             document.getElementById('game').style.display = 'flex';
             document.getElementById('userDisplay').innerText = myNick;
 
-            // Банк Dice
             db.ref('global/diceBank').on('value', snap => {
                 let val = snap.val();
                 if (val === null || val === undefined) {
@@ -769,7 +794,7 @@
             document.getElementById('chatInput').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
         }
 
-        // ===== МАЙНЕР =====
+        // Майнер
         function updateMinerUI() {
             const now = Date.now();
             const elapsed = now - minerLastPayout;
@@ -803,7 +828,6 @@
             updateMinerUI();
             playCoinSound();
 
-            // Анимация
             const card = document.getElementById('minerCard');
             const plus = document.createElement('div');
             plus.className = 'float-plus';
@@ -812,7 +836,7 @@
             setTimeout(() => plus.remove(), 1200);
         }
 
-        // ===== YO =====
+        // YO
         function clickYO() {
             yoClicks++;
             let add = 17000;
@@ -823,7 +847,6 @@
             updateUI();
             playCoinSound();
 
-            // Анимация над кнопкой
             const wrap = document.querySelector('.yo-wrap');
             const plus = document.createElement('div');
             plus.className = 'yo-float';
@@ -832,7 +855,7 @@
             setTimeout(() => plus.remove(), 1150);
         }
 
-        // ===== DICE (банк правильно меняется) =====
+        // Dice
         function playDice(direction) {
             if (!myNick) return;
             const bet = parseFloat(document.getElementById('diceBet').value);
@@ -846,7 +869,6 @@
             const resultEl = document.getElementById('diceResult');
 
             if (win) {
-                // Выигрыш → банк уменьшается
                 myBalance += bet;
                 db.ref('global/diceBank').transaction(cur => {
                     const bank = (cur === null || cur === undefined) ? START_BANK : Number(cur);
@@ -860,7 +882,6 @@
                 resultEl.innerHTML = `<span class="win">ВЫИГРЫШ! ${rollFixed} → +${bet.toLocaleString('ru')}</span>`;
                 playCoinSound();
             } else {
-                // Проигрыш → банк увеличивается
                 myBalance -= bet;
                 db.ref('global/diceBank').transaction(cur => {
                     const bank = (cur === null || cur === undefined) ? START_BANK : Number(cur);
@@ -936,7 +957,7 @@
             setTimeout(() => plus.remove(), 1300);
         }
 
-        // Монетки Bitcoin (в 5 раз меньше)
+        // Монетки (меньше)
         function spawnCoin() {
             const coin = document.createElement('div');
             coin.className = 'btc-coin';
@@ -958,7 +979,7 @@
                 if (coin.parentNode && !coin.classList.contains('coin-explode')) coin.remove();
             }, 14000 + Math.random() * 4000);
         }
-        setInterval(spawnCoin, 2200); // редко
+        setInterval(spawnCoin, 2200);
         setTimeout(() => { for (let i = 0; i < 2; i++) spawnCoin(); }, 1000);
 
         function saveUser() {
@@ -1027,4 +1048,4 @@
         }
     </script>
 </body>
-</html>
+</html
