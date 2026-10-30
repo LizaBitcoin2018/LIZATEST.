@@ -109,7 +109,6 @@
             cursor: not-allowed;
         }
 
-        /* Анимация +50 */
         .float-plus {
             position: absolute;
             right: 50px;
@@ -140,7 +139,14 @@
             font-size: 2.6rem;
             font-weight: bold;
             color: #f7931a;
-            margin: 6px 0 16px;
+            margin: 6px 0 4px;
+        }
+        .rank {
+            font-size: 0.95rem;
+            color: #00d4ff;
+            margin-bottom: 12px;
+            text-align: center;
+            min-height: 22px;
         }
         .stats {
             background: #1a1a1a;
@@ -163,6 +169,33 @@
             height: 100%;
             background: linear-gradient(90deg, #f7931a, #ffb347);
             transition: width 0.5s;
+        }
+
+        .yo-btn {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 12px;
+            padding: 14px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.15rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 150, 255, 0.4);
+        }
+        .yo-btn:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.6);
+        }
+        .yo-info {
+            font-size: 0.78rem;
+            color: #88ccff;
+            text-align: center;
+            margin: -6px 0 14px;
         }
 
         .yobit-btn {
@@ -344,6 +377,7 @@
         <div class="center-panel">
             <div style="color:#aaa; font-size:1rem;">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
+            <div class="rank" id="rankDisplay">Ранг: Новичок</div>
 
             <div class="stats">
                 <p>Награда за 10 мин: <strong id="rewardDisplay" class="highlight">50</strong> LIZA</p>
@@ -354,6 +388,10 @@
                 </div>
                 <p style="font-size:0.82rem; color:#888; margin-top:7px;" id="eraInfo">Эра 1 • Награда 50 LIZA</p>
             </div>
+
+            <!-- Кнопка YO -->
+            <button class="yo-btn" onclick="clickYO()">YO</button>
+            <div class="yo-info">+128 за клик • каждые 3 клика ещё +128</div>
 
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
                 Торговать LIZA на Yobit
@@ -382,7 +420,6 @@
     </div>
 
     <script>
-        // ←←← ЗАМЕНИ НА СВОЙ BNB АДРЕС
         const DONATION_BNB = "0xC837a7ee7146eD6bF9b5b2c126886002De875F5b";
 
         const firebaseConfig = {
@@ -408,6 +445,37 @@
         let myMiners = [];
         let globalTotalMined = 0;
         let currentReward = 50;
+        let yoClicks = 0;
+
+        // ===== Ранги (космическая / квантовая тема) =====
+        const RANKS = [
+            { min: 0,            title: "Новичок" },
+            { min: 10000,        title: "Квантовая Пылинка" },
+            { min: 100000,       title: "Атомный Странник" },
+            { min: 1000000,      title: "Протонный Майнер" },
+            { min: 10000000,     title: "Нейтронная Звезда" },
+            { min: 100000000,    title: "Чёрная Дыра" },
+            { min: 1000000000,   title: "Галактический Коллектор" },
+            { min: 10000000000,  title: "Квазар" },
+            { min: 100000000000, title: "Сверхновое Ядро" },
+            { min: 1e12,         title: "Большой Взрыв" },
+            { min: 1e13,         title: "Мультивселенная" },
+            { min: 1e14,         title: "Абсолютный Ноль" },
+            { min: 1e15,         title: "Божественная Частица" },
+            { min: 1e16,         title: "Создатель Реальности" }
+        ];
+
+        function getRank(balance) {
+            let current = RANKS[0].title;
+            for (let r of RANKS) {
+                if (balance >= r.min) current = r.title;
+            }
+            return current;
+        }
+
+        function updateRank() {
+            document.getElementById('rankDisplay').innerText = "Ранг: " + getRank(myBalance);
+        }
 
         function playCoinSound() {
             const sound = document.getElementById('coinSound');
@@ -537,14 +605,23 @@
             saveUser();
             updateUI();
 
-            // Звук + анимация
             playCoinSound();
             const cards = document.querySelectorAll('.miner-card');
-            if (cards[index]) {
-                showFloatPlus(cards[index], earned);
-            }
+            if (cards[index]) showFloatPlus(cards[index], earned);
 
             renderMiners();
+        }
+
+        // ===== Кнопка YO =====
+        function clickYO() {
+            yoClicks++;
+            let add = 128;
+            if (yoClicks % 3 === 0) add += 128; // каждые 3 клика ещё +128
+
+            myBalance = +(myBalance + add).toFixed(4);
+            saveUser();
+            updateUI();
+            playCoinSound();
         }
 
         function renderMiners() {
@@ -606,7 +683,7 @@
                 });
 
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const value = '0x' + BigInt(Math.floor(0.0025 * 1e18)).toString(16); // 0.0025 BNB
+                const value = '0x' + BigInt(Math.floor(0.0025 * 1e18)).toString(16);
 
                 await window.ethereum.request({
                     method: 'eth_sendTransaction',
@@ -634,6 +711,7 @@
         function updateUI() {
             document.getElementById('balanceDisplay').innerText = formatNum(myBalance);
             updateRewardInfo();
+            updateRank();
         }
 
         function sendChat() {
