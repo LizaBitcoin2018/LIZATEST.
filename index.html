@@ -1,633 +1,727 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LIZA Exchange</title>
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background: #0a0a12;
-        color: #eee;
-        min-height: 100vh;
-        padding: 16px 14px 40px;
-    }
-    .header { text-align: center; margin-bottom: 16px; }
-    .header h1 { color: #00c6ff; font-size: 1.5rem; }
-    .user { color: #00ffcc; font-size: 0.95rem; margin-top: 3px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIZA Exchange</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            min-height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            background: #000;
+            color: #eee;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
 
-    .balance-box { text-align: center; margin-bottom: 18px; }
-    .balance-box .label { color: #888; font-size: 0.9rem; margin-bottom: 3px; }
-    .balances {
-        display: flex;
-        justify-content: center;
-        gap: 24px;
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
-    .liza { color: #f7931a; }
-    .yo { color: #00c6ff; }
+        #galaxy {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse at center, #0a0a2a 0%, #000 70%);
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur) infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .galaxy-arm {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 140vmax; height: 140vmax;
+            margin: -70vmax;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(100,80,255,0.08) 40deg, rgba(180,100,255,0.15) 80deg, transparent 120deg, rgba(80,150,255,0.1) 180deg, transparent 220deg, rgba(150,80,255,0.12) 280deg, transparent 360deg);
+            border-radius: 50%;
+            animation: rotateGalaxy 120s linear infinite;
+            filter: blur(40px);
+        }
+        @keyframes rotateGalaxy {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-    .panel {
-        background: #12121f;
-        border: 1px solid #1e2a4a;
-        border-radius: 16px;
-        padding: 16px;
-        max-width: 480px;
-        margin: 0 auto;
-    }
-    .price {
-        text-align: center;
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: #00ff88;
-        margin-bottom: 2px;
-    }
-    .pool {
-        text-align: center;
-        font-size: 0.83rem;
-        color: #888;
-        margin-bottom: 12px;
-    }
+        .header {
+            position: relative;
+            z-index: 10;
+            background: rgba(15,15,25,0.92);
+            border-bottom: 2px solid #00c6ff;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { color: #00c6ff; font-size: 1.35rem; }
+        .user-info { color: #00ffcc; font-size: 0.95rem; }
 
-    .chart-box {
-        background: #0d0d18;
-        border-radius: 10px;
-        height: 290px;
-        margin-bottom: 14px;
-        position: relative;
-        overflow: hidden;
-    }
-    #chart { width: 100%; height: 100%; display: block; }
+        .content {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px 50px;
+            max-width: 520px;
+            margin: 0 auto;
+            width: 100%;
+        }
 
-    .trade-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 14px;
-    }
-    .trade-box {
-        background: #1a1a2e;
-        border-radius: 10px;
-        padding: 11px;
-    }
-    .trade-box h4 {
-        font-size: 0.88rem;
-        color: #aaa;
-        margin-bottom: 7px;
-    }
-    .trade-box input {
-        width: 100%;
-        background: #0f0f1a;
-        border: 1px solid #333;
-        color: white;
-        padding: 8px 10px;
-        border-radius: 7px;
-        font-size: 0.95rem;
-        margin-bottom: 7px;
-    }
-    .btn-buy {
-        width: 100%;
-        padding: 9px;
-        border: none;
-        border-radius: 7px;
-        background: #00aa55;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .btn-sell {
-        width: 100%;
-        padding: 9px;
-        border: none;
-        border-radius: 7px;
-        background: #cc3333;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        .balance-block {
+            text-align: center;
+            margin-bottom: 22px;
+            width: 100%;
+        }
+        .balance-label { color: #aaa; font-size: 0.95rem; margin-bottom: 4px; }
+        .balances {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        .bal-liza { color: #f7931a; }
+        .bal-yo { color: #00c6ff; }
 
-    .history-title {
-        font-size: 0.88rem;
-        color: #aaa;
-        margin-bottom: 7px;
-    }
-    .history {
-        max-height: 170px;
-        overflow-y: auto;
-        font-size: 0.83rem;
-    }
-    .trade-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 5px 0;
-        border-bottom: 1px solid #222;
-    }
+        .exchange-panel {
+            background: rgba(15,20,40,0.95);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            border: 1px solid rgba(0,180,255,0.35);
+        }
+        .exchange-panel h3 {
+            color: #00c6ff;
+            text-align: center;
+            margin-bottom: 14px;
+            font-size: 1.25rem;
+        }
+        .price-line {
+            text-align: center;
+            font-size: 1.45rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 6px;
+        }
+        .liquidity-info {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 16px;
+        }
 
-    #auth {
-        position: fixed;
-        inset: 0;
-        background: #0a0a12;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 100;
-    }
-    .auth-box {
-        background: #151525;
-        border: 1px solid #00c6ff;
-        border-radius: 14px;
-        padding: 26px;
-        width: 310px;
-        text-align: center;
-    }
-    .auth-box h2 { color: #00c6ff; margin-bottom: 16px; }
-    .auth-box input {
-        width: 100%;
-        background: #0f0f1a;
-        border: 1px solid #333;
-        color: white;
-        padding: 11px;
-        border-radius: 8px;
-        margin-bottom: 9px;
-        font-size: 1rem;
-    }
-    .auth-box button {
-        width: 100%;
-        padding: 11px;
-        background: #00c6ff;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-    .switch {
-        margin-top: 13px;
-        font-size: 0.9rem;
-        color: #888;
-        cursor: pointer;
-    }
-    .switch span { color: #00aaff; }
-    .err {
-        color: #ff5555;
-        margin-top: 11px;
-        font-size: 0.9rem;
-        min-height: 18px;
-    }
-</style>
+        .chart-container {
+            background: #0a0a15;
+            border-radius: 10px;
+            height: 210px;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        #priceChart {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+        .trade-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .trade-box {
+            background: rgba(0,0,0,0.35);
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .trade-box h4 {
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+        .trade-box input {
+            width: 100%;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        .buy-btn, .sell-btn {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: white;
+        }
+        .buy-btn { background: #00aa55; }
+        .sell-btn { background: #cc3333; }
+        .buy-btn:hover { background: #00cc66; }
+        .sell-btn:hover { background: #ee4444; }
+
+        .orderbook {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+        }
+        .orderbook-side h5 {
+            text-align: center;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .asks h5 { color: #ff5555; }
+        .bids h5 { color: #00ff88; }
+        .ob-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 4px;
+        }
+
+        .recent-title {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        .recent-trades {
+            max-height: 180px;
+            overflow-y: auto;
+            font-size: 0.84rem;
+        }
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        #authBlock {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.96);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .auth-box {
+            background: rgba(20,20,40,0.98);
+            border: 1px solid #00c6ff;
+            border-radius: 16px;
+            padding: 30px;
+            width: 340px;
+            max-width: 92vw;
+            text-align: center;
+        }
+        .auth-box h1 {
+            color: #00c6ff;
+            font-size: 1.7rem;
+            margin-bottom: 22px;
+        }
+        .auth-box input {
+            width: 100%;
+            background: #1a1a2e;
+            border: 1px solid #555;
+            color: white;
+            padding: 13px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .auth-box input:focus { border-color: #00c6ff; }
+        .auth-btn {
+            width: 100%;
+            background: #00c6ff;
+            color: #000;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .auth-switch {
+            margin-top: 18px;
+            font-size: 0.9rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .auth-switch span { color: #00aaff; text-decoration: underline; }
+        .error {
+            color: #ff5555;
+            margin-top: 14px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-<div id="auth">
-    <div class="auth-box">
-        <h2>LIZA Exchange</h2>
-        <div id="loginForm">
-            <input type="text" id="nick" placeholder="Никнейм" maxlength="20">
-            <input type="password" id="pass" placeholder="Пароль" maxlength="30">
-            <button onclick="login()">Войти</button>
-            <div class="switch" onclick="showRegister()">Нет аккаунта? <span>Создать</span></div>
-        </div>
-        <div id="registerForm" style="display:none">
-            <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
-            <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
-            <input type="password" id="regPass2" placeholder="Повтор пароля" maxlength="30">
-            <button onclick="register()">Создать</button>
-            <div class="switch" onclick="showLogin()">Уже есть аккаунт? <span>Войти</span></div>
-        </div>
-        <div class="err" id="err"></div>
+    <div id="galaxy">
+        <div class="galaxy-arm"></div>
     </div>
-</div>
 
-<div id="app" style="display:none">
-    <div class="header">
+    <div id="authBlock">
+        <div class="auth-box">
+            <h1>LIZA Exchange</h1>
+            <div id="loginForm">
+                <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20">
+                <input type="password" id="passInput" placeholder="Пароль" maxlength="30">
+                <button type="button" class="auth-btn" id="loginBtn">Войти</button>
+                <div class="auth-switch" id="toRegister">Нет аккаунта? <span>Зарегистрироваться</span></div>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
+                <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
+                <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30">
+                <button type="button" class="auth-btn" id="registerBtn">Создать аккаунт</button>
+                <div class="auth-switch" id="toLogin">Уже есть аккаунт? <span>Войти</span></div>
+            </div>
+            <p id="errorText" class="error"></p>
+        </div>
+    </div>
+
+    <div class="header" id="header" style="display:none;">
         <h1>LIZA Exchange</h1>
-        <div class="user" id="userName">-</div>
+        <div class="user-info" id="userDisplay">-</div>
     </div>
 
-    <div class="balance-box">
-        <div class="label">Твой баланс</div>
-        <div class="balances">
-            <div class="liza"><span id="balLiza">0</span> LIZA</div>
-            <div class="yo"><span id="balYo">0</span> YO</div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="price">1 YO = <span id="price">1.0000</span> LIZA</div>
-        <div class="pool">Пул: <span id="poolLiza">10 000 000</span> LIZA + <span id="poolYo">10 000 000</span> YO</div>
-
-        <div class="chart-box">
-            <canvas id="chart"></canvas>
-        </div>
-
-        <div class="trade-row">
-            <div class="trade-box">
-                <h4>Купить YO</h4>
-                <input type="number" id="buyInput" placeholder="Сумма LIZA">
-                <button class="btn-buy" onclick="buy()">Купить</button>
-            </div>
-            <div class="trade-box">
-                <h4>Продать YO</h4>
-                <input type="number" id="sellInput" placeholder="Сумма YO">
-                <button class="btn-sell" onclick="sell()">Продать</button>
+    <div class="content" id="game" style="display:none;">
+        <div class="balance-block">
+            <div class="balance-label">Твой баланс</div>
+            <div class="balances">
+                <div class="bal-liza"><span id="balanceDisplay">0</span> LIZA</div>
+                <div class="bal-yo"><span id="yoBalanceDisplay">0</span> YO</div>
             </div>
         </div>
 
-        <div class="history-title">Последние сделки</div>
-        <div class="history" id="history"></div>
-    </div>
-</div>
+        <div class="exchange-panel">
+            <h3>Биржа LIZA / YO</h3>
 
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
-    authDomain: "lizatest-124da.firebaseapp.com",
-    databaseURL: "https://lizatest-124da-default-rtdb.firebaseio.com",
-    projectId: "lizatest-124da",
-    storageBucket: "lizatest-124da.firebasestorage.app",
-    messagingSenderId: "88106031938",
-    appId: "1:88106031938:web:0b3b08517e71ce33aa06db"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+            <div class="price-line">
+                1 YO = <span id="currentPrice">1.0000</span> LIZA
+            </div>
+            <div class="liquidity-info">
+                Пул: <span id="poolLiza">1 000 000</span> LIZA + <span id="poolYo">1 000 000</span> YO
+            </div>
 
-const INITIAL_POOL = 10000000;
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
 
-let nick = "";
-let balLiza = 0;
-let balYo = 0;
-let poolLiza = INITIAL_POOL;
-let poolYo = INITIAL_POOL;
-let candles = [];
-let trades = [];
+            <div class="trade-form">
+                <div class="trade-box">
+                    <h4>Купить YO за LIZA</h4>
+                    <input type="number" id="buyAmount" placeholder="Сумма LIZA" min="1" step="any">
+                    <button class="buy-btn" id="buyBtn">Купить YO</button>
+                </div>
+                <div class="trade-box">
+                    <h4>Продать YO за LIZA</h4>
+                    <input type="number" id="sellAmount" placeholder="Сумма YO" min="0.01" step="any">
+                    <button class="sell-btn" id="sellBtn">Продать YO</button>
+                </div>
+            </div>
 
-function showRegister() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-    document.getElementById('err').innerText = '';
-}
-function showLogin() {
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('err').innerText = '';
-}
+            <div class="orderbook">
+                <div class="orderbook-side asks">
+                    <h5>Продажа</h5>
+                    <div id="asksList"></div>
+                </div>
+                <div class="orderbook-side bids">
+                    <h5>Покупка</h5>
+                    <div id="bidsList"></div>
+                </div>
+            </div>
 
-function login() {
-    const n = document.getElementById('nick').value.trim().toLowerCase();
-    const p = document.getElementById('pass').value;
-    if (!n || !p) return document.getElementById('err').innerText = 'Заполни поля';
-
-    db.ref('users/' + n).once('value').then(snap => {
-        if (!snap.exists()) return document.getElementById('err').innerText = 'Пользователь не найден';
-        if (snap.val().password !== p) return document.getElementById('err').innerText = 'Неверный пароль';
-        start(n, snap.val());
-    });
-}
-
-function register() {
-    const n = document.getElementById('regNick').value.trim().toLowerCase();
-    const p = document.getElementById('regPass').value;
-    const p2 = document.getElementById('regPass2').value;
-
-    if (n.length < 3) return document.getElementById('err').innerText = 'Ник минимум 3 символа';
-    if (!/^[a-z0-9_]+$/.test(n)) return document.getElementById('err').innerText = 'Только латиница и цифры';
-    if (p.length < 4) return document.getElementById('err').innerText = 'Пароль минимум 4 символа';
-    if (p !== p2) return document.getElementById('err').innerText = 'Пароли не совпадают';
-
-    db.ref('users/' + n).once('value').then(snap => {
-        if (snap.exists()) return document.getElementById('err').innerText = 'Ник занят';
-        const data = { password: p, balance: 100000, yoBalance: 5000 };
-        db.ref('users/' + n).set(data).then(() => start(n, data));
-    });
-}
-
-function start(n, data) {
-    nick = n;
-    balLiza = Number(data.balance) || 0;
-    balYo = Number(data.yoBalance) || 0;
-
-    document.getElementById('auth').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('userName').innerText = nick;
-
-    db.ref('exchange/pool').on('value', snap => {
-        const d = snap.val();
-        if (d) {
-            poolLiza = Number(d.liza) || INITIAL_POOL;
-            poolYo = Number(d.yo) || INITIAL_POOL;
-        } else {
-            db.ref('exchange/pool').set({ liza: INITIAL_POOL, yo: INITIAL_POOL });
-        }
-        updatePrice();
-    });
-
-    db.ref('exchange/candles').limitToLast(60).once('value').then(snap => {
-        const val = snap.val() || {};
-        candles = Object.values(val).sort((a, b) => a.t - b.t);
-        draw();
-    });
-
-    db.ref('exchange/candles').limitToLast(1).on('child_added', snap => {
-        const c = snap.val();
-        if (!c) return;
-        if (candles.length === 0 || c.t > candles[candles.length - 1].t) {
-            candles.push(c);
-            if (candles.length > 60) candles.shift();
-            draw();
-        }
-    });
-
-    db.ref('exchange/trades').limitToLast(30).once('value').then(snap => {
-        const val = snap.val() || {};
-        trades = Object.values(val).sort((a, b) => b.t - a.t);
-        renderHistory();
-    });
-
-    db.ref('exchange/trades').limitToLast(1).on('child_added', snap => {
-        const t = snap.val();
-        if (!t) return;
-        if (trades.length === 0 || t.t > trades[0].t) {
-            trades.unshift(t);
-            if (trades.length > 30) trades.pop();
-            renderHistory();
-        }
-    });
-
-    updateBalance();
-}
-
-function getPrice() {
-    return poolYo > 0 ? poolLiza / poolYo : 1;
-}
-
-function updatePrice() {
-    document.getElementById('price').innerText = getPrice().toFixed(4);
-    document.getElementById('poolLiza').innerText = Math.floor(poolLiza).toLocaleString('ru');
-    document.getElementById('poolYo').innerText = Math.floor(poolYo).toLocaleString('ru');
-}
-
-function updateBalance() {
-    document.getElementById('balLiza').innerText = Math.floor(balLiza).toLocaleString('ru');
-    document.getElementById('balYo').innerText = balYo.toLocaleString('ru', {maximumFractionDigits: 4});
-}
-
-function buy() {
-    const amount = parseFloat(document.getElementById('buyInput').value);
-    if (!amount || amount <= 0) return;
-    if (amount > balLiza) return alert('Недостаточно LIZA');
-
-    const k = poolLiza * poolYo;
-    const newLiza = poolLiza + amount;
-    const newYo = k / newLiza;
-    const got = poolYo - newYo;
-
-    balLiza -= amount;
-    balYo += got;
-    poolLiza = newLiza;
-    poolYo = newYo;
-
-    const price = getPrice();
-    const now = Date.now();
-
-    let prevClose = price;
-    if (candles.length > 0) {
-        prevClose = candles[candles.length - 1].c;
-    }
-
-    // Покупка → всегда зелёная свеча, короткий фитиль
-    const candle = {
-        o: prevClose,
-        c: price,
-        h: Math.max(prevClose, price) * 1.0008,
-        l: Math.min(prevClose, price) * 0.9995,
-        v: amount,
-        t: now
-    };
-
-    if (candle.c < candle.o) {
-        candle.c = candle.o * 1.0003;
-    }
-
-    const trade = {
-        type: 'buy',
-        amount: +got.toFixed(4),
-        price: +price.toFixed(6),
-        user: nick,
-        t: now
-    };
-
-    candles.push(candle);
-    if (candles.length > 60) candles.shift();
-    trades.unshift(trade);
-    if (trades.length > 30) trades.pop();
-
-    draw();
-    renderHistory();
-    updateBalance();
-    updatePrice();
-
-    db.ref('users/' + nick).update({ balance: balLiza, yoBalance: balYo });
-    db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-    db.ref('exchange/candles').push(candle);
-    db.ref('exchange/trades').push(trade);
-
-    document.getElementById('buyInput').value = '';
-}
-
-function sell() {
-    const amount = parseFloat(document.getElementById('sellInput').value);
-    if (!amount || amount <= 0) return;
-    if (amount > balYo) return alert('Недостаточно YO');
-
-    const k = poolLiza * poolYo;
-    const newYo = poolYo + amount;
-    const newLiza = k / newYo;
-    const got = poolLiza - newLiza;
-
-    balYo -= amount;
-    balLiza += got;
-    poolYo = newYo;
-    poolLiza = newLiza;
-
-    const price = getPrice();
-    const now = Date.now();
-
-    let prevClose = price;
-    if (candles.length > 0) {
-        prevClose = candles[candles.length - 1].c;
-    }
-
-    // Продажа → всегда красная свеча
-    const candle = {
-        o: prevClose,
-        c: price,
-        h: Math.max(prevClose, price) * 1.0005,
-        l: Math.min(prevClose, price) * 0.9992,
-        v: got,
-        t: now
-    };
-
-    if (candle.c > candle.o) {
-        candle.c = candle.o * 0.9997;
-    }
-
-    const trade = {
-        type: 'sell',
-        amount: +amount.toFixed(4),
-        price: +price.toFixed(6),
-        user: nick,
-        t: now
-    };
-
-    candles.push(candle);
-    if (candles.length > 60) candles.shift();
-    trades.unshift(trade);
-    if (trades.length > 30) trades.pop();
-
-    draw();
-    renderHistory();
-    updateBalance();
-    updatePrice();
-
-    db.ref('users/' + nick).update({ balance: balLiza, yoBalance: balYo });
-    db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-    db.ref('exchange/candles').push(candle);
-    db.ref('exchange/trades').push(trade);
-
-    document.getElementById('sellInput').value = '';
-}
-
-function renderHistory() {
-    const box = document.getElementById('history');
-    if (!trades.length) {
-        box.innerHTML = '<div style="color:#666;text-align:center;padding:12px">Пока нет сделок</div>';
-        return;
-    }
-    box.innerHTML = trades.map(t => `
-        <div class="trade-item">
-            <span style="color:${t.type==='buy'?'#00ff88':'#ff5555'}">${t.type==='buy'?'BUY':'SELL'} ${Number(t.amount).toFixed(2)}</span>
-            <span>${Number(t.price).toFixed(4)}</span>
-            <span style="color:#888">${t.user}</span>
+            <div class="recent-title">Последние сделки</div>
+            <div class="recent-trades" id="recentTrades"></div>
         </div>
-    `).join('');
-}
+    </div>
 
-function draw() {
-    const canvas = document.getElementById('chart');
-    if (!canvas) return;
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
+            authDomain: "lizatest-124da.firebaseapp.com",
+            databaseURL: "https://lizatest-124da-default-rtdb.firebaseio.com",
+            projectId: "lizatest-124da",
+            storageBucket: "lizatest-124da.firebasestorage.app",
+            messagingSenderId: "88106031938",
+            appId: "1:88106031938:web:0b3b08517e71ce33aa06db"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    if (w < 50 || h < 50) return;
+        const INITIAL_LIZA = 1000000;
+        const INITIAL_YO = 1000000;
 
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        let myNick = "";
+        let myBalance = 0;
+        let myYoBalance = 0;
+        let poolLiza = INITIAL_LIZA;
+        let poolYo = INITIAL_YO;
+        let priceHistory = [];
+        let recentTrades = [];
 
-    ctx.fillStyle = '#0d0d18';
-    ctx.fillRect(0, 0, w, h);
+        // Звёзды
+        const galaxy = document.getElementById('galaxy');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2.2 + 0.4;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--dur', (Math.random() * 4 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            galaxy.appendChild(star);
+        }
 
-    if (candles.length === 0) {
-        ctx.fillStyle = '#555';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Сделайте первую сделку', w/2, h/2);
-        return;
-    }
+        // Авторизация
+        const errorText = document.getElementById('errorText');
 
-    const data = candles.slice(-45);
-    const chartH = h * 0.66;
-    const volH = h * 0.27;
+        document.getElementById('toRegister').onclick = () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            errorText.innerText = '';
+        };
+        document.getElementById('toLogin').onclick = () => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            errorText.innerText = '';
+        };
 
-    let minP = Math.min(...data.map(c => c.l));
-    let maxP = Math.max(...data.map(c => c.h));
+        document.getElementById('loginBtn').onclick = doLogin;
+        document.getElementById('passInput').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+        document.getElementById('registerBtn').onclick = doRegister;
+        document.getElementById('regPass2').onkeydown = e => { if (e.key === 'Enter') doRegister(); };
 
-    if (maxP - minP < 0.006) {
-        const mid = (maxP + minP) / 2;
-        minP = mid - 0.012;
-        maxP = mid + 0.012;
-    }
+        function doLogin() {
+            const nick = document.getElementById('nickInput').value.trim().toLowerCase();
+            const pass = document.getElementById('passInput').value;
+            if (!nick || !pass) return errorText.innerText = "Заполни все поля";
 
-    const pad = (maxP - minP) * 0.15;
-    minP -= pad;
-    maxP += pad;
-    const range = maxP - minP;
-    const maxV = Math.max(...data.map(c => c.v)) || 1;
+            errorText.innerText = "Проверяем...";
+            db.ref('users/' + nick).once('value').then(snap => {
+                if (!snap.exists()) return errorText.innerText = "Пользователь не найден";
+                const data = snap.val();
+                if (data.password !== pass) return errorText.innerText = "Неверный пароль";
+                startGame(nick, data);
+            }).catch(() => errorText.innerText = "Ошибка соединения");
+        }
 
-    // Сетка
-    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '11px monospace';
-    ctx.textAlign = 'left';
+        function doRegister() {
+            const nick = document.getElementById('regNick').value.trim().toLowerCase();
+            const pass = document.getElementById('regPass').value;
+            const pass2 = document.getElementById('regPass2').value;
 
-    for (let i = 0; i <= 4; i++) {
-        const y = 16 + (i / 4) * (chartH - 14);
-        const p = maxP - (i / 4) * range;
-        ctx.beginPath();
-        ctx.moveTo(50, y);
-        ctx.lineTo(w - 8, y);
-        ctx.stroke();
-        ctx.fillText(p.toFixed(4), 4, y + 3);
-    }
+            if (!nick || nick.length < 3) return errorText.innerText = "Ник минимум 3 символа";
+            if (!/^[a-z0-9_]+$/.test(nick)) return errorText.innerText = "Только латиница, цифры и _";
+            if (!pass || pass.length < 4) return errorText.innerText = "Пароль минимум 4 символа";
+            if (pass !== pass2) return errorText.innerText = "Пароли не совпадают";
 
-    const cw = Math.max(7, (w - 70) / data.length - 2.8);
+            errorText.innerText = "Создаём аккаунт...";
+            db.ref('users/' + nick).once('value').then(snap => {
+                if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
 
-    data.forEach((c, i) => {
-        const x = 55 + i * (cw + 2.8);
+                const data = {
+                    password: pass,
+                    balance: 50000,
+                    yoBalance: 1000
+                };
+                return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
+            }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
+        }
 
-        const yH = 16 + ((maxP - c.h) / range) * (chartH - 14);
-        const yL = 16 + ((maxP - c.l) / range) * (chartH - 14);
-        const yO = 16 + ((maxP - c.o) / range) * (chartH - 14);
-        const yC = 16 + ((maxP - c.c) / range) * (chartH - 14);
+        function startGame(nick, data) {
+            myNick = nick;
+            myBalance = Number(data.balance) || 0;
+            myYoBalance = Number(data.yoBalance) || 0;
 
-        const up = c.c >= c.o;
-        const col = up ? '#00c853' : '#ff1744';
+            document.getElementById('authBlock').style.display = 'none';
+            document.getElementById('header').style.display = 'flex';
+            document.getElementById('game').style.display = 'flex';
+            document.getElementById('userDisplay').innerText = myNick;
 
-        // Короткий фитиль
-        ctx.beginPath();
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 1.8;
-        ctx.moveTo(x + cw / 2, yH);
-        ctx.lineTo(x + cw / 2, yL);
-        ctx.stroke();
+            db.ref('exchange/pool').once('value').then(snap => {
+                const d = snap.val();
+                if (!d) {
+                    poolLiza = INITIAL_LIZA;
+                    poolYo = INITIAL_YO;
+                    db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
+                } else {
+                    poolLiza = Number(d.liza) || INITIAL_LIZA;
+                    poolYo = Number(d.yo) || INITIAL_YO;
+                }
+                updateExchangeUI();
+            });
 
-        // Тело
-        let top = Math.min(yO, yC);
-        let height = Math.abs(yC - yO);
-        if (height < 6) height = 6;
+            db.ref('exchange/pool').on('value', snap => {
+                const d = snap.val();
+                if (d) {
+                    poolLiza = Number(d.liza) || poolLiza;
+                    poolYo = Number(d.yo) || poolYo;
+                    updateExchangeUI();
+                }
+            });
 
-        ctx.fillStyle = col;
-        ctx.fillRect(x, top, cw, height);
-    });
+            updateUI();
+            drawChart();
 
-    // Объём
-    data.forEach((c, i) => {
-        const x = 55 + i * (cw + 2.8);
-        const up = c.c >= c.o;
-        const vh = Math.max(4, (c.v / maxV) * (volH - 8));
-        ctx.fillStyle = up ? 'rgba(0,200,83,0.4)' : 'rgba(255,23,68,0.4)';
-        ctx.fillRect(x, h - 6 - vh, cw, vh);
-    });
+            document.getElementById('buyBtn').onclick = buyYO;
+            document.getElementById('sellBtn').onclick = sellYO;
+        }
 
-    const last = data[data.length - 1].c;
-    ctx.fillStyle = '#00ff88';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(last.toFixed(4), w - 10, 16);
-}
+        function getPrice() {
+            if (poolYo <= 0) return 1;
+            return poolLiza / poolYo;
+        }
 
-window.addEventListener('resize', () => setTimeout(draw, 100));
-</script>
+        function updateExchangeUI() {
+            const price = getPrice();
+            document.getElementById('currentPrice').innerText = price.toFixed(4);
+            document.getElementById('poolLiza').innerText = Math.floor(poolLiza).toLocaleString('ru');
+            document.getElementById('poolYo').innerText = Math.floor(poolYo).toLocaleString('ru');
+            renderOrderBook(price);
+        }
+
+        function renderOrderBook(price) {
+            const asks = [], bids = [];
+            for (let i = 1; i <= 6; i++) {
+                asks.push({ price: price * (1 + i * 0.008), amount: Math.floor(1500 + Math.random() * 7000) });
+                bids.push({ price: price * (1 - i * 0.008), amount: Math.floor(1500 + Math.random() * 7000) });
+            }
+            document.getElementById('asksList').innerHTML = asks.map(a => `
+                <div class="ob-row">
+                    <span style="color:#ff6666">${a.price.toFixed(4)}</span>
+                    <span>${a.amount.toLocaleString('ru')}</span>
+                </div>
+            `).join('');
+            document.getElementById('bidsList').innerHTML = bids.map(b => `
+                <div class="ob-row">
+                    <span style="color:#66ff99">${b.price.toFixed(4)}</span>
+                    <span>${b.amount.toLocaleString('ru')}</span>
+                </div>
+            `).join('');
+        }
+
+        function buyYO() {
+            const lizaIn = parseFloat(document.getElementById('buyAmount').value);
+            if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите сумму LIZA");
+            if (lizaIn > myBalance) return alert("Недостаточно LIZA");
+
+            const k = poolLiza * poolYo;
+            const newPoolLiza = poolLiza + lizaIn;
+            const newPoolYo = k / newPoolLiza;
+            const yoOut = poolYo - newPoolYo;
+
+            if (yoOut <= 0.0001) return alert("Слишком маленькая сумма");
+
+            myBalance -= lizaIn;
+            myYoBalance += yoOut;
+            poolLiza = newPoolLiza;
+            poolYo = newPoolYo;
+
+            const price = getPrice();
+            const now = Date.now();
+
+            updateUI();
+            updateExchangeUI();
+
+            const trade = { type: 'buy', amount: yoOut, price: price, user: myNick, t: now };
+            recentTrades.unshift(trade);
+            if (recentTrades.length > 30) recentTrades.pop();
+            renderRecentTrades();
+
+            priceHistory.push({ p: price, t: now });
+            if (priceHistory.length > 60) priceHistory.shift();
+            drawChart();
+
+            db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
+            db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
+            db.ref('exchange/trades').push(trade);
+            db.ref('exchange/priceHistory').push({ p: price, t: now });
+
+            document.getElementById('buyAmount').value = '';
+            alert(`Куплено ${yoOut.toFixed(4)} YO\nза ${lizaIn.toLocaleString('ru')} LIZA`);
+        }
+
+        function sellYO() {
+            const yoIn = parseFloat(document.getElementById('sellAmount').value);
+            if (isNaN(yoIn) || yoIn <= 0) return alert("Введите сумму YO");
+            if (yoIn > myYoBalance) return alert("Недостаточно YO");
+
+            const k = poolLiza * poolYo;
+            const newPoolYo = poolYo + yoIn;
+            const newPoolLiza = k / newPoolYo;
+            const lizaOut = poolLiza - newPoolLiza;
+
+            if (lizaOut <= 0.0001) return alert("Слишком маленькая сумма");
+
+            myYoBalance -= yoIn;
+            myBalance += lizaOut;
+            poolYo = newPoolYo;
+            poolLiza = newPoolLiza;
+
+            const price = getPrice();
+            const now = Date.now();
+
+            updateUI();
+            updateExchangeUI();
+
+            const trade = { type: 'sell', amount: yoIn, price: price, user: myNick, t: now };
+            recentTrades.unshift(trade);
+            if (recentTrades.length > 30) recentTrades.pop();
+            renderRecentTrades();
+
+            priceHistory.push({ p: price, t: now });
+            if (priceHistory.length > 60) priceHistory.shift();
+            drawChart();
+
+            db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
+            db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
+            db.ref('exchange/trades').push(trade);
+            db.ref('exchange/priceHistory').push({ p: price, t: now });
+
+            document.getElementById('sellAmount').value = '';
+            alert(`Продано ${yoIn.toFixed(4)} YO\nполучено ${lizaOut.toFixed(2)} LIZA`);
+        }
+
+        function renderRecentTrades() {
+            const box = document.getElementById('recentTrades');
+            if (recentTrades.length === 0) {
+                box.innerHTML = '<div style="color:#666;text-align:center;padding:12px;">Пока нет сделок</div>';
+                return;
+            }
+            box.innerHTML = recentTrades.map(t => `
+                <div class="trade-item">
+                    <span style="color:${t.type === 'buy' ? '#00ff88' : '#ff5555'}">
+                        ${t.type === 'buy' ? 'BUY' : 'SELL'} ${Number(t.amount).toFixed(3)}
+                    </span>
+                    <span>${Number(t.price).toFixed(4)}</span>
+                    <span style="color:#888">${t.user}</span>
+                </div>
+            `).join('');
+        }
+
+        // ====================== СВЕЧНОЙ ГРАФИК ======================
+        function drawChart() {
+            const canvas = document.getElementById('priceChart');
+            if (!canvas) return;
+
+            const parent = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const w = parent.clientWidth;
+            const h = parent.clientHeight;
+
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            // Фон
+            ctx.fillStyle = '#0a0a15';
+            ctx.fillRect(0, 0, w, h);
+
+            if (priceHistory.length < 2) {
+                ctx.fillStyle = '#555';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Сделайте первую сделку', w / 2, h / 2);
+                return;
+            }
+
+            // Создаём свечи из истории цен
+            const candles = [];
+            for (let i = 1; i < priceHistory.length; i++) {
+                const open = priceHistory[i - 1].p;
+                const close = priceHistory[i].p;
+                const high = Math.max(open, close) * (1 + Math.random() * 0.004);
+                const low = Math.min(open, close) * (1 - Math.random() * 0.004);
+                candles.push({ open, high, low, close });
+            }
+
+            // Берём последние 40 свечей
+            const visible = candles.slice(-40);
+            if (visible.length === 0) return;
+
+            const prices = visible.flatMap(c => [c.high, c.low]);
+            let minP = Math.min(...prices);
+            let maxP = Math.max(...prices);
+            if (maxP - minP < 0.0001) {
+                minP -= 0.002;
+                maxP += 0.002;
+            }
+            const range = maxP - minP;
+
+            const candleWidth = Math.max(6, (w - 30) / visible.length - 3);
+            const gap = 3;
+
+            visible.forEach((c, i) => {
+                const x = 15 + i * (candleWidth + gap);
+                const openY = h - 20 - ((c.open - minP) / range) * (h - 40);
+                const closeY = h - 20 - ((c.close - minP) / range) * (h - 40);
+                const highY = h - 20 - ((c.high - minP) / range) * (h - 40);
+                const lowY = h - 20 - ((c.low - minP) / range) * (h - 40);
+
+                const isGreen = c.close >= c.open;
+                const color = isGreen ? '#00c853' : '#ff1744';
+
+                // Тень (wick)
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(x + candleWidth / 2, highY);
+                ctx.lineTo(x + candleWidth / 2, lowY);
+                ctx.stroke();
+
+                // Тело свечи
+                const bodyTop = Math.min(openY, closeY);
+                const bodyHeight = Math.max(2, Math.abs(closeY - openY));
+
+                ctx.fillStyle = color;
+                ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+            });
+
+            // Последняя цена
+            const last = visible[visible.length - 1].close;
+            ctx.fillStyle = '#00ff88';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(last.toFixed(4), w - 12, 20);
+        }
+
+        function updateUI() {
+            document.getElementById('balanceDisplay').innerText = Math.floor(myBalance).toLocaleString('ru');
+            document.getElementById('yoBalanceDisplay').innerText = myYoBalance.toLocaleString('ru', {maximumFractionDigits: 4});
+        }
+    </script>
 </body>
 </html>
