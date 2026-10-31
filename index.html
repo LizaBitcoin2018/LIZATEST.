@@ -13,30 +13,12 @@
         min-height: 100vh;
         padding: 16px 14px 40px;
     }
+    .header { text-align: center; margin-bottom: 16px; }
+    .header h1 { color: #00c6ff; font-size: 1.5rem; }
+    .user { color: #00ffcc; font-size: 0.95rem; margin-top: 3px; }
 
-    .header {
-        text-align: center;
-        margin-bottom: 16px;
-    }
-    .header h1 {
-        color: #00c6ff;
-        font-size: 1.5rem;
-    }
-    .user {
-        color: #00ffcc;
-        font-size: 0.95rem;
-        margin-top: 3px;
-    }
-
-    .balance-box {
-        text-align: center;
-        margin-bottom: 18px;
-    }
-    .balance-box .label {
-        color: #888;
-        font-size: 0.9rem;
-        margin-bottom: 3px;
-    }
+    .balance-box { text-align: center; margin-bottom: 18px; }
+    .balance-box .label { color: #888; font-size: 0.9rem; margin-bottom: 3px; }
     .balances {
         display: flex;
         justify-content: center;
@@ -55,7 +37,6 @@
         max-width: 480px;
         margin: 0 auto;
     }
-
     .price {
         text-align: center;
         font-size: 1.3rem;
@@ -73,16 +54,12 @@
     .chart-box {
         background: #0d0d18;
         border-radius: 10px;
-        height: 260px;
+        height: 270px;
         margin-bottom: 14px;
         position: relative;
         overflow: hidden;
     }
-    #chart {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
+    #chart { width: 100%; height: 100%; display: block; }
 
     .trade-row {
         display: grid;
@@ -137,7 +114,7 @@
         margin-bottom: 7px;
     }
     .history {
-        max-height: 150px;
+        max-height: 160px;
         overflow-y: auto;
         font-size: 0.83rem;
     }
@@ -165,10 +142,7 @@
         width: 310px;
         text-align: center;
     }
-    .auth-box h2 {
-        color: #00c6ff;
-        margin-bottom: 16px;
-    }
+    .auth-box h2 { color: #00c6ff; margin-bottom: 16px; }
     .auth-box input {
         width: 100%;
         background: #0f0f1a;
@@ -246,7 +220,7 @@
 
     <div class="panel">
         <div class="price">1 YO = <span id="price">1.0000</span> LIZA</div>
-        <div class="pool">Пул: <span id="poolLiza">1 000 000</span> LIZA + <span id="poolYo">1 000 000</span> YO</div>
+        <div class="pool">Пул: <span id="poolLiza">10 000 000</span> LIZA + <span id="poolYo">10 000 000</span> YO</div>
 
         <div class="chart-box">
             <canvas id="chart"></canvas>
@@ -283,11 +257,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+const INITIAL_POOL = 10000000; // увеличил пул → цена будет двигаться гораздо спокойнее
+
 let nick = "";
 let balLiza = 0;
 let balYo = 0;
-let poolLiza = 1000000;
-let poolYo = 1000000;
+let poolLiza = INITIAL_POOL;
+let poolYo = INITIAL_POOL;
 let candles = [];
 let trades = [];
 
@@ -326,7 +302,7 @@ function register() {
 
     db.ref('users/' + n).once('value').then(snap => {
         if (snap.exists()) return document.getElementById('err').innerText = 'Ник занят';
-        const data = { password: p, balance: 50000, yoBalance: 1000 };
+        const data = { password: p, balance: 100000, yoBalance: 5000 };
         db.ref('users/' + n).set(data).then(() => start(n, data));
     });
 }
@@ -344,16 +320,16 @@ function start(n, data) {
     db.ref('exchange/pool').on('value', snap => {
         const d = snap.val();
         if (d) {
-            poolLiza = Number(d.liza) || 1000000;
-            poolYo = Number(d.yo) || 1000000;
+            poolLiza = Number(d.liza) || INITIAL_POOL;
+            poolYo = Number(d.yo) || INITIAL_POOL;
         } else {
-            db.ref('exchange/pool').set({ liza: 1000000, yo: 1000000 });
+            db.ref('exchange/pool').set({ liza: INITIAL_POOL, yo: INITIAL_POOL });
         }
         updatePrice();
     });
 
     // Свечи
-    db.ref('exchange/candles').limitToLast(50).on('value', snap => {
+    db.ref('exchange/candles').limitToLast(60).on('value', snap => {
         const val = snap.val();
         if (val) {
             candles = Object.values(val).sort((a, b) => a.t - b.t);
@@ -361,8 +337,8 @@ function start(n, data) {
         }
     });
 
-    // История сделок
-    db.ref('exchange/trades').limitToLast(20).on('value', snap => {
+    // История
+    db.ref('exchange/trades').limitToLast(25).on('value', snap => {
         const val = snap.val();
         if (val) {
             trades = Object.values(val).sort((a, b) => b.t - a.t);
@@ -407,9 +383,9 @@ function buy() {
     const now = Date.now();
 
     const candle = {
-        o: price * 0.999,
-        h: price * 1.002,
-        l: price * 0.998,
+        o: price * 0.9997,
+        h: price * 1.0012,
+        l: price * 0.9988,
         c: price,
         v: amount,
         t: now
@@ -417,17 +393,17 @@ function buy() {
 
     const trade = {
         type: 'buy',
-        amount: got,
-        price: price,
+        amount: +got.toFixed(4),
+        price: +price.toFixed(6),
         user: nick,
         t: now
     };
 
-    // Локально сразу
+    // Локально
     candles.push(candle);
-    if (candles.length > 50) candles.shift();
+    if (candles.length > 60) candles.shift();
     trades.unshift(trade);
-    if (trades.length > 20) trades.pop();
+    if (trades.length > 25) trades.pop();
 
     draw();
     renderHistory();
@@ -462,9 +438,9 @@ function sell() {
     const now = Date.now();
 
     const candle = {
-        o: price * 1.001,
-        h: price * 1.002,
-        l: price * 0.998,
+        o: price * 1.0003,
+        h: price * 1.0012,
+        l: price * 0.9988,
         c: price,
         v: got,
         t: now
@@ -472,16 +448,16 @@ function sell() {
 
     const trade = {
         type: 'sell',
-        amount: amount,
-        price: price,
+        amount: +amount.toFixed(4),
+        price: +price.toFixed(6),
         user: nick,
         t: now
     };
 
     candles.push(candle);
-    if (candles.length > 50) candles.shift();
+    if (candles.length > 60) candles.shift();
     trades.unshift(trade);
-    if (trades.length > 20) trades.pop();
+    if (trades.length > 25) trades.pop();
 
     draw();
     renderHistory();
@@ -520,7 +496,6 @@ function draw() {
     const rect = canvas.parentElement.getBoundingClientRect();
     const w = rect.width;
     const h = rect.height;
-
     if (w < 50 || h < 50) return;
 
     canvas.width = w * dpr;
@@ -529,7 +504,6 @@ function draw() {
     canvas.style.height = h + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Фон
     ctx.fillStyle = '#0d0d18';
     ctx.fillRect(0, 0, w, h);
 
@@ -541,7 +515,7 @@ function draw() {
         return;
     }
 
-    const data = candles.slice(-40);
+    const data = candles.slice(-45);
     const chartH = h * 0.67;
     const volH = h * 0.27;
 
@@ -569,7 +543,6 @@ function draw() {
         ctx.fillText(p.toFixed(4), 4, y + 3);
     }
 
-    // Свечи
     const cw = Math.max(4, (w - 65) / data.length - 2);
 
     data.forEach((c, i) => {
@@ -603,7 +576,6 @@ function draw() {
         ctx.fillRect(x, h - 6 - vh, cw, vh);
     });
 
-    // Цена
     const last = data[data.length - 1].c;
     ctx.fillStyle = '#00ff88';
     ctx.font = 'bold 12px sans-serif';
