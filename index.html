@@ -1,609 +1,417 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LIZA Exchange</title>
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background: #0a0a12;
-        color: #eee;
-        min-height: 100vh;
-        padding: 16px 14px 40px;
-    }
-    .header { text-align: center; margin-bottom: 16px; }
-    .header h1 { color: #00c6ff; font-size: 1.5rem; }
-    .user { color: #00ffcc; font-size: 0.95rem; margin-top: 3px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Exchange AI Emulator 2026</title>
+    <style>
+        :root {
+            --text-green: #00e676;
+            --text-red: #ff5252;
+            --bg-main: #0d0613; /* Киберпанк-темный из ваших предпочтений */
+            --bg-panel: #171b26;
+            --bg-grid: #1e222d;
+            --text-main: #1bbf1b; /* Фирменный зеленый */
+            --text-muted: #848e9c;
+            --primary: #33d7bf;
+        }
 
-    .balance-box { text-align: center; margin-bottom: 18px; }
-    .balance-box .label { color: #888; font-size: 0.9rem; margin-bottom: 3px; }
-    .balances {
-        display: flex;
-        justify-content: center;
-        gap: 24px;
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
-    .liza { color: #f7931a; }
-    .yo { color: #00c6ff; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            user-select: none;
+        }
 
-    .panel {
-        background: #12121f;
-        border: 1px solid #1e2a4a;
-        border-radius: 16px;
-        padding: 16px;
-        max-width: 480px;
-        margin: 0 auto;
-    }
-    .price {
-        text-align: center;
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: #00ff88;
-        margin-bottom: 2px;
-    }
-    .pool {
-        text-align: center;
-        font-size: 0.83rem;
-        color: #888;
-        margin-bottom: 12px;
-    }
+        body {
+            background-color: var(--bg-main);
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            padding: 10px;
+            gap: 10px;
+        }
 
-    .chart-box {
-        background: #0d0d18;
-        border-radius: 10px;
-        height: 280px;
-        margin-bottom: 14px;
-        position: relative;
-        overflow: hidden;
-    }
-    #chart { width: 100%; height: 100%; display: block; }
+        /* Левая панель: Стакан */
+        .orderbook-panel {
+            width: 280px;
+            background-color: var(--bg-panel);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            border: 1px solid #222;
+        }
 
-    .trade-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 14px;
-    }
-    .trade-box {
-        background: #1a1a2e;
-        border-radius: 10px;
-        padding: 11px;
-    }
-    .trade-box h4 {
-        font-size: 0.88rem;
-        color: #aaa;
-        margin-bottom: 7px;
-    }
-    .trade-box input {
-        width: 100%;
-        background: #0f0f1a;
-        border: 1px solid #333;
-        color: white;
-        padding: 8px 10px;
-        border-radius: 7px;
-        font-size: 0.95rem;
-        margin-bottom: 7px;
-    }
-    .btn-buy {
-        width: 100%;
-        padding: 9px;
-        border: none;
-        border-radius: 7px;
-        background: #00aa55;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .btn-sell {
-        width: 100%;
-        padding: 9px;
-        border: none;
-        border-radius: 7px;
-        background: #cc3333;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        .panel-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: var(--primary);
+            text-align: center;
+        }
 
-    .history-title {
-        font-size: 0.88rem;
-        color: #aaa;
-        margin-bottom: 7px;
-    }
-    .history {
-        max-height: 170px;
-        overflow-y: auto;
-        font-size: 0.83rem;
-    }
-    .trade-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 5px 0;
-        border-bottom: 1px solid #222;
-    }
+        .ob-header, .ob-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            padding: 4px 5px;
+            position: relative;
+        }
 
-    #auth {
-        position: fixed;
-        inset: 0;
-        background: #0a0a12;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 100;
-    }
-    .auth-box {
-        background: #151525;
-        border: 1px solid #00c6ff;
-        border-radius: 14px;
-        padding: 26px;
-        width: 310px;
-        text-align: center;
-    }
-    .auth-box h2 { color: #00c6ff; margin-bottom: 16px; }
-    .auth-box input {
-        width: 100%;
-        background: #0f0f1a;
-        border: 1px solid #333;
-        color: white;
-        padding: 11px;
-        border-radius: 8px;
-        margin-bottom: 9px;
-        font-size: 1rem;
-    }
-    .auth-box button {
-        width: 100%;
-        padding: 11px;
-        background: #00c6ff;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-    .switch {
-        margin-top: 13px;
-        font-size: 0.9rem;
-        color: #888;
-        cursor: pointer;
-    }
-    .switch span { color: #00aaff; }
-    .err {
-        color: #ff5555;
-        margin-top: 11px;
-        font-size: 0.9rem;
-        min-height: 18px;
-    }
-</style>
+        .ob-header {
+            color: var(--text-muted);
+            border-bottom: 1px solid #2a2e39;
+            margin-bottom: 5px;
+        }
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+        .ob-rows {
+            flex: 1;
+            display: flex;
+            flex-direction: column-reverse; /* Для асков сверху вниз */
+            overflow: hidden;
+        }
+
+        .ob-rows.bids {
+            flex: 1;
+            flex-direction: column; /* Для бидов сверху вниз */
+        }
+
+        .ob-row .depth-bg {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .ob-row span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .price-current-box {
+            background-color: var(--bg-grid);
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            transition: color 0.1s ease;
+        }
+
+        /* Центральная панель: График */
+        .chart-panel {
+            flex: 1;
+            background-color: var(--bg-panel);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            border: 1px solid #222;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            width: 100%;
+        }
+
+        canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Правая панель: Торговля и Лента */
+        .trade-panel {
+            width: 280px;
+            background-color: var(--bg-panel);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            border: 1px solid #222;
+            gap: 15px;
+        }
+
+        .trade-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-buy { background-color: var(--text-green); }
+        .btn-sell { background-color: var(--text-red); }
+
+        .history-box {
+            flex: 1;
+            background-color: var(--bg-main);
+            border-radius: 4px;
+            padding: 5px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            border: 1px solid #2a2e39;
+        }
+
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 5px;
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+    </style>
 </head>
 <body>
 
-<div id="auth">
-    <div class="auth-box">
-        <h2>LIZA Exchange</h2>
-        <div id="loginForm">
-            <input type="text" id="nick" placeholder="Никнейм" maxlength="20">
-            <input type="password" id="pass" placeholder="Пароль" maxlength="30">
-            <button onclick="login()">Войти</button>
-            <div class="switch" onclick="showRegister()">Нет аккаунта? <span>Создать</span></div>
+    <!-- 1. ОРДЕРБУК (СТАКАН) -->
+    <div class="orderbook-panel">
+        <div class="panel-title">Ордербук LIZA/USDT</div>
+        <div class="ob-header">
+            <span>Цена (USDT)</span>
+            <span>Объем</span>
         </div>
-        <div id="registerForm" style="display:none">
-            <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
-            <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
-            <input type="password" id="regPass2" placeholder="Повтор пароля" maxlength="30">
-            <button onclick="register()">Создать</button>
-            <div class="switch" onclick="showLogin()">Уже есть аккаунт? <span>Войти</span></div>
-        </div>
-        <div class="err" id="err"></div>
-    </div>
-</div>
-
-<div id="app" style="display:none">
-    <div class="header">
-        <h1>LIZA Exchange</h1>
-        <div class="user" id="userName">-</div>
+        <div class="ob-rows" id="asks-container"></div>
+        <div class="price-current-box" id="current-price-display">0.00</div>
+        <div class="ob-rows bids" id="bids-container"></div>
     </div>
 
-    <div class="balance-box">
-        <div class="label">Твой баланс</div>
-        <div class="balances">
-            <div class="liza"><span id="balLiza">0</span> LIZA</div>
-            <div class="yo"><span id="balYo">0</span> YO</div>
+    <!-- 2. ГРАФИК СВЕЧЕЙ И ОБЪЕМОВ -->
+    <div class="chart-panel">
+        <div class="panel-title" style="text-align: left; padding-left: 10px;">График цен и объемов (5s)</div>
+        <div class="canvas-container" id="canvas-wrapper">
+            <canvas id="exchangeChart"></canvas>
         </div>
     </div>
 
-    <div class="panel">
-        <div class="price">1 YO = <span id="price">1.0000</span> LIZA</div>
-        <div class="pool">Пул: <span id="poolLiza">10 000 000</span> LIZA + <span id="poolYo">10 000 000</span> YO</div>
-
-        <div class="chart-box">
-            <canvas id="chart"></canvas>
+    <!-- 3. ТОРГОВЛЯ И ИСТОРИЯ СДЕЛОК -->
+    <div class="trade-panel">
+        <div class="panel-title">Торговый терминал</div>
+        <div class="trade-buttons">
+            <button class="btn btn-buy" onclick="playerOrder('BUY')">BUY (Рыночный памп)</button>
+            <button class="btn btn-sell" onclick="playerOrder('SELL')">SELL (Рыночный дамп)</button>
         </div>
-
-        <div class="trade-row">
-            <div class="trade-box">
-                <h4>Купить YO</h4>
-                <input type="number" id="buyInput" placeholder="Сумма LIZA">
-                <button class="btn-buy" onclick="buy()">Купить</button>
-            </div>
-            <div class="trade-box">
-                <h4>Продать YO</h4>
-                <input type="number" id="sellInput" placeholder="Сумма YO">
-                <button class="btn-sell" onclick="sell()">Продать</button>
-            </div>
-        </div>
-
-        <div class="history-title">Последние сделки</div>
-        <div class="history" id="history"></div>
+        <div class="panel-title" style="margin-bottom: 0;">Лента сделок</div>
+        <div class="history-box" id="history-container"></div>
     </div>
-</div>
 
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
-    authDomain: "lizatest-124da.firebaseapp.com",
-    databaseURL: "https://lizatest-124da-default-rtdb.firebaseio.com",
-    projectId: "lizatest-124da",
-    storageBucket: "lizatest-124da.firebasestorage.app",
-    messagingSenderId: "88106031938",
-    appId: "1:88106031938:web:0b3b08517e71ce33aa06db"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+    <script>
+        // Инициализация базовых параметров рынка
+        let currentPrice = 100.00;
+        let tradeHistory = [];
+        let candles = [];
+        
+        // Структура текущей свечи
+        let currentCandle = createNewCandle(currentPrice);
 
-const INITIAL_POOL = 10000000;
+        const canvas = document.getElementById('exchangeChart');
+        const ctx = canvas.getContext('2d');
 
-let nick = "";
-let balLiza = 0;
-let balYo = 0;
-let poolLiza = INITIAL_POOL;
-let poolYo = INITIAL_POOL;
-
-// Локальные массивы — главный источник правды
-let candles = [];
-let trades = [];
-
-function showRegister() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-    document.getElementById('err').innerText = '';
-}
-function showLogin() {
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('err').innerText = '';
-}
-
-function login() {
-    const n = document.getElementById('nick').value.trim().toLowerCase();
-    const p = document.getElementById('pass').value;
-    if (!n || !p) return document.getElementById('err').innerText = 'Заполни поля';
-
-    db.ref('users/' + n).once('value').then(snap => {
-        if (!snap.exists()) return document.getElementById('err').innerText = 'Пользователь не найден';
-        if (snap.val().password !== p) return document.getElementById('err').innerText = 'Неверный пароль';
-        start(n, snap.val());
-    });
-}
-
-function register() {
-    const n = document.getElementById('regNick').value.trim().toLowerCase();
-    const p = document.getElementById('regPass').value;
-    const p2 = document.getElementById('regPass2').value;
-
-    if (n.length < 3) return document.getElementById('err').innerText = 'Ник минимум 3 символа';
-    if (!/^[a-z0-9_]+$/.test(n)) return document.getElementById('err').innerText = 'Только латиница и цифры';
-    if (p.length < 4) return document.getElementById('err').innerText = 'Пароль минимум 4 символа';
-    if (p !== p2) return document.getElementById('err').innerText = 'Пароли не совпадают';
-
-    db.ref('users/' + n).once('value').then(snap => {
-        if (snap.exists()) return document.getElementById('err').innerText = 'Ник занят';
-        const data = { password: p, balance: 100000, yoBalance: 5000 };
-        db.ref('users/' + n).set(data).then(() => start(n, data));
-    });
-}
-
-function start(n, data) {
-    nick = n;
-    balLiza = Number(data.balance) || 0;
-    balYo = Number(data.yoBalance) || 0;
-
-    document.getElementById('auth').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('userName').innerText = nick;
-
-    // Пул
-    db.ref('exchange/pool').on('value', snap => {
-        const d = snap.val();
-        if (d) {
-            poolLiza = Number(d.liza) || INITIAL_POOL;
-            poolYo = Number(d.yo) || INITIAL_POOL;
-        } else {
-            db.ref('exchange/pool').set({ liza: INITIAL_POOL, yo: INITIAL_POOL });
+        function createNewCandle(price) {
+            return { open: price, high: price, low: price, close: price, volume: 0 };
         }
-        updatePrice();
-    });
 
-    // === Свечи: сначала загружаем всё, потом только добавляем новые ===
-    db.ref('exchange/candles').limitToLast(80).once('value').then(snap => {
-        const val = snap.val() || {};
-        candles = Object.values(val).sort((a, b) => a.t - b.t);
-        draw();
-    });
-
-    // Слушаем только новые свечи
-    db.ref('exchange/candles').limitToLast(1).on('child_added', snap => {
-        const c = snap.val();
-        if (!c) return;
-        // Добавляем только если такой свечи ещё нет
-        if (candles.length === 0 || c.t > candles[candles.length - 1].t) {
-            candles.push(c);
-            if (candles.length > 80) candles.shift();
-            draw();
+        // Автоподгонка размеров Canvas под контейнер
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
         }
-    });
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-    // === История сделок ===
-    db.ref('exchange/trades').limitToLast(30).once('value').then(snap => {
-        const val = snap.val() || {};
-        trades = Object.values(val).sort((a, b) => b.t - a.t);
-        renderHistory();
-    });
+        // Имитация активности ордербука и ботов маркет-мейкеров
+        function simulateMarket() {
+            // Случайный шаг цены с шумом
+            const change = (Math.random() - 0.5) * 0.12;
+            currentPrice = Math.max(0.01, parseFloat((currentPrice + change).toFixed(2)));
 
-    db.ref('exchange/trades').limitToLast(1).on('child_added', snap => {
-        const t = snap.val();
-        if (!t) return;
-        if (trades.length === 0 || t.t > trades[0].t) {
-            trades.unshift(t);
-            if (trades.length > 30) trades.pop();
-            renderHistory();
+            // Обновление цен внутри формирующейся свечи
+            currentCandle.close = currentPrice;
+            if (currentPrice > currentCandle.high) currentCandle.high = currentPrice;
+            if (currentPrice < currentCandle.low) currentCandle.low = currentPrice;
+            
+            const tradeVol = Math.floor(Math.random() * 250) + 10;
+            currentCandle.volume += tradeVol;
+
+            // Направление сделки
+            const side = change >= 0 ? 'BUY' : 'SELL';
+            addTradeHistory(side, currentPrice, tradeVol);
+
+            renderOrderBook();
+            
+            // Интервал изменения цены ботами (от 150 до 400 мс)
+            setTimeout(simulateMarket, Math.floor(Math.random() * 250) + 150);
         }
-    });
 
-    updateBalance();
+        // Кнопки игрока (памп / дамп)
+        function playerOrder(side) {
+            const multiplier = side === 'BUY' ? 1.003 : 0.997;
+            currentPrice = parseFloat((currentPrice * multiplier).toFixed(2));
+            
+            currentCandle.close = currentPrice;
+            if (currentPrice > currentCandle.high) currentCandle.high = currentPrice;
+            if (currentPrice < currentCandle.low) currentCandle.low = currentPrice;
+            
+            const pVol = 1500;
+            currentCandle.volume += pVol;
+            
+            addTradeHistory(side, currentPrice, pVol);
+            renderOrderBook();
+        }
+
+        function addTradeHistory(side, price, vol) {
+            const timeStr = new Date().toLocaleTimeString().split(' ')[0];
+            tradeHistory.unshift({ side, price, vol, time: timeStr });
+            if (tradeHistory.length > 35) tradeHistory.pop();
+            
+            // Рендер ленты сделок
+            const container = document.getElementById('history-container');
+            container.innerHTML = tradeHistory.map(t => `
+                <div class="history-row" style="color: ${t.side === 'BUY' ? 'var(--text-green)' : 'var(--text-red)'}">
+                    <span>${t.time}</span>
+                    <span>${t.price.toFixed(2)}</span>
+                    <span style="color: #fff">${t.vol}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderOrderBook() {
+            const displayPrice = document.getElementById('current-price-display');
+            displayPrice.innerText = currentPrice.toFixed(2);
+            
+            // Эффект подсвечивания при изменении цены
+            const lastTrade = tradeHistory[0];
+displayPrice.style.color = lastTrade && lastTrade.side === 'BUY' ? 'var(--text-green)' : 'var(--text-red)';
+const asksContainer = document.getElementById('asks-container');
+const bidsContainer = document.getElementById('bids-container');
+let asksHtml = '';
+let bidsHtml = '';
+// Генерируем 7 уровней стакана вверх и вниз
+let maxVol = 1;
+const generatedAsks = [];
+const generatedBids = [];
+for (let i = 1; i <= 7; i++) {
+const askPrice = parseFloat((currentPrice + (i * (Math.random() * 0.05 + 0.02))).toFixed(2));
+const bidPrice = parseFloat((currentPrice - (i * (Math.random() * 0.05 + 0.02))).toFixed(2));
+const askVol = Math.floor(Math.random() * 600) + 15;
+const bidVol = Math.floor(Math.random() * 600) + 15;
+generatedAsks.push({ price: askPrice, vol: askVol });
+generatedBids.push({ price: bidPrice, vol: bidVol });
+if (askVol > maxVol) maxVol = askVol;
+if (bidVol > maxVol) maxVol = bidVol;
 }
-
-function getPrice() {
-    return poolYo > 0 ? poolLiza / poolYo : 1;
+// Аски сортируем по убыванию цены для верного отображения сверху вниз
+generatedAsks.sort((a,b) => b.price - a.price);
+for (let i = 0; i < 7; i++) {
+const askW = (generatedAsks[i].vol / maxVol) * 100;
+asksHtml +=  <div class="ob-row"> <div class="depth-bg" style="width: ${askW}%; background-color: rgba(239, 83, 80, 0.15)"></div> <span style="color: var(--text-red)">${generatedAsks[i].price.toFixed(2)}</span> <span style="color: #bbb">${generatedAsks[i].vol}</span> </div>;
+const bidW = (generatedBids[i].vol / maxVol) * 100;
+bidsHtml +=  <div class="ob-row"> <div class="depth-bg" style="width: ${bidW}%; background-color: rgba(38, 166, 154, 0.15)"></div> <span style="color: var(--text-green)">${generatedBids[i].price.toFixed(2)}</span> <span style="color: #bbb">${generatedBids[i].vol}</span> </div>;
 }
-
-function updatePrice() {
-    document.getElementById('price').innerText = getPrice().toFixed(4);
-    document.getElementById('poolLiza').innerText = Math.floor(poolLiza).toLocaleString('ru');
-    document.getElementById('poolYo').innerText = Math.floor(poolYo).toLocaleString('ru');
+asksContainer.innerHTML = asksHtml;
+bidsContainer.innerHTML = bidsHtml;
 }
-
-function updateBalance() {
-    document.getElementById('balLiza').innerText = Math.floor(balLiza).toLocaleString('ru');
-    document.getElementById('balYo').innerText = balYo.toLocaleString('ru', {maximumFractionDigits: 4});
+// Таймфрейм свечей: каждые 5 секунд фиксируем свечу
+setInterval(() => {
+candles.push({ ...currentCandle });
+if (candles.length > 45) candles.shift(); // Лимит свечей на экране
+currentCandle = createNewCandle(currentPrice);
+}, 5000);
+// Главный цикл визуализации графика (Canvas)
+function drawChart() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+const paddingRight = 70;
+const paddingBottom = 120;
+const chartWidth = canvas.width - paddingRight;
+const chartHeight = canvas.height - paddingBottom;
+const allCandles = [...candles, currentCandle];
+if (allCandles.length === 0) return;
+// Поиск минимума и максимума цен для масштабирования сетки
+let highPrices = allCandles.map(c => c.high);
+let lowPrices = allCandles.map(c => c.low);
+let maxP = Math.max(...highPrices) * 1.001;
+let minP = Math.min(...lowPrices) * 0.999;
+let priceRange = maxP - minP || 1;
+// 1. Отрисовка статической сетки цен (Price Grid)
+ctx.strokeStyle = '#1e222d';
+ctx.lineWidth = 1;
+ctx.fillStyle = 'var(--text-muted)';
+ctx.font = '10px Arial';
+ctx.textAlign = 'left';
+for (let i = 0; i <= 4; i++) {
+const y = 30 + (i * (chartHeight - 30) / 4);
+const pValue = maxP - ((y - 30) / (chartHeight - 30) * priceRange);
+ctx.beginPath();
+ctx.moveTo(0, y);
+ctx.lineTo(chartWidth, y);
+ctx.stroke();
+ctx.fillText(pValue.toFixed(2), chartWidth + 8, y + 4);
 }
-
-function buy() {
-    const amount = parseFloat(document.getElementById('buyInput').value);
-    if (!amount || amount <= 0) return;
-    if (amount > balLiza) return alert('Недостаточно LIZA');
-
-    const k = poolLiza * poolYo;
-    const newLiza = poolLiza + amount;
-    const newYo = k / newLiza;
-    const got = poolYo - newYo;
-
-    balLiza -= amount;
-    balYo += got;
-    poolLiza = newLiza;
-    poolYo = newYo;
-
-    const price = getPrice();
-    const now = Date.now();
-
-    const candle = {
-        o: price * 0.9996,
-        h: price * 1.0014,
-        l: price * 0.9986,
-        c: price,
-        v: amount,
-        t: now
-    };
-
-    const trade = {
-        type: 'buy',
-        amount: +got.toFixed(4),
-        price: +price.toFixed(6),
-        user: nick,
-        t: now
-    };
-
-    // Сразу локально
-    candles.push(candle);
-    if (candles.length > 80) candles.shift();
-    trades.unshift(trade);
-    if (trades.length > 30) trades.pop();
-
-    draw();
-    renderHistory();
-    updateBalance();
-    updatePrice();
-
-    // В Firebase
-    db.ref('users/' + nick).update({ balance: balLiza, yoBalance: balYo });
-    db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-    db.ref('exchange/candles').push(candle);
-    db.ref('exchange/trades').push(trade);
-
-    document.getElementById('buyInput').value = '';
+// 2. Отрисовка свечей и объемов
+const candleWidth = 14;
+const spacing = 6;
+let startX = chartWidth - (allCandles.length * (candleWidth + spacing));
+let maxVolume = Math.max(...allCandles.map(c => c.volume)) || 1;
+allCandles.forEach(c => {
+const isBull = c.close >= c.open;
+const color = isBull ? '#26a69a' : '#ef5350';
+ctx.strokeStyle = color;
+ctx.fillStyle = color;
+ctx.lineWidth = 1.5;
+// Перевод координат цен в пиксели Y
+const yOpen = 30 + ((maxP - c.open) / priceRange) * (chartHeight - 30);
+const yClose = 30 + ((maxP - c.close) / priceRange) * (chartHeight - 30);
+const yHigh = 30 + ((maxP - c.high) / priceRange) * (chartHeight - 30);
+const yLow = 30 + ((maxP - c.low) / priceRange) * (chartHeight - 30);
+// Фитиль свечи (тени)
+ctx.beginPath();
+ctx.moveTo(startX + candleWidth / 2, yHigh);
+ctx.lineTo(startX + candleWidth / 2, yLow);
+ctx.stroke();
+// Тело свечи
+const bodyY = Math.min(yOpen, yClose);
+const bodyHeight = Math.max(Math.abs(yOpen - yClose), 1.5);
+ctx.fillRect(startX, bodyY, candleWidth, bodyHeight);
+// Отрисовка индикатора объема (Volume) внизу графика
+const volHeight = (c.volume / maxVolume) * 50;
+ctx.fillStyle = isBull ? 'rgba(38, 166, 154, 0.25)' : 'rgba(239, 83, 80, 0.25)';
+ctx.fillRect(startX, canvas.height - 30 - volHeight, candleWidth, volHeight);
+ctx.strokeStyle = color;
+ctx.lineWidth = 0.5;
+ctx.strokeRect(startX, canvas.height - 30 - volHeight, candleWidth, volHeight);
+startX += candleWidth + spacing;
+});
+requestAnimationFrame(drawChart);
 }
-
-function sell() {
-    const amount = parseFloat(document.getElementById('sellInput').value);
-    if (!amount || amount <= 0) return;
-    if (amount > balYo) return alert('Недостаточно YO');
-
-    const k = poolLiza * poolYo;
-    const newYo = poolYo + amount;
-    const newLiza = k / newYo;
-    const got = poolLiza - newLiza;
-
-    balYo -= amount;
-    balLiza += got;
-    poolYo = newYo;
-    poolLiza = newLiza;
-
-    const price = getPrice();
-    const now = Date.now();
-
-    const candle = {
-        o: price * 1.0004,
-        h: price * 1.0014,
-        l: price * 0.9986,
-        c: price,
-        v: got,
-        t: now
-    };
-
-    const trade = {
-        type: 'sell',
-        amount: +amount.toFixed(4),
-        price: +price.toFixed(6),
-        user: nick,
-        t: now
-    };
-
-    candles.push(candle);
-    if (candles.length > 80) candles.shift();
-    trades.unshift(trade);
-    if (trades.length > 30) trades.pop();
-
-    draw();
-    renderHistory();
-    updateBalance();
-    updatePrice();
-
-    db.ref('users/' + nick).update({ balance: balLiza, yoBalance: balYo });
-    db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-    db.ref('exchange/candles').push(candle);
-    db.ref('exchange/trades').push(trade);
-
-    document.getElementById('sellInput').value = '';
-}
-
-function renderHistory() {
-    const box = document.getElementById('history');
-    if (!trades.length) {
-        box.innerHTML = '<div style="color:#666;text-align:center;padding:12px">Пока нет сделок</div>';
-        return;
-    }
-    box.innerHTML = trades.map(t => `
-        <div class="trade-item">
-            <span style="color:${t.type==='buy'?'#00ff88':'#ff5555'}">${t.type==='buy'?'BUY':'SELL'} ${Number(t.amount).toFixed(2)}</span>
-            <span>${Number(t.price).toFixed(4)}</span>
-            <span style="color:#888">${t.user}</span>
-        </div>
-    `).join('');
-}
-
-function draw() {
-    const canvas = document.getElementById('chart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    if (w < 50 || h < 50) return;
-
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    ctx.fillStyle = '#0d0d18';
-    ctx.fillRect(0, 0, w, h);
-
-    if (candles.length === 0) {
-        ctx.fillStyle = '#555';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Сделайте первую сделку', w/2, h/2);
-        return;
-    }
-
-    const data = candles.slice(-50);
-    const chartH = h * 0.66;
-    const volH = h * 0.28;
-
-    let minP = Math.min(...data.map(c => c.l));
-    let maxP = Math.max(...data.map(c => c.h));
-    const pad = (maxP - minP) * 0.14 || 0.008;
-    minP -= pad;
-    maxP += pad;
-    const range = maxP - minP;
-    const maxV = Math.max(...data.map(c => c.v)) || 1;
-
-    // Сетка
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '11px monospace';
-    ctx.textAlign = 'left';
-
-    for (let i = 0; i <= 4; i++) {
-        const y = 15 + (i / 4) * (chartH - 12);
-        const p = maxP - (i / 4) * range;
-        ctx.beginPath();
-        ctx.moveTo(48, y);
-        ctx.lineTo(w - 8, y);
-        ctx.stroke();
-        ctx.fillText(p.toFixed(4), 4, y + 3);
-    }
-
-    const cw = Math.max(4, (w - 65) / data.length - 1.8);
-
-    data.forEach((c, i) => {
-        const x = 52 + i * (cw + 1.8);
-
-        const yH = 15 + ((maxP - c.h) / range) * (chartH - 12);
-        const yL = 15 + ((maxP - c.l) / range) * (chartH - 12);
-        const yO = 15 + ((maxP - c.o) / range) * (chartH - 12);
-        const yC = 15 + ((maxP - c.c) / range) * (chartH - 12);
-
-        const up = c.c >= c.o;
-        const col = up ? '#00c853' : '#ff1744';
-
-        // Тень
-        ctx.beginPath();
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 1.3;
-        ctx.moveTo(x + cw/2, yH);
-        ctx.lineTo(x + cw/2, yL);
-        ctx.stroke();
-
-        // Тело
-        const top = Math.min(yO, yC);
-        const height = Math.max(2, Math.abs(yC - yO));
-        ctx.fillStyle = col;
-        ctx.fillRect(x, top, cw, height);
-
-        // Объём
-        const vh = (c.v / maxV) * (volH - 6);
-        ctx.fillStyle = up ? 'rgba(0,200,83,0.4)' : 'rgba(255,23,68,0.4)';
-        ctx.fillRect(x, h - 6 - vh, cw, vh);
-    });
-
-    const last = data[data.length - 1].c;
-    ctx.fillStyle = '#00ff88';
-    ctx.font = 'bold 12px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(last.toFixed(4), w - 10, 14);
-}
-
-window.addEventListener('resize', () => setTimeout(draw, 100));
-</script>
-</body>
-</html>
