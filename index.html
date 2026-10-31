@@ -125,7 +125,7 @@
         .chart-container {
             background: #0a0a15;
             border-radius: 10px;
-            height: 180px;
+            height: 190px;
             margin-bottom: 18px;
             position: relative;
             overflow: hidden;
@@ -214,7 +214,6 @@
             border-bottom: 1px solid #222;
         }
 
-        /* Auth */
         #authBlock {
             position: fixed;
             inset: 0;
@@ -449,11 +448,10 @@
             db.ref('users/' + nick).once('value').then(snap => {
                 if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
 
-                // Новым игрокам даём стартовый капитал
                 const data = {
                     password: pass,
-                    balance: 50000,      // стартовые LIZA
-                    yoBalance: 1000      // стартовые YO
+                    balance: 50000,
+                    yoBalance: 1000
                 };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
             }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
@@ -469,7 +467,7 @@
             document.getElementById('game').style.display = 'flex';
             document.getElementById('userDisplay').innerText = myNick;
 
-            // Пул ликвидности
+            // Пул
             db.ref('exchange/pool').on('value', snap => {
                 const d = snap.val();
                 if (!d) {
@@ -484,26 +482,24 @@
             });
 
             // История цен
-            db.ref('exchange/priceHistory').limitToLast(80).on('value', snap => {
+            db.ref('exchange/priceHistory').limitToLast(100).on('value', snap => {
                 const val = snap.val() || {};
                 priceHistory = Object.values(val).sort((a, b) => a.t - b.t);
-                setTimeout(drawChart, 40);
+                drawChart();
             });
 
             // Сделки
-            db.ref('exchange/trades').limitToLast(25).on('value', snap => {
+            db.ref('exchange/trades').limitToLast(30).on('value', snap => {
                 const val = snap.val() || {};
                 recentTrades = Object.values(val).sort((a, b) => b.t - a.t);
                 renderRecentTrades();
             });
 
             updateUI();
-
             document.getElementById('buyBtn').onclick = buyYO;
             document.getElementById('sellBtn').onclick = sellYO;
         }
 
-        // ===== Биржа =====
         function getPrice() {
             if (poolYo <= 0) return 1;
             return poolLiza / poolYo;
@@ -518,17 +514,10 @@
         }
 
         function renderOrderBook(price) {
-            const asks = [];
-            const bids = [];
+            const asks = [], bids = [];
             for (let i = 1; i <= 6; i++) {
-                asks.push({
-                    price: price * (1 + i * 0.008),
-                    amount: Math.floor(1200 + Math.random() * 8000)
-                });
-                bids.push({
-                    price: price * (1 - i * 0.008),
-                    amount: Math.floor(1200 + Math.random() * 8000)
-                });
+                asks.push({ price: price * (1 + i * 0.008), amount: Math.floor(1200 + Math.random() * 8000) });
+                bids.push({ price: price * (1 - i * 0.008), amount: Math.floor(1200 + Math.random() * 8000) });
             }
             document.getElementById('asksList').innerHTML = asks.map(a => `
                 <div class="ob-row">
@@ -542,6 +531,21 @@
                     <span>${b.amount.toLocaleString('ru')}</span>
                 </div>
             `).join('');
+        }
+
+        // ===== ГЛАВНОЕ ИСПРАВЛЕНИЕ ГРАФИКА =====
+        function addPricePoint(price) {
+            const point = { p: price, t: Date.now() };
+            
+            // Сразу добавляем локально
+            priceHistory.push(point);
+            if (priceHistory.length > 100) priceHistory.shift();
+            
+            // Сразу рисуем
+            drawChart();
+
+            // И отправляем в Firebase
+            db.ref('exchange/priceHistory').push(point);
         }
 
         function buyYO() {
@@ -563,29 +567,21 @@
             poolLiza = newPoolLiza;
             poolYo = newPoolYo;
 
-            db.ref('users/' + myNick).update({
-                balance: myBalance,
-                yoBalance: myYoBalance
-            });
-
-            db.ref('exchange/pool').set({
-                liza: poolLiza,
-                yo: poolYo
-            });
-
             const price = getPrice();
-            const now = Date.now();
+
+            // Обновляем данные
+            db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
+            db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
             db.ref('exchange/trades').push({
                 type: 'buy',
                 amount: yoOut,
                 price: price,
                 user: myNick,
-                t: now
+                t: Date.now()
             });
-            db.ref('exchange/priceHistory').push({
-                p: price,
-                t: now
-            });
+
+            // Вот здесь сразу обновляем график
+            addPricePoint(price);
 
             updateUI();
             updateExchangeUI();
@@ -612,29 +608,20 @@
             poolYo = newPoolYo;
             poolLiza = newPoolLiza;
 
-            db.ref('users/' + myNick).update({
-                balance: myBalance,
-                yoBalance: myYoBalance
-            });
-
-            db.ref('exchange/pool').set({
-                liza: poolLiza,
-                yo: poolYo
-            });
-
             const price = getPrice();
-            const now = Date.now();
+
+            db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
+            db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
             db.ref('exchange/trades').push({
                 type: 'sell',
                 amount: yoIn,
                 price: price,
                 user: myNick,
-                t: now
+                t: Date.now()
             });
-            db.ref('exchange/priceHistory').push({
-                p: price,
-                t: now
-            });
+
+            // Сразу обновляем график
+            addPricePoint(price);
 
             updateUI();
             updateExchangeUI();
@@ -676,11 +663,12 @@
             const ctx = canvas.getContext('2d');
             ctx.scale(dpr, dpr);
 
+            // Фон
             ctx.fillStyle = '#0a0a15';
             ctx.fillRect(0, 0, w, h);
 
             if (priceHistory.length < 2) {
-                ctx.fillStyle = '#555';
+                ctx.fillStyle = '#666';
                 ctx.font = '14px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('Сделайте первую сделку', w / 2, h / 2);
@@ -688,28 +676,45 @@
             }
 
             const prices = priceHistory.map(p => p.p);
-            const minP = Math.min(...prices) * 0.995;
-            const maxP = Math.max(...prices) * 1.005;
-            const range = maxP - minP || 0.001;
+            let minP = Math.min(...prices);
+            let maxP = Math.max(...prices);
+            
+            // Чтобы линия не была совсем плоской
+            if (maxP - minP < 0.0001) {
+                minP -= 0.001;
+                maxP += 0.001;
+            }
 
+            const range = maxP - minP;
+
+            // Рисуем линию
             ctx.beginPath();
             ctx.strokeStyle = '#00c6ff';
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 2.8;
             ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
 
             priceHistory.forEach((p, i) => {
-                const x = (i / (priceHistory.length - 1)) * (w - 16) + 8;
-                const y = h - 12 - ((p.p - minP) / range) * (h - 24);
+                const x = (i / (priceHistory.length - 1)) * (w - 20) + 10;
+                const y = h - 15 - ((p.p - minP) / range) * (h - 30);
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             });
             ctx.stroke();
 
-            const last = prices[prices.length - 1];
+            // Точка последней цены
+            const lastX = w - 10;
+            const lastY = h - 15 - ((prices[prices.length - 1] - minP) / range) * (h - 30);
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#00ff88';
+            ctx.fill();
+
+            // Текст последней цены
             ctx.fillStyle = '#00ff88';
             ctx.font = 'bold 13px sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(last.toFixed(4), w - 8, 18);
+            ctx.fillText(prices[prices.length - 1].toFixed(4), w - 12, 20);
         }
 
         function updateUI() {
