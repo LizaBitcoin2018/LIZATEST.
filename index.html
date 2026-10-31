@@ -316,6 +316,7 @@ function start(n, data) {
     document.getElementById('app').style.display = 'block';
     document.getElementById('userName').innerText = nick;
 
+    // Пул
     db.ref('exchange/pool').on('value', snap => {
         const d = snap.val();
         if (d) {
@@ -327,7 +328,7 @@ function start(n, data) {
         updatePrice();
     });
 
-    // Загружаем историю свечей
+    // Загружаем свечи
     db.ref('exchange/candles').limitToLast(60).once('value').then(snap => {
         const val = snap.val() || {};
         candles = Object.values(val).sort((a, b) => a.t - b.t);
@@ -398,11 +399,16 @@ function buy() {
     const price = getPrice();
     const now = Date.now();
 
-    // Делаем свечу более выразительной
+    // Берём закрытие предыдущей свечи
+    let prevClose = price;
+    if (candles.length > 0) {
+        prevClose = candles[candles.length - 1].c;
+    }
+
     const candle = {
-        o: price * 0.9985,
-        h: price * 1.0035,
-        l: price * 0.9965,
+        o: prevClose,
+        h: Math.max(prevClose, price) * 1.002,
+        l: Math.min(prevClose, price) * 0.998,
         c: price,
         v: amount,
         t: now
@@ -452,10 +458,15 @@ function sell() {
     const price = getPrice();
     const now = Date.now();
 
+    let prevClose = price;
+    if (candles.length > 0) {
+        prevClose = candles[candles.length - 1].c;
+    }
+
     const candle = {
-        o: price * 1.0015,
-        h: price * 1.0035,
-        l: price * 0.9965,
+        o: prevClose,
+        h: Math.max(prevClose, price) * 1.002,
+        l: Math.min(prevClose, price) * 0.998,
         c: price,
         v: got,
         t: now
@@ -538,11 +549,10 @@ function draw() {
     let minP = Math.min(...data.map(c => c.l));
     let maxP = Math.max(...data.map(c => c.h));
 
-    // Защита от слишком маленького диапазона
-    if (maxP - minP < 0.01) {
+    if (maxP - minP < 0.008) {
         const mid = (maxP + minP) / 2;
-        minP = mid - 0.02;
-        maxP = mid + 0.02;
+        minP = mid - 0.015;
+        maxP = mid + 0.015;
     }
 
     const pad = (maxP - minP) * 0.18;
@@ -580,7 +590,7 @@ function draw() {
         const up = c.c >= c.o;
         const col = up ? '#00c853' : '#ff1744';
 
-        // Фитиль (толще)
+        // Фитиль
         ctx.beginPath();
         ctx.strokeStyle = col;
         ctx.lineWidth = 2;
@@ -588,10 +598,10 @@ function draw() {
         ctx.lineTo(x + cw / 2, yL);
         ctx.stroke();
 
-        // Тело свечи (с минимальной высотой)
+        // Тело
         let top = Math.min(yO, yC);
         let height = Math.abs(yC - yO);
-        if (height < 4) height = 4; // минимальная высота тела
+        if (height < 5) height = 5;
 
         ctx.fillStyle = col;
         ctx.fillRect(x, top, cw, height);
