@@ -8,12 +8,11 @@
         :root {
             --text-green: #00e676;
             --text-red: #ff5252;
-            --bg-main: #0d0613; /* Киберпанк-темный из ваших предпочтений */
+            --bg-main: #0d0613;
             --bg-panel: #171b26;
             --bg-grid: #1e222d;
-            --text-main: #1bbf1b; /* Фирменный зеленый */
-            --text-muted: #848e9c;
             --primary: #33d7bf;
+            --text-muted: #848e9c;
         }
 
         * {
@@ -34,7 +33,6 @@
             gap: 10px;
         }
 
-        /* Левая панель: Стакан */
         .orderbook-panel {
             width: 280px;
             background-color: var(--bg-panel);
@@ -73,13 +71,13 @@
         .ob-rows {
             flex: 1;
             display: flex;
-            flex-direction: column-reverse; /* Для асков сверху вниз */
+            flex-direction: column-reverse;
             overflow: hidden;
         }
 
         .ob-rows.bids {
             flex: 1;
-            flex-direction: column; /* Для бидов сверху вниз */
+            flex-direction: column;
         }
 
         .ob-row .depth-bg {
@@ -105,10 +103,8 @@
             margin: 8px 0;
             border-radius: 4px;
             font-family: 'Consolas', monospace;
-            transition: color 0.1s ease;
         }
 
-        /* Центральная панель: График */
         .chart-panel {
             flex: 1;
             background-color: var(--bg-panel);
@@ -133,7 +129,6 @@
             height: 100%;
         }
 
-        /* Правая панель: Торговля и Лента */
         .trade-panel {
             width: 280px;
             background-color: var(--bg-panel);
@@ -160,11 +155,6 @@
             font-size: 14px;
             cursor: pointer;
             color: #fff;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
         }
 
         .btn-buy { background-color: var(--text-green); }
@@ -186,16 +176,10 @@
             justify-content: space-between;
             padding: 3px 5px;
         }
-
-        /* Кастомный скроллбар */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
     </style>
 </head>
 <body>
 
-    <!-- 1. ОРДЕРБУК (СТАКАН) -->
     <div class="orderbook-panel">
         <div class="panel-title">Ордербук LIZA/USDT</div>
         <div class="ob-header">
@@ -203,215 +187,119 @@
             <span>Объем</span>
         </div>
         <div class="ob-rows" id="asks-container"></div>
-        <div class="price-current-box" id="current-price-display">0.00</div>
+        <div class="price-current-box" id="current-price-display">100.00</div>
         <div class="ob-rows bids" id="bids-container"></div>
     </div>
 
-    <!-- 2. ГРАФИК СВЕЧЕЙ И ОБЪЕМОВ -->
     <div class="chart-panel">
         <div class="panel-title" style="text-align: left; padding-left: 10px;">График цен и объемов (5s)</div>
-        <div class="canvas-container" id="canvas-wrapper">
+        <div class="canvas-container">
             <canvas id="exchangeChart"></canvas>
         </div>
     </div>
 
-    <!-- 3. ТОРГОВЛЯ И ИСТОРИЯ СДЕЛОК -->
     <div class="trade-panel">
         <div class="panel-title">Торговый терминал</div>
         <div class="trade-buttons">
-            <button class="btn btn-buy" onclick="playerOrder('BUY')">BUY (Рыночный памп)</button>
-            <button class="btn btn-sell" onclick="playerOrder('SELL')">SELL (Рыночный дамп)</button>
+            <button class="btn btn-buy" id="player-buy-btn">BUY (Рыночный памп)</button>
+            <button class="btn btn-sell" id="player-sell-btn">SELL (Рыночный дамп)</button>
         </div>
         <div class="panel-title" style="margin-bottom: 0;">Лента сделок</div>
         <div class="history-box" id="history-container"></div>
     </div>
 
     <script>
-        // Инициализация базовых параметров рынка
-        let currentPrice = 100.00;
-        let tradeHistory = [];
-        let candles = [];
-        
-        // Структура текущей свечи
-        let currentCandle = createNewCandle(currentPrice);
-
-        const canvas = document.getElementById('exchangeChart');
-        const ctx = canvas.getContext('2d');
-
-        function createNewCandle(price) {
-            return { open: price, high: price, low: price, close: price, volume: 0 };
-        }
-
-        // Автоподгонка размеров Canvas под контейнер
-        function resizeCanvas() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Имитация активности ордербука и ботов маркет-мейкеров
-        function simulateMarket() {
-            // Случайный шаг цены с шумом
-            const change = (Math.random() - 0.5) * 0.12;
-            currentPrice = Math.max(0.01, parseFloat((currentPrice + change).toFixed(2)));
-
-            // Обновление цен внутри формирующейся свечи
-            currentCandle.close = currentPrice;
-            if (currentPrice > currentCandle.high) currentCandle.high = currentPrice;
-            if (currentPrice < currentCandle.low) currentCandle.low = currentPrice;
+        window.onload = function() {
+            let currentPrice = 100.00;
+            let tradeHistory = [];
+            let candles = [];
             
-            const tradeVol = Math.floor(Math.random() * 250) + 10;
-            currentCandle.volume += tradeVol;
+            function createNewCandle(price) {
+                return { open: price, high: price, low: price, close: price, volume: 0 };
+            }
+            
+            let currentCandle = createNewCandle(currentPrice);
 
-            // Направление сделки
-            const side = change >= 0 ? 'BUY' : 'SELL';
-            addTradeHistory(side, currentPrice, tradeVol);
+            const canvas = document.getElementById('exchangeChart');
+            const ctx = canvas.getContext('2d');
 
-            renderOrderBook();
-            
-            // Интервал изменения цены ботами (от 150 до 400 мс)
-            setTimeout(simulateMarket, Math.floor(Math.random() * 250) + 150);
-        }
+            function resizeCanvas() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
 
-        // Кнопки игрока (памп / дамп)
-        function playerOrder(side) {
-            const multiplier = side === 'BUY' ? 1.003 : 0.997;
-            currentPrice = parseFloat((currentPrice * multiplier).toFixed(2));
-            
-            currentCandle.close = currentPrice;
-            if (currentPrice > currentCandle.high) currentCandle.high = currentPrice;
-            if (currentPrice < currentCandle.low) currentCandle.low = currentPrice;
-            
-            const pVol = 1500;
-            currentCandle.volume += pVol;
-            
-            addTradeHistory(side, currentPrice, pVol);
-            renderOrderBook();
-        }
+            function simulateMarket() {
+                const change = (Math.random() - 0.5) * 0.16;
+                currentPrice = Math.max(0.01, parseFloat((currentPrice + change).toFixed(2)));
 
-        function addTradeHistory(side, price, vol) {
-            const timeStr = new Date().toLocaleTimeString().split(' ')[0];
-            tradeHistory.unshift({ side, price, vol, time: timeStr });
-            if (tradeHistory.length > 35) tradeHistory.pop();
-            
-            // Рендер ленты сделок
-            const container = document.getElementById('history-container');
-            container.innerHTML = tradeHistory.map(t => `
-                <div class="history-row" style="color: ${t.side === 'BUY' ? 'var(--text-green)' : 'var(--text-red)'}">
-                    <span>${t.time}</span>
-                    <span>${t.price.toFixed(2)}</span>
-                    <span style="color: #fff">${t.vol}</span>
-                </div>
-            `).join('');
-        }
+                currentCandle.close = currentPrice;
+                if (currentPrice > currentCandle.high) currentCandle.high = currentPrice;
+                if (currentPrice < currentCandle.low) currentCandle.low = currentPrice;
+                
+                const tradeVol = Math.floor(Math.random() * 250) + 10;
+                currentCandle.volume += tradeVol;
 
-        function renderOrderBook() {
-            const displayPrice = document.getElementById('current-price-display');
-            displayPrice.innerText = currentPrice.toFixed(2);
-            
-            // Эффект подсвечивания при изменении цены
-            const lastTrade = tradeHistory[0];
-displayPrice.style.color = lastTrade && lastTrade.side === 'BUY' ? 'var(--text-green)' : 'var(--text-red)';
-const asksContainer = document.getElementById('asks-container');
-const bidsContainer = document.getElementById('bids-container');
-let asksHtml = '';
-let bidsHtml = '';
-// Генерируем 7 уровней стакана вверх и вниз
-let maxVol = 1;
-const generatedAsks = [];
-const generatedBids = [];
-for (let i = 1; i <= 7; i++) {
-const askPrice = parseFloat((currentPrice + (i * (Math.random() * 0.05 + 0.02))).toFixed(2));
-const bidPrice = parseFloat((currentPrice - (i * (Math.random() * 0.05 + 0.02))).toFixed(2));
-const askVol = Math.floor(Math.random() * 600) + 15;
-const bidVol = Math.floor(Math.random() * 600) + 15;
-generatedAsks.push({ price: askPrice, vol: askVol });
-generatedBids.push({ price: bidPrice, vol: bidVol });
-if (askVol > maxVol) maxVol = askVol;
-if (bidVol > maxVol) maxVol = bidVol;
-}
-// Аски сортируем по убыванию цены для верного отображения сверху вниз
-generatedAsks.sort((a,b) => b.price - a.price);
-for (let i = 0; i < 7; i++) {
-const askW = (generatedAsks[i].vol / maxVol) * 100;
-asksHtml +=  <div class="ob-row"> <div class="depth-bg" style="width: ${askW}%; background-color: rgba(239, 83, 80, 0.15)"></div> <span style="color: var(--text-red)">${generatedAsks[i].price.toFixed(2)}</span> <span style="color: #bbb">${generatedAsks[i].vol}</span> </div>;
-const bidW = (generatedBids[i].vol / maxVol) * 100;
-bidsHtml +=  <div class="ob-row"> <div class="depth-bg" style="width: ${bidW}%; background-color: rgba(38, 166, 154, 0.15)"></div> <span style="color: var(--text-green)">${generatedBids[i].price.toFixed(2)}</span> <span style="color: #bbb">${generatedBids[i].vol}</span> </div>;
-}
-asksContainer.innerHTML = asksHtml;
-bidsContainer.innerHTML = bidsHtml;
-}
-// Таймфрейм свечей: каждые 5 секунд фиксируем свечу
-setInterval(() => {
-candles.push({ ...currentCandle });
-if (candles.length > 45) candles.shift(); // Лимит свечей на экране
-currentCandle = createNewCandle(currentPrice);
-}, 5000);
-// Главный цикл визуализации графика (Canvas)
-function drawChart() {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-const paddingRight = 70;
-const paddingBottom = 120;
-const chartWidth = canvas.width - paddingRight;
-const chartHeight = canvas.height - paddingBottom;
-const allCandles = [...candles, currentCandle];
-if (allCandles.length === 0) return;
-// Поиск минимума и максимума цен для масштабирования сетки
-let highPrices = allCandles.map(c => c.high);
-let lowPrices = allCandles.map(c => c.low);
-let maxP = Math.max(...highPrices) * 1.001;
-let minP = Math.min(...lowPrices) * 0.999;
-let priceRange = maxP - minP || 1;
-// 1. Отрисовка статической сетки цен (Price Grid)
-ctx.strokeStyle = '#1e222d';
-ctx.lineWidth = 1;
-ctx.fillStyle = 'var(--text-muted)';
-ctx.font = '10px Arial';
-ctx.textAlign = 'left';
-for (let i = 0; i <= 4; i++) {
-const y = 30 + (i * (chartHeight - 30) / 4);
-const pValue = maxP - ((y - 30) / (chartHeight - 30) * priceRange);
-ctx.beginPath();
-ctx.moveTo(0, y);
-ctx.lineTo(chartWidth, y);
-ctx.stroke();
-ctx.fillText(pValue.toFixed(2), chartWidth + 8, y + 4);
-}
-// 2. Отрисовка свечей и объемов
-const candleWidth = 14;
-const spacing = 6;
-let startX = chartWidth - (allCandles.length * (candleWidth + spacing));
-let maxVolume = Math.max(...allCandles.map(c => c.volume)) || 1;
-allCandles.forEach(c => {
-const isBull = c.close >= c.open;
-const color = isBull ? '#26a69a' : '#ef5350';
-ctx.strokeStyle = color;
-ctx.fillStyle = color;
-ctx.lineWidth = 1.5;
-// Перевод координат цен в пиксели Y
-const yOpen = 30 + ((maxP - c.open) / priceRange) * (chartHeight - 30);
-const yClose = 30 + ((maxP - c.close) / priceRange) * (chartHeight - 30);
-const yHigh = 30 + ((maxP - c.high) / priceRange) * (chartHeight - 30);
-const yLow = 30 + ((maxP - c.low) / priceRange) * (chartHeight - 30);
-// Фитиль свечи (тени)
-ctx.beginPath();
-ctx.moveTo(startX + candleWidth / 2, yHigh);
-ctx.lineTo(startX + candleWidth / 2, yLow);
-ctx.stroke();
-// Тело свечи
-const bodyY = Math.min(yOpen, yClose);
-const bodyHeight = Math.max(Math.abs(yOpen - yClose), 1.5);
-ctx.fillRect(startX, bodyY, candleWidth, bodyHeight);
-// Отрисовка индикатора объема (Volume) внизу графика
-const volHeight = (c.volume / maxVolume) * 50;
-ctx.fillStyle = isBull ? 'rgba(38, 166, 154, 0.25)' : 'rgba(239, 83, 80, 0.25)';
-ctx.fillRect(startX, canvas.height - 30 - volHeight, candleWidth, volHeight);
-ctx.strokeStyle = color;
-ctx.lineWidth = 0.5;
-ctx.strokeRect(startX, canvas.height - 30 - volHeight, candleWidth, volHeight);
-startX += candleWidth + spacing;
-});
-requestAnimationFrame(drawChart);
-}
+                const side = change >= 0 ? 'BUY' : 'SELL';
+                addTradeHistory(side, currentPrice, tradeVol);
+                renderOrderBook();
+                
+                setTimeout(simulateMarket, Math.floor(Math.random() * 200) + 150);
+            }
+
+            function playerOrder(side) {
+                const multiplier = side === 'BUY' ? 1.003 : 0.997;
+                currentPrice = parseFloat((currentPrice * multiplier).toFixed(2));
+                
+                currentCandle.close = currentPrice;
+                if (currentPrice > currentCandle.high) currentCandle.high = currentPrice;
+                if (currentPrice < currentCandle.low) currentCandle.low = currentPrice;
+                
+                const pVol = 1500;
+                currentCandle.volume += pVol;
+                
+                addTradeHistory(side, currentPrice, pVol);
+                renderOrderBook();
+            }
+
+            document.getElementById('player-buy-btn').onclick = () => playerOrder('BUY');
+            document.getElementById('player-sell-btn').onclick = () => playerOrder('SELL');
+
+            function addTradeHistory(side, price, vol) {
+                const timeStr = new Date().toLocaleTimeString();
+                tradeHistory.unshift({ side, price, vol, time: timeStr });
+                if (tradeHistory.length > 30) tradeHistory.pop();
+                
+                const container = document.getElementById('history-container');
+                container.innerHTML = tradeHistory.map(t => `
+                    <div class="history-row" style="color: ${t.side === 'BUY' ? 'var(--text-green)' : 'var(--text-red)'}">
+                        <span>${t.time}</span>
+                        <span>${t.price.toFixed(2)}</span>
+                        <span style="color: #fff">${t.vol}</span>
+                    </div>
+                `).join('');
+            }
+
+            function renderOrderBook() {
+                const displayPrice = document.getElementById('current-price-display');
+                displayPrice.innerText = currentPrice.toFixed(2);
+                
+                if(tradeHistory.length > 0) {
+                    displayPrice.style.color = tradeHistory[0].side === 'BUY' ? 'var(--text-green)' : 'var(--text-red)';
+                }
+
+                const asksContainer = document.getElementById('asks-container');
+                const bidsContainer = document.getElementById('bids-container');
+
+                let asksHtml = '';
+                let bidsHtml = '';
+                let maxVol = 1;
+                const generatedAsks = [];
+                const generatedBids = [];
+
+                for (let i = 1; i <= 7; i++) {
+                    const askPrice = parseFloat((currentPrice + (i * (Math.random() * 0.04 + 0.01))).toFixed(2));
+                    const bidPrice = parseFloat((currentPrice - (i * (Math.random() * 0.04 + 0.01))).toFixed(2));
+                    const askVol = Math.floor(Math.random() * 500) + 15;
