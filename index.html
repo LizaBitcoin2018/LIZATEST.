@@ -316,7 +316,6 @@ function start(n, data) {
     document.getElementById('app').style.display = 'block';
     document.getElementById('userName').innerText = nick;
 
-    // Пул
     db.ref('exchange/pool').on('value', snap => {
         const d = snap.val();
         if (d) {
@@ -328,14 +327,12 @@ function start(n, data) {
         updatePrice();
     });
 
-    // Загружаем свечи
     db.ref('exchange/candles').limitToLast(60).once('value').then(snap => {
         const val = snap.val() || {};
         candles = Object.values(val).sort((a, b) => a.t - b.t);
         draw();
     });
 
-    // Новые свечи
     db.ref('exchange/candles').limitToLast(1).on('child_added', snap => {
         const c = snap.val();
         if (!c) return;
@@ -346,7 +343,6 @@ function start(n, data) {
         }
     });
 
-    // История
     db.ref('exchange/trades').limitToLast(30).once('value').then(snap => {
         const val = snap.val() || {};
         trades = Object.values(val).sort((a, b) => b.t - a.t);
@@ -399,20 +395,24 @@ function buy() {
     const price = getPrice();
     const now = Date.now();
 
-    // Берём закрытие предыдущей свечи
     let prevClose = price;
     if (candles.length > 0) {
         prevClose = candles[candles.length - 1].c;
     }
 
+    // Покупка → всегда зелёная свеча, короткий фитиль
     const candle = {
         o: prevClose,
-        h: Math.max(prevClose, price) * 1.002,
-        l: Math.min(prevClose, price) * 0.998,
         c: price,
+        h: Math.max(prevClose, price) * 1.0008,
+        l: Math.min(prevClose, price) * 0.9995,
         v: amount,
         t: now
     };
+
+    if (candle.c < candle.o) {
+        candle.c = candle.o * 1.0003;
+    }
 
     const trade = {
         type: 'buy',
@@ -463,14 +463,19 @@ function sell() {
         prevClose = candles[candles.length - 1].c;
     }
 
+    // Продажа → всегда красная свеча
     const candle = {
         o: prevClose,
-        h: Math.max(prevClose, price) * 1.002,
-        l: Math.min(prevClose, price) * 0.998,
         c: price,
+        h: Math.max(prevClose, price) * 1.0005,
+        l: Math.min(prevClose, price) * 0.9992,
         v: got,
         t: now
     };
+
+    if (candle.c > candle.o) {
+        candle.c = candle.o * 0.9997;
+    }
 
     const trade = {
         type: 'sell',
@@ -530,7 +535,6 @@ function draw() {
     canvas.style.height = h + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Фон
     ctx.fillStyle = '#0d0d18';
     ctx.fillRect(0, 0, w, h);
 
@@ -543,26 +547,26 @@ function draw() {
     }
 
     const data = candles.slice(-45);
-    const chartH = h * 0.65;
-    const volH = h * 0.28;
+    const chartH = h * 0.66;
+    const volH = h * 0.27;
 
     let minP = Math.min(...data.map(c => c.l));
     let maxP = Math.max(...data.map(c => c.h));
 
-    if (maxP - minP < 0.008) {
+    if (maxP - minP < 0.006) {
         const mid = (maxP + minP) / 2;
-        minP = mid - 0.015;
-        maxP = mid + 0.015;
+        minP = mid - 0.012;
+        maxP = mid + 0.012;
     }
 
-    const pad = (maxP - minP) * 0.18;
+    const pad = (maxP - minP) * 0.15;
     minP -= pad;
     maxP += pad;
     const range = maxP - minP;
     const maxV = Math.max(...data.map(c => c.v)) || 1;
 
     // Сетка
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.font = '11px monospace';
     ctx.textAlign = 'left';
@@ -577,10 +581,10 @@ function draw() {
         ctx.fillText(p.toFixed(4), 4, y + 3);
     }
 
-    const cw = Math.max(6, (w - 70) / data.length - 2.5);
+    const cw = Math.max(7, (w - 70) / data.length - 2.8);
 
     data.forEach((c, i) => {
-        const x = 55 + i * (cw + 2.5);
+        const x = 55 + i * (cw + 2.8);
 
         const yH = 16 + ((maxP - c.h) / range) * (chartH - 14);
         const yL = 16 + ((maxP - c.l) / range) * (chartH - 14);
@@ -590,10 +594,10 @@ function draw() {
         const up = c.c >= c.o;
         const col = up ? '#00c853' : '#ff1744';
 
-        // Фитиль
+        // Короткий фитиль
         ctx.beginPath();
         ctx.strokeStyle = col;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.8;
         ctx.moveTo(x + cw / 2, yH);
         ctx.lineTo(x + cw / 2, yL);
         ctx.stroke();
@@ -601,7 +605,7 @@ function draw() {
         // Тело
         let top = Math.min(yO, yC);
         let height = Math.abs(yC - yO);
-        if (height < 5) height = 5;
+        if (height < 6) height = 6;
 
         ctx.fillStyle = col;
         ctx.fillRect(x, top, cw, height);
@@ -609,14 +613,13 @@ function draw() {
 
     // Объём
     data.forEach((c, i) => {
-        const x = 55 + i * (cw + 2.5);
+        const x = 55 + i * (cw + 2.8);
         const up = c.c >= c.o;
-        const vh = Math.max(3, (c.v / maxV) * (volH - 8));
-        ctx.fillStyle = up ? 'rgba(0,200,83,0.45)' : 'rgba(255,23,68,0.45)';
+        const vh = Math.max(4, (c.v / maxV) * (volH - 8));
+        ctx.fillStyle = up ? 'rgba(0,200,83,0.4)' : 'rgba(255,23,68,0.4)';
         ctx.fillRect(x, h - 6 - vh, cw, vh);
     });
 
-    // Последняя цена
     const last = data[data.length - 1].c;
     ctx.fillStyle = '#00ff88';
     ctx.font = 'bold 13px sans-serif';
