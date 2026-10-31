@@ -303,3 +303,78 @@
                     const askPrice = parseFloat((currentPrice + (i * (Math.random() * 0.04 + 0.01))).toFixed(2));
                     const bidPrice = parseFloat((currentPrice - (i * (Math.random() * 0.04 + 0.01))).toFixed(2));
                     const askVol = Math.floor(Math.random() * 500) + 15;
+const bidVol = Math.floor(Math.random() * 500) + 15;
+generatedAsks.push({ price: askPrice, vol: askVol });
+generatedBids.push({ price: bidPrice, vol: bidVol });
+if (askVol > maxVol) maxVol = askVol;
+if (bidVol > maxVol) maxVol = bidVol;
+}
+generatedAsks.sort((a,b) => b.price - a.price);
+for (let i = 0; i < 7; i++) {
+const askW = (generatedAsks[i].vol / maxVol) * 100;
+asksHtml +=  <div class="ob-row"> <div class="depth-bg" style="width: ${askW}%; background-color: rgba(239, 83, 80, 0.15)"></div> <span style="color: var(--text-red)">${generatedAsks[i].price.toFixed(2)}</span> <span style="color: #bbb">${generatedAsks[i].vol}</span> </div>;
+const bidW = (generatedBids[i].vol / maxVol) * 100;
+bidsHtml +=  <div class="ob-row"> <div class="depth-bg" style="width: ${bidW}%; background-color: rgba(38, 166, 154, 0.15)"></div> <span style="color: var(--text-green)">${generatedBids[i].price.toFixed(2)}</span> <span style="color: #bbb">${generatedBids[i].vol}</span> </div>;
+}
+asksContainer.innerHTML = asksHtml;
+bidsContainer.innerHTML = bidsHtml;
+}
+setInterval(() => {
+candles.push({ ...currentCandle });
+if (candles.length > 50) candles.shift();
+currentCandle = createNewCandle(currentPrice);
+}, 5000);
+function drawChart() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+const paddingRight = 70;
+const paddingBottom = 40;
+const chartWidth = canvas.width - paddingRight;
+const chartHeight = canvas.height - paddingBottom;
+const allCandles = [...candles, currentCandle];
+let highPrices = allCandles.map(c => c.high);
+let lowPrices = allCandles.map(c => c.low);
+let maxP = Math.max(...highPrices) * 1.001;
+let minP = Math.min(...lowPrices) * 0.999;
+let priceRange = maxP - minP || 1;
+ctx.strokeStyle = '#222632';
+ctx.lineWidth = 1;
+ctx.fillStyle = 'var(--text-muted)';
+ctx.font = '10px Consolas';
+ctx.textAlign = 'left';
+for (let i = 0; i <= 4; i++) {
+const y = 20 + (i * (chartHeight - 40) / 4);
+const pValue = maxP - ((y - 20) / (chartHeight - 40) * priceRange);
+ctx.beginPath();
+ctx.moveTo(0, y);
+ctx.lineTo(chartWidth, y);
+ctx.stroke();
+ctx.fillText(pValue.toFixed(2), chartWidth + 8, y + 4);
+}
+const candleWidth = 12;
+const spacing = 6;
+let startX = chartWidth - (allCandles.length * (candleWidth + spacing));
+let maxVolume = Math.max(...allCandles.map(c => c.volume)) || 1;
+allCandles.forEach(c => {
+const isBull = c.close >= c.open;
+const color = isBull ? '#26a69a' : '#ef5350';
+ctx.strokeStyle = color;
+ctx.fillStyle = color;
+ctx.lineWidth = 1.5;
+const yOpen = 20 + ((maxP - c.open) / priceRange) * (chartHeight - 40);
+const yClose = 20 + ((maxP - c.close) / priceRange) * (chartHeight - 40);
+const yHigh = 20 + ((maxP - c.high) / priceRange) * (chartHeight - 40);
+const yLow = 20 + ((maxP - c.low) / priceRange) * (chartHeight - 40);
+ctx.beginPath();
+ctx.moveTo(startX + candleWidth / 2, yHigh);
+ctx.lineTo(startX + candleWidth / 2, yLow);
+ctx.stroke();
+const bodyY = Math.min(yOpen, yClose);
+const bodyHeight = Math.max(Math.abs(yOpen - yClose), 2);
+ctx.fillRect(startX, bodyY, candleWidth, bodyHeight);
+const volHeight = (c.volume / maxVolume) * 40;
+ctx.fillStyle = isBull ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)';
+ctx.fillRect(startX, chartHeight - volHeight, candleWidth, volHeight);
+startX += candleWidth + spacing;
+});
+requestAnimationFrame(drawChart);
+}
