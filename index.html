@@ -125,7 +125,7 @@
         .chart-container {
             background: #0a0a15;
             border-radius: 10px;
-            height: 230px;
+            height: 240px;
             margin-bottom: 18px;
             position: relative;
             overflow: hidden;
@@ -174,8 +174,6 @@
         }
         .buy-btn { background: #00aa55; }
         .sell-btn { background: #cc3333; }
-        .buy-btn:hover { background: #00cc66; }
-        .sell-btn:hover { background: #ee4444; }
 
         .orderbook {
             display: grid;
@@ -248,7 +246,6 @@
             font-size: 1rem;
             outline: none;
         }
-        .auth-box input:focus { border-color: #00c6ff; }
         .auth-btn {
             width: 100%;
             background: #00c6ff;
@@ -388,16 +385,15 @@
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 70; i++) {
             const star = document.createElement('div');
             star.className = 'star';
-            const size = Math.random() * 2.2 + 0.4;
+            const size = Math.random() * 2 + 0.5;
             star.style.width = size + 'px';
             star.style.height = size + 'px';
             star.style.left = Math.random() * 100 + '%';
             star.style.top = Math.random() * 100 + '%';
             star.style.setProperty('--dur', (Math.random() * 4 + 2) + 's');
-            star.style.animationDelay = (Math.random() * 5) + 's';
             galaxy.appendChild(star);
         }
 
@@ -454,7 +450,7 @@
                     yoBalance: 1000
                 };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
-            }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
+            }).catch(err => errorText.innerText = "Ошибка");
         }
 
         function startGame(nick, data) {
@@ -481,15 +477,28 @@
                 updateExchangeUI();
             });
 
-            // ===== ОБЩАЯ ИСТОРИЯ ЦЕН (для всех браузеров) =====
-            db.ref('exchange/priceHistory').limitToLast(80).on('value', snap => {
+            // История цен (общая)
+            db.ref('exchange/priceHistory').limitToLast(100).on('value', snap => {
                 const val = snap.val() || {};
                 priceHistory = Object.values(val).sort((a, b) => a.t - b.t);
-                drawChart();
+                
+                // Если истории почти нет — создаём стартовые точки
+                if (priceHistory.length < 3) {
+                    const now = Date.now();
+                    const base = getPrice();
+                    priceHistory = [
+                        { p: base * 0.98, t: now - 60000 },
+                        { p: base * 1.01, t: now - 40000 },
+                        { p: base * 0.99, t: now - 20000 },
+                        { p: base, t: now }
+                    ];
+                }
+                
+                setTimeout(drawChart, 50);
             });
 
-            // ===== ОБЩАЯ ИСТОРИЯ СДЕЛОК =====
-            db.ref('exchange/trades').limitToLast(30).on('value', snap => {
+            // История сделок
+            db.ref('exchange/trades').limitToLast(25).on('value', snap => {
                 const val = snap.val() || {};
                 recentTrades = Object.values(val).sort((a, b) => b.t - a.t);
                 renderRecentTrades();
@@ -499,6 +508,9 @@
 
             document.getElementById('buyBtn').onclick = buyYO;
             document.getElementById('sellBtn').onclick = sellYO;
+
+            // На всякий случай перерисовываем через секунду
+            setTimeout(drawChart, 800);
         }
 
         function getPrice() {
@@ -515,28 +527,19 @@
         }
 
         function renderOrderBook(price) {
-            const asks = [], bids = [];
+            let htmlAsks = '';
+            let htmlBids = '';
             for (let i = 1; i <= 6; i++) {
-                asks.push({ price: price * (1 + i * 0.008), amount: Math.floor(1500 + Math.random() * 7000) });
-                bids.push({ price: price * (1 - i * 0.008), amount: Math.floor(1500 + Math.random() * 7000) });
+                htmlAsks += `<div class="ob-row"><span style="color:#ff6666">${(price * (1 + i * 0.007)).toFixed(4)}</span><span>${(2000 + i * 700).toLocaleString('ru')}</span></div>`;
+                htmlBids += `<div class="ob-row"><span style="color:#66ff99">${(price * (1 - i * 0.007)).toFixed(4)}</span><span>${(2000 + i * 700).toLocaleString('ru')}</span></div>`;
             }
-            document.getElementById('asksList').innerHTML = asks.map(a => `
-                <div class="ob-row">
-                    <span style="color:#ff6666">${a.price.toFixed(4)}</span>
-                    <span>${a.amount.toLocaleString('ru')}</span>
-                </div>
-            `).join('');
-            document.getElementById('bidsList').innerHTML = bids.map(b => `
-                <div class="ob-row">
-                    <span style="color:#66ff99">${b.price.toFixed(4)}</span>
-                    <span>${b.amount.toLocaleString('ru')}</span>
-                </div>
-            `).join('');
+            document.getElementById('asksList').innerHTML = htmlAsks;
+            document.getElementById('bidsList').innerHTML = htmlBids;
         }
 
         function buyYO() {
             const lizaIn = parseFloat(document.getElementById('buyAmount').value);
-            if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите сумму LIZA");
+            if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите сумму");
             if (lizaIn > myBalance) return alert("Недостаточно LIZA");
 
             const k = poolLiza * poolYo;
@@ -544,7 +547,7 @@
             const newPoolYo = k / newPoolLiza;
             const yoOut = poolYo - newPoolYo;
 
-            if (yoOut <= 0.0001) return alert("Слишком маленькая сумма");
+            if (yoOut <= 0) return alert("Слишком маленькая сумма");
 
             myBalance -= lizaIn;
             myYoBalance += yoOut;
@@ -554,26 +557,18 @@
             const price = getPrice();
             const now = Date.now();
 
-            // Сохраняем всё в Firebase (график и история подтянутся сами через .on)
             db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
             db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-            db.ref('exchange/trades').push({
-                type: 'buy',
-                amount: yoOut,
-                price: price,
-                user: myNick,
-                t: now
-            });
+            db.ref('exchange/trades').push({ type: 'buy', amount: yoOut, price, user: myNick, t: now });
             db.ref('exchange/priceHistory').push({ p: price, t: now });
 
             updateUI();
             document.getElementById('buyAmount').value = '';
-            alert(`Куплено ${yoOut.toFixed(4)} YO\nза ${lizaIn.toLocaleString('ru')} LIZA`);
         }
 
         function sellYO() {
             const yoIn = parseFloat(document.getElementById('sellAmount').value);
-            if (isNaN(yoIn) || yoIn <= 0) return alert("Введите сумму YO");
+            if (isNaN(yoIn) || yoIn <= 0) return alert("Введите сумму");
             if (yoIn > myYoBalance) return alert("Недостаточно YO");
 
             const k = poolLiza * poolYo;
@@ -581,7 +576,7 @@
             const newPoolLiza = k / newPoolYo;
             const lizaOut = poolLiza - newPoolLiza;
 
-            if (lizaOut <= 0.0001) return alert("Слишком маленькая сумма");
+            if (lizaOut <= 0) return alert("Слишком маленькая сумма");
 
             myYoBalance -= yoIn;
             myBalance += lizaOut;
@@ -593,53 +588,51 @@
 
             db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
             db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-            db.ref('exchange/trades').push({
-                type: 'sell',
-                amount: yoIn,
-                price: price,
-                user: myNick,
-                t: now
-            });
+            db.ref('exchange/trades').push({ type: 'sell', amount: yoIn, price, user: myNick, t: now });
             db.ref('exchange/priceHistory').push({ p: price, t: now });
 
             updateUI();
             document.getElementById('sellAmount').value = '';
-            alert(`Продано ${yoIn.toFixed(4)} YO\nполучено ${lizaOut.toFixed(2)} LIZA`);
         }
 
         function renderRecentTrades() {
             const box = document.getElementById('recentTrades');
-            if (recentTrades.length === 0) {
+            if (!recentTrades.length) {
                 box.innerHTML = '<div style="color:#666;text-align:center;padding:12px;">Пока нет сделок</div>';
                 return;
             }
             box.innerHTML = recentTrades.map(t => `
                 <div class="trade-item">
-                    <span style="color:${t.type === 'buy' ? '#00ff88' : '#ff5555'}">
-                        ${t.type === 'buy' ? 'BUY' : 'SELL'} ${Number(t.amount).toFixed(3)}
-                    </span>
+                    <span style="color:${t.type === 'buy' ? '#00ff88' : '#ff5555'}">${t.type === 'buy' ? 'BUY' : 'SELL'} ${Number(t.amount).toFixed(2)}</span>
                     <span>${Number(t.price).toFixed(4)}</span>
                     <span style="color:#888">${t.user}</span>
                 </div>
             `).join('');
         }
 
-        // ====================== СВЕЧНОЙ ГРАФИК + СЕТКА ======================
+        // ====================== НАДЁЖНЫЙ СВЕЧНОЙ ГРАФИК ======================
         function drawChart() {
             const canvas = document.getElementById('priceChart');
             if (!canvas) return;
 
-            const parent = canvas.parentElement;
-            const dpr = window.devicePixelRatio || 1;
-            const w = parent.clientWidth;
-            const h = parent.clientHeight;
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
 
+            if (w < 50 || h < 50) {
+                setTimeout(drawChart, 200);
+                return;
+            }
+
+            const dpr = window.devicePixelRatio || 1;
             canvas.width = w * dpr;
             canvas.height = h * dpr;
             canvas.style.width = w + 'px';
             canvas.style.height = h + 'px';
 
             const ctx = canvas.getContext('2d');
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(dpr, dpr);
 
             // Фон
@@ -647,85 +640,82 @@
             ctx.fillRect(0, 0, w, h);
 
             if (priceHistory.length < 2) {
-                ctx.fillStyle = '#555';
+                ctx.fillStyle = '#666';
                 ctx.font = '14px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('Сделайте первую сделку', w / 2, h / 2);
+                ctx.fillText('Загрузка графика...', w/2, h/2);
                 return;
             }
 
             // Создаём свечи
             const candles = [];
             for (let i = 1; i < priceHistory.length; i++) {
-                const open = priceHistory[i - 1].p;
+                const open = priceHistory[i-1].p;
                 const close = priceHistory[i].p;
-                const high = Math.max(open, close) * (1 + Math.random() * 0.0035);
-                const low = Math.min(open, close) * (1 - Math.random() * 0.0035);
+                const high = Math.max(open, close) * 1.004;
+                const low = Math.min(open, close) * 0.996;
                 candles.push({ open, high, low, close });
             }
 
-            const visible = candles.slice(-45);
+            const visible = candles.slice(-40);
             if (visible.length === 0) return;
 
-            const allPrices = visible.flatMap(c => [c.high, c.low]);
-            let minP = Math.min(...allPrices);
-            let maxP = Math.max(...allPrices);
-            if (maxP - minP < 0.0001) {
-                minP -= 0.002;
-                maxP += 0.002;
-            }
+            let minP = Math.min(...visible.map(c => c.low));
+            let maxP = Math.max(...visible.map(c => c.high));
+            const padding = (maxP - minP) * 0.15 || 0.01;
+            minP -= padding;
+            maxP += padding;
             const range = maxP - minP;
 
             // ===== СЕТКА =====
-            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-            ctx.lineWidth = 1;
-            ctx.font = '11px sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '11px monospace';
             ctx.textAlign = 'left';
+            ctx.lineWidth = 1;
 
-            const steps = 5;
-            for (let i = 0; i <= steps; i++) {
-                const y = 20 + (i / steps) * (h - 40);
-                const price = maxP - (i / steps) * range;
+            for (let i = 0; i <= 4; i++) {
+                const y = 25 + (i / 4) * (h - 50);
+                const price = maxP - (i / 4) * range;
 
                 ctx.beginPath();
-                ctx.moveTo(10, y);
+                ctx.moveTo(50, y);
                 ctx.lineTo(w - 10, y);
                 ctx.stroke();
 
-                ctx.fillText(price.toFixed(4), 8, y - 4);
+                ctx.fillText(price.toFixed(4), 6, y + 4);
             }
 
             // ===== СВЕЧИ =====
-            const candleWidth = Math.max(5, (w - 50) / visible.length - 2.5);
+            const candleW = Math.max(6, (w - 70) / visible.length - 3);
 
             visible.forEach((c, i) => {
-                const x = 45 + i * (candleWidth + 2.5);
-                const openY = 20 + ((maxP - c.open) / range) * (h - 40);
-                const closeY = 20 + ((maxP - c.close) / range) * (h - 40);
-                const highY = 20 + ((maxP - c.high) / range) * (h - 40);
-                const lowY = 20 + ((maxP - c.low) / range) * (h - 40);
+                const x = 55 + i * (candleW + 3);
+                
+                const yHigh = 25 + ((maxP - c.high) / range) * (h - 50);
+                const yLow  = 25 + ((maxP - c.low)  / range) * (h - 50);
+                const yOpen = 25 + ((maxP - c.open) / range) * (h - 50);
+                const yClose= 25 + ((maxP - c.close)/ range) * (h - 50);
 
-                const isGreen = c.close >= c.open;
-                const color = isGreen ? '#00c853' : '#ff1744';
+                const green = c.close >= c.open;
+                const color = green ? '#00c853' : '#ff1744';
 
                 // Тень
                 ctx.beginPath();
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 1.4;
-                ctx.moveTo(x + candleWidth / 2, highY);
-                ctx.lineTo(x + candleWidth / 2, lowY);
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(x + candleW/2, yHigh);
+                ctx.lineTo(x + candleW/2, yLow);
                 ctx.stroke();
 
                 // Тело
-                const bodyTop = Math.min(openY, closeY);
-                const bodyHeight = Math.max(2, Math.abs(closeY - openY));
-
+                const top = Math.min(yOpen, yClose);
+                const height = Math.max(2, Math.abs(yClose - yOpen));
                 ctx.fillStyle = color;
-                ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+                ctx.fillRect(x, top, candleW, height);
             });
 
-            // Последняя цена справа
+            // Последняя цена
             const last = visible[visible.length - 1].close;
             ctx.fillStyle = '#00ff88';
             ctx.font = 'bold 13px sans-serif';
@@ -737,6 +727,9 @@
             document.getElementById('balanceDisplay').innerText = Math.floor(myBalance).toLocaleString('ru');
             document.getElementById('yoBalanceDisplay').innerText = myYoBalance.toLocaleString('ru', {maximumFractionDigits: 4});
         }
+
+        // На случай изменения размера окна
+        window.addEventListener('resize', () => setTimeout(drawChart, 100));
     </script>
 </body>
 </html>
