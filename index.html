@@ -254,7 +254,6 @@
             cursor: pointer;
         }
 
-        /* ===== ТОП 100 ===== */
         .leaderboard {
             background: rgba(15,15,30,0.95);
             border-radius: 12px;
@@ -335,7 +334,6 @@
             </a>
         </div>
 
-        <!-- Майнер -->
         <div class="miner-card">
             <div>
                 <div class="title">Майнер</div>
@@ -347,7 +345,6 @@
             </div>
         </div>
 
-        <!-- YO -->
         <div class="yo-wrap">
             <button class="yo-btn" id="yoBtn">YO</button>
             <div class="yo-info">
@@ -360,7 +357,6 @@
             Торговать LIZA на Yobit
         </a>
 
-        <!-- Dice -->
         <div class="dice-panel">
             <h4>DICE — Удвой LIZA</h4>
             <div class="dice-bank">Банк: <strong id="diceBank">...</strong></div>
@@ -372,7 +368,6 @@
             <div class="dice-result" id="diceResult">Сделай ставку</div>
         </div>
 
-        <!-- Чат -->
         <div class="chat-panel">
             <h3>Чат майнеров</h3>
             <div class="chat-messages" id="chatMessages"></div>
@@ -382,7 +377,6 @@
             </div>
         </div>
 
-        <!-- ===== ТОП 100 ИГРОКОВ ===== -->
         <div class="leaderboard">
             <h3>Топ 100 игроков</h3>
             <div id="leaderboardList">
@@ -394,7 +388,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
-        // Telegram
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -403,7 +396,6 @@
             try { tg.setBackgroundColor('#0a0a1a'); } catch(e) {}
         }
 
-        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDbMP3oLBoPuz4jNpEJzs3aqfhv2nULZJk",
             authDomain: "lizatest-124da.firebaseapp.com",
@@ -442,20 +434,40 @@
             galaxy.appendChild(s);
         }
 
-        // ===== Старт =====
+        // ===== ГЛАВНАЯ ФУНКЦИЯ СОХРАНЕНИЯ =====
+        function saveUser(force = false) {
+            if (!myId) return;
+
+            const data = {
+                name: myName,
+                balance: myBalance,
+                minerLastPayout: minerLastPayout,
+                lastActive: Date.now(),
+                fromTelegram: myId.startsWith("tg_")
+            };
+
+            // Используем set + update, чтобы точно создать запись
+            db.ref("users/" + myId).update(data)
+                .catch(err => console.error("Ошибка сохранения:", err));
+        }
+
         function init() {
-            // Определяем пользователя из Telegram
+            // 1. Получаем пользователя Telegram
+            let tgUser = null;
             if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                myId = "tg_" + user.id;
-                myName = user.username 
-                    ? "@" + user.username 
-                    : (user.first_name || "Игрок");
+                tgUser = tg.initDataUnsafe.user;
+            }
+
+            if (tgUser && tgUser.id) {
+                myId = "tg_" + tgUser.id;
+                myName = tgUser.username 
+                    ? "@" + tgUser.username 
+                    : (tgUser.first_name || ("ID" + tgUser.id));
             } else {
-                // Если открыли не из Telegram
+                // Гость
                 let guestId = localStorage.getItem("liza_guest_id");
                 if (!guestId) {
-                    guestId = "guest_" + Math.random().toString(36).slice(2, 10);
+                    guestId = "guest_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
                     localStorage.setItem("liza_guest_id", guestId);
                 }
                 myId = guestId;
@@ -464,26 +476,60 @@
 
             document.getElementById('userDisplay').innerText = myName;
 
-            // Загружаем данные игрока
-            db.ref("users/" + myId).once("value").then(snap => {
-                const data = snap.val() || {};
-                myBalance = Number(data.balance) || 0;
-                minerLastPayout = data.minerLastPayout || Date.now();
+            // 2. Загружаем данные + СРАЗУ создаём/обновляем запись в Firebase
+            const userRef = db.ref("users/" + myId);
 
-                // Обязательно сохраняем имя — чтобы отображалось в топе
-                db.ref("users/" + myId).update({
+            userRef.once("value").then(snap => {
+                const data = snap.val();
+
+                if (data) {
+                    myBalance = Number(data.balance) || 0;
+                    minerLastPayout = data.minerLastPayout || Date.now();
+                } else {
+                    // Новый пользователь — создаём с нуля
+                    myBalance = 0;
+                    minerLastPayout = Date.now();
+                }
+
+                // ОБЯЗАТЕЛЬНО записываем в базу (это главное исправление)
+                userRef.set({
                     name: myName,
-                    lastActive: Date.now()
+                    balance: myBalance,
+                    minerLastPayout: minerLastPayout,
+                    lastActive: Date.now(),
+                    fromTelegram: myId.startsWith("tg_")
                 });
 
                 updateUI();
                 updateMinerUI();
+            }).catch(err => {
+                console.error("Ошибка загрузки:", err);
+                // Даже при ошибке пытаемся создать запись
+                userRef.set({
+                    name: myName,
+                    balance: 0,
+                    minerLastPayout: Date.now(),
+                    lastActive: Date.now(),
+                    fromTelegram: myId.startsWith("tg_")
+                });
             });
 
-            // Банк Dice
+            // 3. Слушаем свой баланс (на случай изменений с другого устройства)
+            userRef.on("value", snap => {
+                const data = snap.val();
+                if (data && typeof data.balance !== "undefined") {
+                    // Не перезаписываем, если локально больше (защита от гонок)
+                    if (Number(data.balance) > myBalance) {
+                        myBalance = Number(data.balance);
+                        updateUI();
+                    }
+                }
+            });
+
+            // Банк
             db.ref("global/diceBank").on("value", snap => {
                 const val = snap.val();
-                if (val === null) {
+                if (val === null || val === undefined) {
                     db.ref("global/diceBank").set(START_BANK);
                     diceBank = START_BANK;
                 } else {
@@ -492,7 +538,7 @@
                 document.getElementById("diceBank").innerText = Math.floor(diceBank).toLocaleString("ru");
             });
 
-            // Топ 100 (реальное время)
+            // Топ 100
             db.ref("users").on("value", snap => {
                 renderLeaderboard(snap.val());
             });
@@ -513,16 +559,13 @@
             };
 
             setInterval(updateMinerUI, 1000);
-        }
 
-        function saveUser() {
-            if (!myId) return;
-            db.ref("users/" + myId).update({
-                balance: myBalance,
-                name: myName,
-                minerLastPayout: minerLastPayout,
-                lastActive: Date.now()
-            });
+            // Периодически обновляем lastActive
+            setInterval(() => {
+                if (myId) {
+                    db.ref("users/" + myId).update({ lastActive: Date.now() });
+                }
+            }, 60000);
         }
 
         function updateUI() {
@@ -632,7 +675,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ===== ТОП 100 =====
+        // Топ 100
         function renderLeaderboard(users) {
             const box = document.getElementById("leaderboardList");
             if (!users) {
@@ -646,9 +689,9 @@
                     name: data.name || "Игрок",
                     balance: Number(data.balance) || 0
                 }))
-                .filter(u => u.balance > 0)
+                .filter(u => u.balance > 0 || u.id.startsWith("tg_")) // показываем даже с 0, если из телеги
                 .sort((a, b) => b.balance - a.balance)
-                .slice(0, 100);   // Топ 100
+                .slice(0, 100);
 
             if (sorted.length === 0) {
                 box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
@@ -666,7 +709,6 @@
             `).join("");
         }
 
-        // Вспомогательные
         function showFloat(text) {
             const el = document.createElement("div");
             el.className = "float-plus";
