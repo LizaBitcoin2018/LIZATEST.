@@ -2,8 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIZABITCOIN</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
@@ -164,7 +165,6 @@
             word-break: break-all;
         }
 
-        /* Синяя кнопка AIRDROP */
         .airdrop-btn {
             display: inline-block;
             margin: 12px 0 10px;
@@ -186,7 +186,6 @@
         .rank { font-size: 0.95rem; color: #00d4ff; margin-top: 4px; }
         .next-rank { font-size: 0.8rem; color: #88aaff; margin-bottom: 14px; }
 
-        /* Майнер */
         .miner-card {
             background: rgba(30,30,50,0.85);
             border-radius: 10px;
@@ -224,7 +223,6 @@
             cursor: not-allowed;
         }
 
-        /* Анимации +сумма */
         .float-plus {
             position: absolute;
             right: 70px;
@@ -271,7 +269,6 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1); }
         }
 
-        /* YO кнопка */
         .yo-wrap {
             display: flex;
             flex-direction: column;
@@ -320,7 +317,6 @@
             margin-bottom: 18px;
         }
 
-        /* Dice */
         .dice-panel {
             background: rgba(20,20,40,0.9);
             border-radius: 12px;
@@ -390,7 +386,6 @@
         .win { color: #00ff88; }
         .lose { color: #ff5555; }
 
-        /* Чат */
         .chat-panel {
             width: 100%;
             background: rgba(15,15,30,0.9);
@@ -445,7 +440,6 @@
             font-weight: bold;
         }
 
-        /* Топ */
         .bottom-stats {
             width: 100%;
             background: rgba(15,15,30,0.9);
@@ -471,66 +465,17 @@
         .lb-addr { color: #00ffcc; }
         .lb-bal { font-weight: bold; }
 
-        /* Авторизация */
-        #authBlock {
+        #loading {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
+            background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 100;
-        }
-        .auth-box {
-            background: rgba(20,20,40,0.98);
-            border: 1px solid #f7931a;
-            border-radius: 14px;
-            padding: 28px 30px;
-            width: 340px;
-            max-width: 92vw;
-            text-align: center;
-        }
-        .auth-box h1 {
             color: #f7931a;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-        }
-        .auth-box input {
-            width: 100%;
-            background: #1a1a2e;
-            border: 1px solid #555;
-            color: white;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 1rem;
-            outline: none;
-        }
-        .auth-box input:focus { border-color: #f7931a; }
-        .auth-btn {
-            width: 100%;
-            background: #f7931a;
-            color: white;
-            border: none;
-            padding: 13px;
-            border-radius: 8px;
+            font-size: 1.4rem;
             font-weight: bold;
-            font-size: 1.05rem;
-            cursor: pointer;
-            margin-top: 4px;
-        }
-        .auth-switch {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            color: #aaa;
-            cursor: pointer;
-        }
-        .auth-switch span { color: #00aaff; text-decoration: underline; }
-        .error {
-            color: #ff5555;
-            margin-top: 12px;
-            font-size: 0.9rem;
-            min-height: 20px;
         }
     </style>
 
@@ -548,25 +493,7 @@
     <div class="fairy">🧚‍♀️</div>
     <div class="waifu">👘</div>
 
-    <div id="authBlock">
-        <div class="auth-box">
-            <h1>LIZABITCOIN</h1>
-            <div id="loginForm">
-                <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20">
-                <input type="password" id="passInput" placeholder="Пароль" maxlength="30">
-                <button type="button" class="auth-btn" id="loginBtn">Войти</button>
-                <div class="auth-switch" id="toRegister">Нет аккаунта? <span>Зарегистрироваться</span></div>
-            </div>
-            <div id="registerForm" style="display:none;">
-                <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
-                <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
-                <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30">
-                <button type="button" class="auth-btn" id="registerBtn">Создать аккаунт</button>
-                <div class="auth-switch" id="toLogin">Уже есть аккаунт? <span>Войти</span></div>
-            </div>
-            <p id="errorText" class="error"></p>
-        </div>
-    </div>
+    <div id="loading">Загрузка...</div>
 
     <div class="header" id="header" style="display:none;">
         <h1>LIZABITCOIN</h1>
@@ -578,7 +505,6 @@
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
 
-            <!-- Синяя кнопка AIRDROP -->
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="airdrop-btn">
                 AIRDROP 27.12.2026
             </a>
@@ -587,7 +513,6 @@
             <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
         </div>
 
-        <!-- Майнер -->
         <div class="miner-card" id="minerCard">
             <div>
                 <div class="title">Майнер</div>
@@ -600,7 +525,6 @@
             </div>
         </div>
 
-        <!-- YO -->
         <div class="yo-wrap">
             <button class="yo-btn" id="yoBtn">YO</button>
             <div class="yo-info">
@@ -613,7 +537,6 @@
             Торговать LIZA на Yobit
         </a>
 
-        <!-- Dice -->
         <div class="dice-panel">
             <h4>DICE — Удвой LIZA</h4>
             <div class="dice-bank">Банк: <strong id="diceBank">9 223 372 036 854 775 807</strong></div>
@@ -626,7 +549,6 @@
             <div class="dice-history" id="diceHistory"></div>
         </div>
 
-        <!-- Чат -->
         <div class="chat-panel">
             <h3>Чат майнеров</h3>
             <div class="chat-messages" id="chatMessages"></div>
@@ -636,7 +558,6 @@
             </div>
         </div>
 
-        <!-- Топ -->
         <div class="bottom-stats">
             <h3>Топ игроков</h3>
             <div id="leaderboardList"></div>
@@ -702,60 +623,56 @@
             galaxy.appendChild(star);
         }
 
-        // Авторизация
-        const errorText = document.getElementById('errorText');
+        // ===== Telegram WebApp =====
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-        document.getElementById('toRegister').onclick = () => {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-            errorText.innerText = '';
-        };
-        document.getElementById('toLogin').onclick = () => {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            errorText.innerText = '';
-        };
-
-        document.getElementById('loginBtn').onclick = doLogin;
-        document.getElementById('passInput').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
-        document.getElementById('registerBtn').onclick = doRegister;
-        document.getElementById('regPass2').onkeydown = e => { if (e.key === 'Enter') doRegister(); };
-
-        function doLogin() {
-            const nick = document.getElementById('nickInput').value.trim().toLowerCase();
-            const pass = document.getElementById('passInput').value;
-            if (!nick || !pass) return errorText.innerText = "Заполни все поля";
-
-            errorText.innerText = "Проверяем...";
-            db.ref('users/' + nick).once('value').then(snap => {
-                if (!snap.exists()) return errorText.innerText = "Пользователь не найден";
-                const data = snap.val();
-                if (data.password !== pass) return errorText.innerText = "Неверный пароль";
-                startGame(nick, data);
-            }).catch(() => errorText.innerText = "Ошибка соединения");
+        function getTelegramNick() {
+            if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+                return null;
+            }
+            const user = tg.initDataUnsafe.user;
+            // Приоритет: username → first_name + id
+            if (user.username) {
+                return user.username.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+            }
+            const name = (user.first_name || 'user').toLowerCase().replace(/[^a-z0-9_]/g, '_');
+            return name + '_' + user.id;
         }
 
-        function doRegister() {
-            const nick = document.getElementById('regNick').value.trim().toLowerCase();
-            const pass = document.getElementById('regPass').value;
-            const pass2 = document.getElementById('regPass2').value;
+        function initTelegram() {
+            if (tg) {
+                tg.ready();
+                tg.expand();
+                // Можно настроить цвета темы
+                try {
+                    tg.setHeaderColor('#0f0f19');
+                    tg.setBackgroundColor('#000000');
+                } catch(e) {}
+            }
 
-            if (!nick || nick.length < 3) return errorText.innerText = "Ник минимум 3 символа";
-            if (!/^[a-z0-9_]+$/.test(nick)) return errorText.innerText = "Только латиница, цифры и _";
-            if (!pass || pass.length < 4) return errorText.innerText = "Пароль минимум 4 символа";
-            if (pass !== pass2) return errorText.innerText = "Пароли не совпадают";
+            const nick = getTelegramNick();
+            if (!nick) {
+                document.getElementById('loading').innerText = 'Открой игру внутри Telegram';
+                return;
+            }
 
-            errorText.innerText = "Создаём аккаунт...";
+            // Мгновенный вход
             db.ref('users/' + nick).once('value').then(snap => {
-                if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
-
-                const data = {
-                    password: pass,
-                    balance: 0,
-                    minerLastPayout: Date.now()
-                };
-                return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
-            }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
+                let data;
+                if (snap.exists()) {
+                    data = snap.val();
+                } else {
+                    data = {
+                        balance: 0,
+                        minerLastPayout: Date.now()
+                    };
+                    db.ref('users/' + nick).set(data);
+                }
+                startGame(nick, data);
+            }).catch(err => {
+                document.getElementById('loading').innerText = 'Ошибка соединения';
+                console.error(err);
+            });
         }
 
         function startGame(nick, data) {
@@ -763,7 +680,7 @@
             myBalance = data.balance || 0;
             minerLastPayout = data.minerLastPayout || Date.now();
 
-            document.getElementById('authBlock').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
             document.getElementById('header').style.display = 'flex';
             document.getElementById('game').style.display = 'flex';
             document.getElementById('userDisplay').innerText = myNick;
@@ -957,7 +874,7 @@
             setTimeout(() => plus.remove(), 1300);
         }
 
-        // Монетки (меньше)
+        // Монетки
         function spawnCoin() {
             const coin = document.createElement('div');
             coin.className = 'btc-coin';
@@ -1046,6 +963,9 @@
             d.innerText = text;
             return d.innerHTML;
         }
+
+        // Запуск
+        initTelegram();
     </script>
 </body>
-</html
+</html>
