@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIZABITCOIN</title>
+    <title>LIZABITCOIN + Биржа</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
@@ -148,7 +148,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 16px 40px;
+            padding: 20px 16px 50px;
             max-width: 520px;
             margin: 0 auto;
             width: 100%;
@@ -157,14 +157,19 @@
         .balance-block { text-align: center; margin-bottom: 8px; }
         .balance-label { color: #aaa; font-size: 0.95rem; }
         .balance {
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: bold;
             color: #f7931a;
             text-shadow: 0 0 20px rgba(247,147,26,0.45);
             word-break: break-all;
         }
+        .yo-balance {
+            font-size: 1.15rem;
+            color: #00c6ff;
+            margin-top: 4px;
+            font-weight: bold;
+        }
 
-        /* Синяя кнопка AIRDROP */
         .airdrop-btn {
             display: inline-block;
             margin: 12px 0 10px;
@@ -176,17 +181,11 @@
             border-radius: 8px;
             text-decoration: none;
             box-shadow: 0 0 18px rgba(0, 150, 255, 0.5);
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-        .airdrop-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 180, 255, 0.7);
         }
 
         .rank { font-size: 0.95rem; color: #00d4ff; margin-top: 4px; }
         .next-rank { font-size: 0.8rem; color: #88aaff; margin-bottom: 14px; }
 
-        /* Майнер */
         .miner-card {
             background: rgba(30,30,50,0.85);
             border-radius: 10px;
@@ -224,7 +223,6 @@
             cursor: not-allowed;
         }
 
-        /* Анимации +сумма */
         .float-plus {
             position: absolute;
             right: 70px;
@@ -271,7 +269,6 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1); }
         }
 
-        /* YO кнопка */
         .yo-wrap {
             display: flex;
             flex-direction: column;
@@ -318,6 +315,124 @@
             text-align: center;
             text-decoration: none;
             margin-bottom: 18px;
+        }
+
+        /* Биржа */
+        .exchange-panel {
+            background: rgba(15,20,40,0.95);
+            border-radius: 14px;
+            padding: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,180,255,0.4);
+        }
+        .exchange-panel h3 {
+            color: #00c6ff;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 1.15rem;
+        }
+        .price-line {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 6px;
+        }
+        .liquidity-info {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+        .trade-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .trade-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .trade-box h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        .trade-box input {
+            width: 100%;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        .buy-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #00aa55;
+            color: white;
+        }
+        .sell-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #cc3333;
+            color: white;
+        }
+        .chart-container {
+            background: #0a0a15;
+            border-radius: 8px;
+            height: 180px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        #priceChart {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .orderbook {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+        .orderbook-side h5 {
+            text-align: center;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .asks h5 { color: #ff5555; }
+        .bids h5 { color: #00ff88; }
+        .ob-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 4px;
+        }
+        .recent-trades {
+            max-height: 110px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px solid #222;
         }
 
         /* Dice */
@@ -390,7 +505,6 @@
         .win { color: #00ff88; }
         .lose { color: #ff5555; }
 
-        /* Чат */
         .chat-panel {
             width: 100%;
             background: rgba(15,15,30,0.9);
@@ -445,7 +559,6 @@
             font-weight: bold;
         }
 
-        /* Топ */
         .bottom-stats {
             width: 100%;
             background: rgba(15,15,30,0.9);
@@ -471,7 +584,6 @@
         .lb-addr { color: #00ffcc; }
         .lb-bal { font-weight: bold; }
 
-        /* Авторизация */
         #authBlock {
             position: fixed;
             inset: 0;
@@ -577,8 +689,8 @@
         <div class="balance-block">
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
+            <div class="yo-balance">YO: <span id="yoBalanceDisplay">0</span></div>
 
-            <!-- Синяя кнопка AIRDROP -->
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="airdrop-btn">
                 AIRDROP 27.12.2026
             </a>
@@ -587,7 +699,6 @@
             <div class="next-rank" id="nextRankDisplay">Следующий: Квантовая Пылинка</div>
         </div>
 
-        <!-- Майнер -->
         <div class="miner-card" id="minerCard">
             <div>
                 <div class="title">Майнер</div>
@@ -600,7 +711,6 @@
             </div>
         </div>
 
-        <!-- YO -->
         <div class="yo-wrap">
             <button class="yo-btn" id="yoBtn">YO</button>
             <div class="yo-info">
@@ -613,7 +723,49 @@
             Торговать LIZA на Yobit
         </a>
 
-        <!-- Dice -->
+        <!-- БИРЖА -->
+        <div class="exchange-panel">
+            <h3>Биржа LIZA / YO</h3>
+            
+            <div class="price-line">
+                1 YO = <span id="currentPrice">1.0000</span> LIZA
+            </div>
+            <div class="liquidity-info">
+                Ликвидность: <span id="poolLiza">1 000 000</span> LIZA + <span id="poolYo">1 000 000</span> YO
+            </div>
+
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+
+            <div class="trade-form">
+                <div class="trade-box">
+                    <h4>Купить YO за LIZA</h4>
+                    <input type="number" id="buyAmount" placeholder="Сумма LIZA" min="1" step="any">
+                    <button class="buy-btn" id="buyBtn">Купить YO</button>
+                </div>
+                <div class="trade-box">
+                    <h4>Продать YO за LIZA</h4>
+                    <input type="number" id="sellAmount" placeholder="Сумма YO" min="0.01" step="any">
+                    <button class="sell-btn" id="sellBtn">Продать YO</button>
+                </div>
+            </div>
+
+            <div class="orderbook">
+                <div class="orderbook-side asks">
+                    <h5>Продажа (Asks)</h5>
+                    <div id="asksList"></div>
+                </div>
+                <div class="orderbook-side bids">
+                    <h5>Покупка (Bids)</h5>
+                    <div id="bidsList"></div>
+                </div>
+            </div>
+
+            <div style="font-size:0.85rem; color:#aaa; margin-bottom:6px;">Последние сделки:</div>
+            <div class="recent-trades" id="recentTrades"></div>
+        </div>
+
         <div class="dice-panel">
             <h4>DICE — Удвой LIZA</h4>
             <div class="dice-bank">Банк: <strong id="diceBank">9 223 372 036 854 775 807</strong></div>
@@ -626,7 +778,6 @@
             <div class="dice-history" id="diceHistory"></div>
         </div>
 
-        <!-- Чат -->
         <div class="chat-panel">
             <h3>Чат майнеров</h3>
             <div class="chat-messages" id="chatMessages"></div>
@@ -636,7 +787,6 @@
             </div>
         </div>
 
-        <!-- Топ -->
         <div class="bottom-stats">
             <h3>Топ игроков</h3>
             <div id="leaderboardList"></div>
@@ -662,13 +812,20 @@
         const START_BANK = 9223372036854775807;
         const MINER_REWARD = 17000000;
         const CYCLE_MS = 60 * 1000;
+        const INITIAL_LIZA = 1000000;
+        const INITIAL_YO = 1000000;
 
         let myNick = "";
         let myBalance = 0;
+        let myYoBalance = 0;
         let minerLastPayout = Date.now();
         let yoClicks = 0;
         let diceBank = START_BANK;
         let diceHistory = [];
+        let poolLiza = INITIAL_LIZA;
+        let poolYo = INITIAL_YO;
+        let priceHistory = [];
+        let recentTrades = [];
 
         const RANKS = [
             { min: 0, title: "Новичок" },
@@ -689,7 +846,7 @@
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 120; i++) {
+        for (let i = 0; i < 110; i++) {
             const star = document.createElement('div');
             star.className = 'star';
             const size = Math.random() * 2.2 + 0.4;
@@ -752,6 +909,7 @@
                 const data = {
                     password: pass,
                     balance: 0,
+                    yoBalance: 0,
                     minerLastPayout: Date.now()
                 };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
@@ -760,7 +918,8 @@
 
         function startGame(nick, data) {
             myNick = nick;
-            myBalance = data.balance || 0;
+            myBalance = Number(data.balance) || 0;
+            myYoBalance = Number(data.yoBalance) || 0;
             minerLastPayout = data.minerLastPayout || Date.now();
 
             document.getElementById('authBlock').style.display = 'none';
@@ -768,6 +927,7 @@
             document.getElementById('game').style.display = 'flex';
             document.getElementById('userDisplay').innerText = myNick;
 
+            // Dice
             db.ref('global/diceBank').on('value', snap => {
                 let val = snap.val();
                 if (val === null || val === undefined) {
@@ -779,6 +939,34 @@
                 document.getElementById('diceBank').innerText = Math.floor(diceBank).toLocaleString('ru');
             });
 
+            // Пул
+            db.ref('exchange/pool').on('value', snap => {
+                const d = snap.val();
+                if (!d) {
+                    db.ref('exchange/pool').set({ liza: INITIAL_LIZA, yo: INITIAL_YO });
+                    poolLiza = INITIAL_LIZA;
+                    poolYo = INITIAL_YO;
+                } else {
+                    poolLiza = Number(d.liza) || INITIAL_LIZA;
+                    poolYo = Number(d.yo) || INITIAL_YO;
+                }
+                updateExchangeUI();
+            });
+
+            // История цен
+            db.ref('exchange/priceHistory').limitToLast(60).on('value', snap => {
+                const val = snap.val() || {};
+                priceHistory = Object.values(val).sort((a, b) => a.t - b.t);
+                setTimeout(drawChart, 50);
+            });
+
+            // Сделки
+            db.ref('exchange/trades').limitToLast(20).on('value', snap => {
+                const val = snap.val() || {};
+                recentTrades = Object.values(val).sort((a, b) => b.t - a.t);
+                renderRecentTrades();
+            });
+
             db.ref('users').on('value', snap => renderLeaderboard(snap.val()));
             db.ref('chat').orderByChild('time').limitToLast(40).on('value', snap => renderChat(snap.val()));
 
@@ -786,15 +974,241 @@
             updateMinerUI();
             setInterval(updateMinerUI, 1000);
 
+            // Кнопки
             document.getElementById('yoBtn').onclick = clickYO;
             document.getElementById('claimBtn').onclick = claimMiner;
             document.getElementById('diceLow').onclick = () => playDice('low');
             document.getElementById('diceHigh').onclick = () => playDice('high');
             document.getElementById('chatBtn').onclick = sendChat;
             document.getElementById('chatInput').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+            document.getElementById('buyBtn').onclick = buyYO;
+            document.getElementById('sellBtn').onclick = sellYO;
         }
 
-        // Майнер
+        // ========== БИРЖА (исправленная) ==========
+        function getPrice() {
+            if (poolYo <= 0) return 1;
+            return poolLiza / poolYo;
+        }
+
+        function updateExchangeUI() {
+            const price = getPrice();
+            document.getElementById('currentPrice').innerText = price.toFixed(4);
+            document.getElementById('poolLiza').innerText = Math.floor(poolLiza).toLocaleString('ru');
+            document.getElementById('poolYo').innerText = Math.floor(poolYo).toLocaleString('ru');
+            renderOrderBook(price);
+        }
+
+        function renderOrderBook(price) {
+            const asks = [];
+            const bids = [];
+            for (let i = 1; i <= 6; i++) {
+                asks.push({
+                    price: price * (1 + i * 0.007),
+                    amount: Math.floor(1500 + Math.random() * 7000)
+                });
+                bids.push({
+                    price: price * (1 - i * 0.007),
+                    amount: Math.floor(1500 + Math.random() * 7000)
+                });
+            }
+            document.getElementById('asksList').innerHTML = asks.map(a => `
+                <div class="ob-row">
+                    <span style="color:#ff6666">${a.price.toFixed(4)}</span>
+                    <span>${a.amount.toLocaleString('ru')}</span>
+                </div>
+            `).join('');
+            document.getElementById('bidsList').innerHTML = bids.map(b => `
+                <div class="ob-row">
+                    <span style="color:#66ff99">${b.price.toFixed(4)}</span>
+                    <span>${b.amount.toLocaleString('ru')}</span>
+                </div>
+            `).join('');
+        }
+
+        function buyYO() {
+            if (!myNick) return alert("Сначала войди");
+
+            const lizaIn = parseFloat(document.getElementById('buyAmount').value);
+            if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите корректную сумму LIZA");
+            if (lizaIn > myBalance) return alert("Недостаточно LIZA на балансе");
+
+            // Расчёт AMM
+            const k = poolLiza * poolYo;
+            const newPoolLiza = poolLiza + lizaIn;
+            const newPoolYo = k / newPoolLiza;
+            const yoOut = poolYo - newPoolYo;
+
+            if (yoOut <= 0.0001) return alert("Слишком маленькая сумма");
+
+            // Обновляем локально
+            myBalance -= lizaIn;
+            myYoBalance += yoOut;
+            poolLiza = newPoolLiza;
+            poolYo = newPoolYo;
+
+            // Сохраняем пользователя
+            db.ref('users/' + myNick).update({
+                balance: myBalance,
+                yoBalance: myYoBalance
+            });
+
+            // Сохраняем пул
+            db.ref('exchange/pool').set({
+                liza: poolLiza,
+                yo: poolYo
+            });
+
+            // Пишем сделку и цену
+            const price = getPrice();
+            const now = Date.now();
+            db.ref('exchange/trades').push({
+                type: 'buy',
+                amount: yoOut,
+                price: price,
+                user: myNick,
+                t: now
+            });
+            db.ref('exchange/priceHistory').push({
+                p: price,
+                t: now
+            });
+
+            // Обновляем UI
+            updateUI();
+            updateExchangeUI();
+            document.getElementById('buyAmount').value = '';
+            playCoinSound();
+            alert(`Успешно куплено ${yoOut.toFixed(4)} YO\nза ${lizaIn.toLocaleString('ru')} LIZA`);
+        }
+
+        function sellYO() {
+            if (!myNick) return alert("Сначала войди");
+
+            const yoIn = parseFloat(document.getElementById('sellAmount').value);
+            if (isNaN(yoIn) || yoIn <= 0) return alert("Введите корректную сумму YO");
+            if (yoIn > myYoBalance) return alert("Недостаточно YO на балансе");
+
+            // Расчёт AMM
+            const k = poolLiza * poolYo;
+            const newPoolYo = poolYo + yoIn;
+            const newPoolLiza = k / newPoolYo;
+            const lizaOut = poolLiza - newPoolLiza;
+
+            if (lizaOut <= 0.0001) return alert("Слишком маленькая сумма");
+
+            // Обновляем локально
+            myYoBalance -= yoIn;
+            myBalance += lizaOut;
+            poolYo = newPoolYo;
+            poolLiza = newPoolLiza;
+
+            // Сохраняем
+            db.ref('users/' + myNick).update({
+                balance: myBalance,
+                yoBalance: myYoBalance
+            });
+
+            db.ref('exchange/pool').set({
+                liza: poolLiza,
+                yo: poolYo
+            });
+
+            const price = getPrice();
+            const now = Date.now();
+            db.ref('exchange/trades').push({
+                type: 'sell',
+                amount: yoIn,
+                price: price,
+                user: myNick,
+                t: now
+            });
+            db.ref('exchange/priceHistory').push({
+                p: price,
+                t: now
+            });
+
+            updateUI();
+            updateExchangeUI();
+            document.getElementById('sellAmount').value = '';
+            playCoinSound();
+            alert(`Успешно продано ${yoIn.toFixed(4)} YO\nполучено ${lizaOut.toFixed(2)} LIZA`);
+        }
+
+        function renderRecentTrades() {
+            const box = document.getElementById('recentTrades');
+            if (!recentTrades.length) {
+                box.innerHTML = '<div style="color:#666;text-align:center;padding:10px;">Пока нет сделок</div>';
+                return;
+            }
+            box.innerHTML = recentTrades.map(t => `
+                <div class="trade-item">
+                    <span style="color:${t.type === 'buy' ? '#00ff88' : '#ff5555'}">
+                        ${t.type === 'buy' ? 'BUY' : 'SELL'} ${Number(t.amount).toFixed(2)}
+                    </span>
+                    <span>${Number(t.price).toFixed(4)}</span>
+                    <span style="color:#888">${t.user}</span>
+                </div>
+            `).join('');
+        }
+
+        function drawChart() {
+            const canvas = document.getElementById('priceChart');
+            if (!canvas) return;
+
+            const parent = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const w = parent.clientWidth;
+            const h = parent.clientHeight;
+
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            // Фон
+            ctx.fillStyle = '#0a0a15';
+            ctx.fillRect(0, 0, w, h);
+
+            if (priceHistory.length < 2) {
+                ctx.fillStyle = '#555';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Сделайте первую сделку', w / 2, h / 2);
+                return;
+            }
+
+            const prices = priceHistory.map(p => p.p);
+            const minP = Math.min(...prices) * 0.995;
+            const maxP = Math.max(...prices) * 1.005;
+            const range = maxP - minP || 0.001;
+
+            // Линия
+            ctx.beginPath();
+            ctx.strokeStyle = '#00c6ff';
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+
+            priceHistory.forEach((p, i) => {
+                const x = (i / (priceHistory.length - 1)) * (w - 16) + 8;
+                const y = h - 12 - ((p.p - minP) / range) * (h - 24);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Последняя цена
+            const last = prices[prices.length - 1];
+            ctx.fillStyle = '#00ff88';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(last.toFixed(4), w - 8, 16);
+        }
+
+        // Майнер, YO, Dice и остальное
         function updateMinerUI() {
             const now = Date.now();
             const elapsed = now - minerLastPayout;
@@ -836,7 +1250,6 @@
             setTimeout(() => plus.remove(), 1200);
         }
 
-        // YO
         function clickYO() {
             yoClicks++;
             let add = 17000;
@@ -855,7 +1268,6 @@
             setTimeout(() => plus.remove(), 1150);
         }
 
-        // Dice
         function playDice(direction) {
             if (!myNick) return;
             const bet = parseFloat(document.getElementById('diceBet').value);
@@ -957,7 +1369,6 @@
             setTimeout(() => plus.remove(), 1300);
         }
 
-        // Монетки (меньше)
         function spawnCoin() {
             const coin = document.createElement('div');
             coin.className = 'btc-coin';
@@ -985,12 +1396,14 @@
         function saveUser() {
             db.ref('users/' + myNick).update({
                 balance: myBalance,
+                yoBalance: myYoBalance,
                 minerLastPayout: minerLastPayout
             });
         }
 
         function updateUI() {
             document.getElementById('balanceDisplay').innerText = myBalance.toLocaleString('ru');
+            document.getElementById('yoBalanceDisplay').innerText = myYoBalance.toLocaleString('ru', {maximumFractionDigits: 4});
             updateRank();
         }
 
@@ -1048,4 +1461,4 @@
         }
     </script>
 </body>
-</html
+</html>
