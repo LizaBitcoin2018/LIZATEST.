@@ -89,7 +89,7 @@
             display: flex;
             justify-content: center;
             gap: 30px;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: bold;
         }
         .bal-liza { color: #f7931a; }
@@ -105,28 +105,28 @@
         .exchange-panel h3 {
             color: #00c6ff;
             text-align: center;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             font-size: 1.25rem;
         }
         .price-line {
             text-align: center;
-            font-size: 1.45rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: #00ff88;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .liquidity-info {
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             color: #999;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .chart-container {
             background: #0a0a15;
             border-radius: 10px;
             height: 240px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             position: relative;
             overflow: hidden;
         }
@@ -140,7 +140,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
         .trade-box {
             background: rgba(0,0,0,0.35);
@@ -148,7 +148,7 @@
             padding: 14px;
         }
         .trade-box h4 {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             margin-bottom: 10px;
             color: #ccc;
         }
@@ -180,7 +180,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             font-size: 0.82rem;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         .orderbook-side h5 {
             text-align: center;
@@ -201,14 +201,14 @@
             margin-bottom: 8px;
         }
         .recent-trades {
-            max-height: 180px;
+            max-height: 170px;
             overflow-y: auto;
             font-size: 0.84rem;
         }
         .trade-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 5px 0;
             border-bottom: 1px solid #222;
         }
 
@@ -256,7 +256,6 @@
             font-weight: bold;
             font-size: 1.05rem;
             cursor: pointer;
-            margin-top: 4px;
         }
         .auth-switch {
             margin-top: 18px;
@@ -288,14 +287,14 @@
             <div id="loginForm">
                 <input type="text" id="nickInput" placeholder="Никнейм" maxlength="20">
                 <input type="password" id="passInput" placeholder="Пароль" maxlength="30">
-                <button type="button" class="auth-btn" id="loginBtn">Войти</button>
+                <button class="auth-btn" id="loginBtn">Войти</button>
                 <div class="auth-switch" id="toRegister">Нет аккаунта? <span>Зарегистрироваться</span></div>
             </div>
             <div id="registerForm" style="display:none;">
                 <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
                 <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
                 <input type="password" id="regPass2" placeholder="Повторите пароль" maxlength="30">
-                <button type="button" class="auth-btn" id="registerBtn">Создать аккаунт</button>
+                <button class="auth-btn" id="registerBtn">Создать аккаунт</button>
                 <div class="auth-switch" id="toLogin">Уже есть аккаунт? <span>Войти</span></div>
             </div>
             <p id="errorText" class="error"></p>
@@ -385,7 +384,7 @@
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 70; i++) {
+        for (let i = 0; i < 60; i++) {
             const star = document.createElement('div');
             star.className = 'star';
             const size = Math.random() * 2 + 0.5;
@@ -399,7 +398,6 @@
 
         // Авторизация
         const errorText = document.getElementById('errorText');
-
         document.getElementById('toRegister').onclick = () => {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
@@ -440,17 +438,12 @@
             if (!pass || pass.length < 4) return errorText.innerText = "Пароль минимум 4 символа";
             if (pass !== pass2) return errorText.innerText = "Пароли не совпадают";
 
-            errorText.innerText = "Создаём аккаунт...";
+            errorText.innerText = "Создаём...";
             db.ref('users/' + nick).once('value').then(snap => {
-                if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
-
-                const data = {
-                    password: pass,
-                    balance: 50000,
-                    yoBalance: 1000
-                };
+                if (snap.exists()) return errorText.innerText = "Ник занят";
+                const data = { password: pass, balance: 50000, yoBalance: 1000 };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
-            }).catch(err => errorText.innerText = "Ошибка");
+            }).catch(() => errorText.innerText = "Ошибка");
         }
 
         function startGame(nick, data) {
@@ -463,59 +456,61 @@
             document.getElementById('game').style.display = 'flex';
             document.getElementById('userDisplay').innerText = myNick;
 
-            // Пул
+            // Загружаем пул один раз + слушаем
             db.ref('exchange/pool').on('value', snap => {
                 const d = snap.val();
-                if (!d) {
-                    poolLiza = INITIAL_LIZA;
-                    poolYo = INITIAL_YO;
-                    db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
+                if (d) {
+                    poolLiza = Number(d.liza) || poolLiza;
+                    poolYo = Number(d.yo) || poolYo;
                 } else {
-                    poolLiza = Number(d.liza) || INITIAL_LIZA;
-                    poolYo = Number(d.yo) || INITIAL_YO;
+                    db.ref('exchange/pool').set({ liza: INITIAL_LIZA, yo: INITIAL_YO });
                 }
                 updateExchangeUI();
             });
 
-            // История цен (общая)
-            db.ref('exchange/priceHistory').limitToLast(100).on('value', snap => {
+            // Загружаем историю цен
+            db.ref('exchange/priceHistory').limitToLast(60).once('value').then(snap => {
                 const val = snap.val() || {};
                 priceHistory = Object.values(val).sort((a, b) => a.t - b.t);
-                
-                // Если истории почти нет — создаём стартовые точки
-                if (priceHistory.length < 3) {
+                if (priceHistory.length < 2) {
+                    const p = 1.0;
                     const now = Date.now();
-                    const base = getPrice();
                     priceHistory = [
-                        { p: base * 0.98, t: now - 60000 },
-                        { p: base * 1.01, t: now - 40000 },
-                        { p: base * 0.99, t: now - 20000 },
-                        { p: base, t: now }
+                        {p: p*0.99, t: now-30000},
+                        {p: p*1.01, t: now-20000},
+                        {p: p*0.995, t: now-10000},
+                        {p: p, t: now}
                     ];
                 }
-                
-                setTimeout(drawChart, 50);
+                drawChart();
+            });
+
+            // Слушаем новые точки цены
+            db.ref('exchange/priceHistory').limitToLast(1).on('child_added', snap => {
+                const point = snap.val();
+                if (!point) return;
+                // Добавляем только если это действительно новая точка
+                if (priceHistory.length === 0 || point.t > priceHistory[priceHistory.length-1].t) {
+                    priceHistory.push(point);
+                    if (priceHistory.length > 60) priceHistory.shift();
+                    drawChart();
+                }
             });
 
             // История сделок
-            db.ref('exchange/trades').limitToLast(25).on('value', snap => {
+            db.ref('exchange/trades').limitToLast(20).on('value', snap => {
                 const val = snap.val() || {};
                 recentTrades = Object.values(val).sort((a, b) => b.t - a.t);
                 renderRecentTrades();
             });
 
             updateUI();
-
             document.getElementById('buyBtn').onclick = buyYO;
             document.getElementById('sellBtn').onclick = sellYO;
-
-            // На всякий случай перерисовываем через секунду
-            setTimeout(drawChart, 800);
         }
 
         function getPrice() {
-            if (poolYo <= 0) return 1;
-            return poolLiza / poolYo;
+            return poolYo > 0 ? poolLiza / poolYo : 1;
         }
 
         function updateExchangeUI() {
@@ -527,71 +522,93 @@
         }
 
         function renderOrderBook(price) {
-            let htmlAsks = '';
-            let htmlBids = '';
+            let asks = '', bids = '';
             for (let i = 1; i <= 6; i++) {
-                htmlAsks += `<div class="ob-row"><span style="color:#ff6666">${(price * (1 + i * 0.007)).toFixed(4)}</span><span>${(2000 + i * 700).toLocaleString('ru')}</span></div>`;
-                htmlBids += `<div class="ob-row"><span style="color:#66ff99">${(price * (1 - i * 0.007)).toFixed(4)}</span><span>${(2000 + i * 700).toLocaleString('ru')}</span></div>`;
+                asks += `<div class="ob-row"><span style="color:#ff6666">${(price*(1+i*0.007)).toFixed(4)}</span><span>${(1800+i*600).toLocaleString('ru')}</span></div>`;
+                bids += `<div class="ob-row"><span style="color:#66ff99">${(price*(1-i*0.007)).toFixed(4)}</span><span>${(1800+i*600).toLocaleString('ru')}</span></div>`;
             }
-            document.getElementById('asksList').innerHTML = htmlAsks;
-            document.getElementById('bidsList').innerHTML = htmlBids;
+            document.getElementById('asksList').innerHTML = asks;
+            document.getElementById('bidsList').innerHTML = bids;
         }
 
         function buyYO() {
             const lizaIn = parseFloat(document.getElementById('buyAmount').value);
-            if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите сумму");
+            if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите сумму LIZA");
             if (lizaIn > myBalance) return alert("Недостаточно LIZA");
 
             const k = poolLiza * poolYo;
-            const newPoolLiza = poolLiza + lizaIn;
-            const newPoolYo = k / newPoolLiza;
-            const yoOut = poolYo - newPoolYo;
-
+            const newLiza = poolLiza + lizaIn;
+            const newYo = k / newLiza;
+            const yoOut = poolYo - newYo;
             if (yoOut <= 0) return alert("Слишком маленькая сумма");
 
+            // Локально обновляем
             myBalance -= lizaIn;
             myYoBalance += yoOut;
-            poolLiza = newPoolLiza;
-            poolYo = newPoolYo;
+            poolLiza = newLiza;
+            poolYo = newYo;
 
             const price = getPrice();
             const now = Date.now();
+            const point = { p: price, t: now };
+            const trade = { type: 'buy', amount: yoOut, price, user: myNick, t: now };
 
-            db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
-            db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-            db.ref('exchange/trades').push({ type: 'buy', amount: yoOut, price, user: myNick, t: now });
-            db.ref('exchange/priceHistory').push({ p: price, t: now });
+            // Сразу в график и историю
+            priceHistory.push(point);
+            if (priceHistory.length > 60) priceHistory.shift();
+            recentTrades.unshift(trade);
+            if (recentTrades.length > 20) recentTrades.pop();
 
             updateUI();
+            updateExchangeUI();
+            drawChart();
+            renderRecentTrades();
+
+            // Отправляем в Firebase
+            db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
+            db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
+            db.ref('exchange/priceHistory').push(point);
+            db.ref('exchange/trades').push(trade);
+
             document.getElementById('buyAmount').value = '';
         }
 
         function sellYO() {
             const yoIn = parseFloat(document.getElementById('sellAmount').value);
-            if (isNaN(yoIn) || yoIn <= 0) return alert("Введите сумму");
+            if (isNaN(yoIn) || yoIn <= 0) return alert("Введите сумму YO");
             if (yoIn > myYoBalance) return alert("Недостаточно YO");
 
             const k = poolLiza * poolYo;
-            const newPoolYo = poolYo + yoIn;
-            const newPoolLiza = k / newPoolYo;
-            const lizaOut = poolLiza - newPoolLiza;
-
+            const newYo = poolYo + yoIn;
+            const newLiza = k / newYo;
+            const lizaOut = poolLiza - newLiza;
             if (lizaOut <= 0) return alert("Слишком маленькая сумма");
 
             myYoBalance -= yoIn;
             myBalance += lizaOut;
-            poolYo = newPoolYo;
-            poolLiza = newPoolLiza;
+            poolYo = newYo;
+            poolLiza = newLiza;
 
             const price = getPrice();
             const now = Date.now();
+            const point = { p: price, t: now };
+            const trade = { type: 'sell', amount: yoIn, price, user: myNick, t: now };
+
+            priceHistory.push(point);
+            if (priceHistory.length > 60) priceHistory.shift();
+            recentTrades.unshift(trade);
+            if (recentTrades.length > 20) recentTrades.pop();
+
+            updateUI();
+            updateExchangeUI();
+            drawChart();
+            renderRecentTrades();
 
             db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
             db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
-            db.ref('exchange/trades').push({ type: 'sell', amount: yoIn, price, user: myNick, t: now });
-            db.ref('exchange/priceHistory').push({ p: price, t: now });
+            db.ref('exchange/priceHistory').push(point);
+            db.ref('exchange/trades').push(trade);
 
-            updateUI();
             document.getElementById('sellAmount').value = '';
         }
 
@@ -603,27 +620,21 @@
             }
             box.innerHTML = recentTrades.map(t => `
                 <div class="trade-item">
-                    <span style="color:${t.type === 'buy' ? '#00ff88' : '#ff5555'}">${t.type === 'buy' ? 'BUY' : 'SELL'} ${Number(t.amount).toFixed(2)}</span>
+                    <span style="color:${t.type==='buy' ? '#00ff88' : '#ff5555'}">${t.type==='buy'?'BUY':'SELL'} ${Number(t.amount).toFixed(2)}</span>
                     <span>${Number(t.price).toFixed(4)}</span>
                     <span style="color:#888">${t.user}</span>
                 </div>
             `).join('');
         }
 
-        // ====================== НАДЁЖНЫЙ СВЕЧНОЙ ГРАФИК ======================
         function drawChart() {
             const canvas = document.getElementById('priceChart');
             if (!canvas) return;
 
             const container = canvas.parentElement;
-            const rect = container.getBoundingClientRect();
-            const w = rect.width;
-            const h = rect.height;
-
-            if (w < 50 || h < 50) {
-                setTimeout(drawChart, 200);
-                return;
-            }
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            if (w < 50 || h < 50) return;
 
             const dpr = window.devicePixelRatio || 1;
             canvas.width = w * dpr;
@@ -632,8 +643,7 @@
             canvas.style.height = h + 'px';
 
             const ctx = canvas.getContext('2d');
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.scale(dpr, dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             // Фон
             ctx.fillStyle = '#0a0a15';
@@ -643,84 +653,84 @@
                 ctx.fillStyle = '#666';
                 ctx.font = '14px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('Загрузка графика...', w/2, h/2);
+                ctx.fillText('Сделайте сделку', w/2, h/2);
                 return;
             }
 
-            // Создаём свечи
+            // Свечи
             const candles = [];
             for (let i = 1; i < priceHistory.length; i++) {
                 const open = priceHistory[i-1].p;
                 const close = priceHistory[i].p;
-                const high = Math.max(open, close) * 1.004;
-                const low = Math.min(open, close) * 0.996;
-                candles.push({ open, high, low, close });
+                candles.push({
+                    open,
+                    close,
+                    high: Math.max(open, close) * 1.003,
+                    low: Math.min(open, close) * 0.997
+                });
             }
 
-            const visible = candles.slice(-40);
-            if (visible.length === 0) return;
+            const visible = candles.slice(-35);
+            if (!visible.length) return;
 
             let minP = Math.min(...visible.map(c => c.low));
             let maxP = Math.max(...visible.map(c => c.high));
-            const padding = (maxP - minP) * 0.15 || 0.01;
-            minP -= padding;
-            maxP += padding;
+            const pad = (maxP - minP) * 0.18 || 0.01;
+            minP -= pad;
+            maxP += pad;
             const range = maxP - minP;
 
-            // ===== СЕТКА =====
-            ctx.strokeStyle = 'rgba(255,255,255,0.07)';
-            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            // Сетка
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.fillStyle = 'rgba(255,255,255,0.45)';
             ctx.font = '11px monospace';
             ctx.textAlign = 'left';
             ctx.lineWidth = 1;
 
             for (let i = 0; i <= 4; i++) {
-                const y = 25 + (i / 4) * (h - 50);
-                const price = maxP - (i / 4) * range;
-
+                const y = 22 + (i/4)*(h-45);
+                const price = maxP - (i/4)*range;
                 ctx.beginPath();
-                ctx.moveTo(50, y);
-                ctx.lineTo(w - 10, y);
+                ctx.moveTo(48, y);
+                ctx.lineTo(w-8, y);
                 ctx.stroke();
-
-                ctx.fillText(price.toFixed(4), 6, y + 4);
+                ctx.fillText(price.toFixed(4), 4, y+3);
             }
 
-            // ===== СВЕЧИ =====
-            const candleW = Math.max(6, (w - 70) / visible.length - 3);
+            // Свечи
+            const cw = Math.max(5, (w - 65) / visible.length - 2.2);
 
             visible.forEach((c, i) => {
-                const x = 55 + i * (candleW + 3);
-                
-                const yHigh = 25 + ((maxP - c.high) / range) * (h - 50);
-                const yLow  = 25 + ((maxP - c.low)  / range) * (h - 50);
-                const yOpen = 25 + ((maxP - c.open) / range) * (h - 50);
-                const yClose= 25 + ((maxP - c.close)/ range) * (h - 50);
+                const x = 52 + i * (cw + 2.2);
+                const yH = 22 + ((maxP - c.high)/range)*(h-45);
+                const yL = 22 + ((maxP - c.low)/range)*(h-45);
+                const yO = 22 + ((maxP - c.open)/range)*(h-45);
+                const yC = 22 + ((maxP - c.close)/range)*(h-45);
 
                 const green = c.close >= c.open;
-                const color = green ? '#00c853' : '#ff1744';
+                const col = green ? '#00c853' : '#ff1744';
 
                 // Тень
                 ctx.beginPath();
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 1.5;
-                ctx.moveTo(x + candleW/2, yHigh);
-                ctx.lineTo(x + candleW/2, yLow);
+                ctx.strokeStyle = col;
+                ctx.lineWidth = 1.4;
+                ctx.moveTo(x + cw/2, yH);
+                ctx.lineTo(x + cw/2, yL);
                 ctx.stroke();
 
                 // Тело
-                const top = Math.min(yOpen, yClose);
-                const height = Math.max(2, Math.abs(yClose - yOpen));
-                ctx.fillStyle = color;
-                ctx.fillRect(x, top, candleW, height);
+                const top = Math.min(yO, yC);
+                const height = Math.max(2, Math.abs(yC - yO));
+                ctx.fillStyle = col;
+                ctx.fillRect(x, top, cw, height);
             });
 
             // Последняя цена
-            const last = visible[visible.length - 1].close;
+            const last = visible[visible.length-1].close;
             ctx.fillStyle = '#00ff88';
             ctx.font = 'bold 13px sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(last.toFixed(4), w - 12, 18);
+            ctx.fillText(last.toFixed(4), w-10, 16);
         }
 
         function updateUI() {
@@ -728,8 +738,7 @@
             document.getElementById('yoBalanceDisplay').innerText = myYoBalance.toLocaleString('ru', {maximumFractionDigits: 4});
         }
 
-        // На случай изменения размера окна
-        window.addEventListener('resize', () => setTimeout(drawChart, 100));
+        window.addEventListener('resize', () => setTimeout(drawChart, 150));
     </script>
 </body>
 </html>
