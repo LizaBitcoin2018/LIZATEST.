@@ -377,6 +377,7 @@
 
         const INITIAL_LIZA = 1000000;
         const INITIAL_YO = 1000000;
+        const START_BALANCE = 1000000000; // 1 миллиард
 
         let myNick = "";
         let myBalance = 0;
@@ -448,10 +449,11 @@
             db.ref('users/' + nick).once('value').then(snap => {
                 if (snap.exists()) return errorText.innerText = "Такой ник уже занят";
 
+                // Стартовый баланс 1 миллиард LIZA + 1 миллиард YO
                 const data = {
                     password: pass,
-                    balance: 50000,
-                    yoBalance: 1000
+                    balance: START_BALANCE,
+                    yoBalance: START_BALANCE
                 };
                 return db.ref('users/' + nick).set(data).then(() => startGame(nick, data));
             }).catch(err => errorText.innerText = "Ошибка: " + (err.message || "неизвестно"));
@@ -487,6 +489,20 @@
                     poolYo = Number(d.yo) || poolYo;
                     updateExchangeUI();
                 }
+            });
+
+            // История цен
+            db.ref('exchange/priceHistory').limitToLast(60).on('value', snap => {
+                const val = snap.val() || {};
+                priceHistory = Object.values(val).sort((a, b) => a.t - b.t);
+                drawChart();
+            });
+
+            // Сделки
+            db.ref('exchange/trades').limitToLast(25).on('value', snap => {
+                const val = snap.val() || {};
+                recentTrades = Object.values(val).sort((a, b) => b.t - a.t);
+                renderRecentTrades();
             });
 
             updateUI();
@@ -567,7 +583,6 @@
             db.ref('exchange/priceHistory').push({ p: price, t: now });
 
             document.getElementById('buyAmount').value = '';
-            alert(`Куплено ${yoOut.toFixed(4)} YO\nза ${lizaIn.toLocaleString('ru')} LIZA`);
         }
 
         function sellYO() {
@@ -608,7 +623,6 @@
             db.ref('exchange/priceHistory').push({ p: price, t: now });
 
             document.getElementById('sellAmount').value = '';
-            alert(`Продано ${yoIn.toFixed(4)} YO\nполучено ${lizaOut.toFixed(2)} LIZA`);
         }
 
         function renderRecentTrades() {
@@ -628,7 +642,6 @@
             `).join('');
         }
 
-        // ====================== СВЕЧНОЙ ГРАФИК ======================
         function drawChart() {
             const canvas = document.getElementById('priceChart');
             if (!canvas) return;
@@ -646,7 +659,6 @@
             const ctx = canvas.getContext('2d');
             ctx.scale(dpr, dpr);
 
-            // Фон
             ctx.fillStyle = '#0a0a15';
             ctx.fillRect(0, 0, w, h);
 
@@ -658,17 +670,16 @@
                 return;
             }
 
-            // Создаём свечи из истории цен
+            // Создаём свечи
             const candles = [];
             for (let i = 1; i < priceHistory.length; i++) {
                 const open = priceHistory[i - 1].p;
                 const close = priceHistory[i].p;
-                const high = Math.max(open, close) * (1 + Math.random() * 0.004);
-                const low = Math.min(open, close) * (1 - Math.random() * 0.004);
+                const high = Math.max(open, close) * (1 + Math.random() * 0.003);
+                const low = Math.min(open, close) * (1 - Math.random() * 0.003);
                 candles.push({ open, high, low, close });
             }
 
-            // Берём последние 40 свечей
             const visible = candles.slice(-40);
             if (visible.length === 0) return;
 
@@ -694,7 +705,7 @@
                 const isGreen = c.close >= c.open;
                 const color = isGreen ? '#00c853' : '#ff1744';
 
-                // Тень (wick)
+                // Фитиль
                 ctx.beginPath();
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 1.5;
@@ -702,7 +713,7 @@
                 ctx.lineTo(x + candleWidth / 2, lowY);
                 ctx.stroke();
 
-                // Тело свечи
+                // Тело
                 const bodyTop = Math.min(openY, closeY);
                 const bodyHeight = Math.max(2, Math.abs(closeY - openY));
 
