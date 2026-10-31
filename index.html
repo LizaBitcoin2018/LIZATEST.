@@ -69,11 +69,6 @@
             word-break: break-all;
             margin: 4px 0;
         }
-        .rank {
-            font-size: 0.9rem;
-            color: #00d4ff;
-            margin-top: 6px;
-        }
 
         .airdrop-btn {
             display: inline-block;
@@ -265,47 +260,6 @@
             cursor: pointer;
         }
 
-        /* ТОП ИГРОКОВ (внизу) */
-        .leaderboard {
-            background: rgba(15,15,30,0.95);
-            border-radius: 12px;
-            border: 1px solid rgba(100,100,255,0.25);
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        .leaderboard h3 {
-            color: #f7931a;
-            padding: 12px 14px;
-            border-bottom: 1px solid #333;
-            font-size: 1.05rem;
-        }
-        .lb-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            border-bottom: 1px solid #2a2a2a;
-            font-size: 0.92rem;
-        }
-        .lb-item:last-child { border-bottom: none; }
-        .lb-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .lb-rank {
-            color: #888;
-            min-width: 22px;
-        }
-        .lb-name {
-            color: #00ffcc;
-            font-weight: 500;
-        }
-        .lb-bal {
-            font-weight: bold;
-            color: #f7931a;
-        }
-
         .float-plus {
             position: fixed;
             color: #00ff88;
@@ -338,7 +292,6 @@
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="airdrop-btn">
                 AIRDROP 27.12.2026
             </a>
-            <div class="rank" id="rankDisplay">Ранг: Новичок</div>
         </div>
 
         <!-- Майнер -->
@@ -387,14 +340,6 @@
                 <button id="chatBtn">➤</button>
             </div>
         </div>
-
-        <!-- ТОП ИГРОКОВ (самый низ) -->
-        <div class="leaderboard">
-            <h3>Топ игроков</h3>
-            <div id="leaderboardList">
-                <div style="padding:20px;text-align:center;color:#666;">Загрузка...</div>
-            </div>
-        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -428,25 +373,12 @@
         const CYCLE_MS = 60 * 1000;
         const START_BANK = 9223372036854775807;
 
-        let myId = null;          // Telegram ID или guest
+        let myId = null;
         let myName = "Игрок";
         let myBalance = 0;
         let minerLastPayout = Date.now();
         let yoClicks = 0;
         let diceBank = START_BANK;
-
-        const RANKS = [
-            { min: 0, title: "Новичок" },
-            { min: 10000, title: "Квантовая Пылинка" },
-            { min: 100000, title: "Атомный Странник" },
-            { min: 1000000, title: "Протонный Майнер" },
-            { min: 10000000, title: "Нейтронная Звезда" },
-            { min: 100000000, title: "Чёрная Дыра" },
-            { min: 1000000000, title: "Галактический Коллектор" },
-            { min: 10000000000, title: "Квазар" },
-            { min: 100000000000, title: "Сверхновое Ядро" },
-            { min: 1e12, title: "Большой Взрыв" }
-        ];
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
@@ -464,13 +396,11 @@
 
         // ===== Старт =====
         function init() {
-            // Получаем данные из Telegram
             if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 myId = "tg_" + user.id;
                 myName = user.username ? "@" + user.username : (user.first_name || "Игрок");
             } else {
-                // Если открыли не из Telegram — гость
                 let guestId = localStorage.getItem("liza_guest_id");
                 if (!guestId) {
                     guestId = "guest_" + Math.random().toString(36).slice(2, 10);
@@ -482,13 +412,11 @@
 
             document.getElementById('userDisplay').innerText = myName;
 
-            // Загружаем данные пользователя
             db.ref("users/" + myId).once("value").then(snap => {
                 const data = snap.val() || {};
                 myBalance = Number(data.balance) || 0;
                 minerLastPayout = data.minerLastPayout || Date.now();
 
-                // Сохраняем имя (чтобы в топе было видно)
                 db.ref("users/" + myId).update({
                     name: myName,
                     lastActive: Date.now()
@@ -498,7 +426,6 @@
                 updateMinerUI();
             });
 
-            // Слушатели
             db.ref("global/diceBank").on("value", snap => {
                 const val = snap.val();
                 if (val === null) {
@@ -510,17 +437,10 @@
                 document.getElementById("diceBank").innerText = Math.floor(diceBank).toLocaleString("ru");
             });
 
-            // Топ игроков (обновляется в реальном времени)
-            db.ref("users").on("value", snap => {
-                renderLeaderboard(snap.val());
-            });
-
-            // Чат
             db.ref("chat").orderByChild("time").limitToLast(40).on("value", snap => {
                 renderChat(snap.val());
             });
 
-            // Кнопки
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
             document.getElementById("diceLow").onclick = () => playDice("low");
@@ -533,7 +453,6 @@
             setInterval(updateMinerUI, 1000);
         }
 
-        // ===== Сохранение =====
         function saveUser() {
             if (!myId) return;
             db.ref("users/" + myId).update({
@@ -546,18 +465,6 @@
 
         function updateUI() {
             document.getElementById("balanceDisplay").innerText = myBalance.toLocaleString("ru");
-            updateRank();
-        }
-
-        function updateRank() {
-            let title = "Новичок";
-            for (let i = RANKS.length - 1; i >= 0; i--) {
-                if (myBalance >= RANKS[i].min) {
-                    title = RANKS[i].title;
-                    break;
-                }
-            }
-            document.getElementById("rankDisplay").innerText = "Ранг: " + title;
         }
 
         // ===== YO =====
@@ -661,40 +568,6 @@
                 </div>`;
             }).join("");
             box.scrollTop = box.scrollHeight;
-        }
-
-        // ===== ТОП ИГРОКОВ =====
-        function renderLeaderboard(users) {
-            const box = document.getElementById("leaderboardList");
-            if (!users) {
-                box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
-                return;
-            }
-
-            const sorted = Object.entries(users)
-                .map(([id, data]) => ({
-                    id,
-                    name: data.name || id,
-                    balance: Number(data.balance) || 0
-                }))
-                .filter(u => u.balance > 0)
-                .sort((a, b) => b.balance - a.balance)
-                .slice(0, 20);
-
-            if (sorted.length === 0) {
-                box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
-                return;
-            }
-
-            box.innerHTML = sorted.map((u, i) => `
-                <div class="lb-item">
-                    <div class="lb-left">
-                        <span class="lb-rank">${i + 1}.</span>
-                        <span class="lb-name">${escapeHtml(u.name)}</span>
-                    </div>
-                    <span class="lb-bal">${u.balance.toLocaleString("ru")}</span>
-                </div>
-            `).join("");
         }
 
         // Вспомогательные
