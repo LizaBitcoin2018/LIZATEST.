@@ -14,9 +14,7 @@
             color: #eee;
             overflow-x: hidden;
         }
-        body {
-            padding-bottom: 30px;
-        }
+        body { padding-bottom: 40px; }
 
         #galaxy {
             position: fixed;
@@ -82,7 +80,6 @@
             text-decoration: none;
         }
 
-        /* YO кнопка */
         .yo-wrap {
             display: flex;
             flex-direction: column;
@@ -126,7 +123,6 @@
             margin-bottom: 18px;
         }
 
-        /* Майнер */
         .miner-card {
             background: rgba(30,30,50,0.9);
             border-radius: 10px;
@@ -154,7 +150,6 @@
             color: #666;
         }
 
-        /* Dice */
         .dice-panel {
             background: rgba(20,20,40,0.95);
             border-radius: 12px;
@@ -209,7 +204,6 @@
         .win { color: #00ff88; }
         .lose { color: #ff5555; }
 
-        /* Чат */
         .chat-panel {
             background: rgba(15,15,30,0.95);
             border-radius: 12px;
@@ -258,6 +252,53 @@
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        /* ===== ТОП 100 ===== */
+        .leaderboard {
+            background: rgba(15,15,30,0.95);
+            border-radius: 12px;
+            border: 1px solid rgba(100,100,255,0.25);
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .leaderboard h3 {
+            color: #f7931a;
+            padding: 12px 14px;
+            border-bottom: 1px solid #333;
+            font-size: 1.05rem;
+        }
+        .lb-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 14px;
+            border-bottom: 1px solid #2a2a2a;
+            font-size: 0.9rem;
+        }
+        .lb-item:last-child { border-bottom: none; }
+        .lb-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 65%;
+        }
+        .lb-rank {
+            color: #888;
+            min-width: 28px;
+            font-size: 0.85rem;
+        }
+        .lb-name {
+            color: #00ffcc;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .lb-bal {
+            font-weight: bold;
+            color: #f7931a;
+            font-size: 0.9rem;
         }
 
         .float-plus {
@@ -340,12 +381,20 @@
                 <button id="chatBtn">➤</button>
             </div>
         </div>
+
+        <!-- ===== ТОП 100 ИГРОКОВ ===== -->
+        <div class="leaderboard">
+            <h3>Топ 100 игроков</h3>
+            <div id="leaderboardList">
+                <div style="padding:20px;text-align:center;color:#666;">Загрузка...</div>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
-        // ===== Telegram WebApp =====
+        // Telegram
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -367,7 +416,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Константы
         const MAX_BALANCE = 9223372036854775807n;
         const MINER_REWARD = 17000000;
         const CYCLE_MS = 60 * 1000;
@@ -396,11 +444,15 @@
 
         // ===== Старт =====
         function init() {
+            // Определяем пользователя из Telegram
             if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 myId = "tg_" + user.id;
-                myName = user.username ? "@" + user.username : (user.first_name || "Игрок");
+                myName = user.username 
+                    ? "@" + user.username 
+                    : (user.first_name || "Игрок");
             } else {
+                // Если открыли не из Telegram
                 let guestId = localStorage.getItem("liza_guest_id");
                 if (!guestId) {
                     guestId = "guest_" + Math.random().toString(36).slice(2, 10);
@@ -412,11 +464,13 @@
 
             document.getElementById('userDisplay').innerText = myName;
 
+            // Загружаем данные игрока
             db.ref("users/" + myId).once("value").then(snap => {
                 const data = snap.val() || {};
                 myBalance = Number(data.balance) || 0;
                 minerLastPayout = data.minerLastPayout || Date.now();
 
+                // Обязательно сохраняем имя — чтобы отображалось в топе
                 db.ref("users/" + myId).update({
                     name: myName,
                     lastActive: Date.now()
@@ -426,6 +480,7 @@
                 updateMinerUI();
             });
 
+            // Банк Dice
             db.ref("global/diceBank").on("value", snap => {
                 const val = snap.val();
                 if (val === null) {
@@ -437,10 +492,17 @@
                 document.getElementById("diceBank").innerText = Math.floor(diceBank).toLocaleString("ru");
             });
 
+            // Топ 100 (реальное время)
+            db.ref("users").on("value", snap => {
+                renderLeaderboard(snap.val());
+            });
+
+            // Чат
             db.ref("chat").orderByChild("time").limitToLast(40).on("value", snap => {
                 renderChat(snap.val());
             });
 
+            // Кнопки
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
             document.getElementById("diceLow").onclick = () => playDice("low");
@@ -467,7 +529,7 @@
             document.getElementById("balanceDisplay").innerText = myBalance.toLocaleString("ru");
         }
 
-        // ===== YO =====
+        // YO
         function clickYO() {
             yoClicks++;
             let add = 17000;
@@ -480,7 +542,7 @@
             playSound();
         }
 
-        // ===== Майнер =====
+        // Майнер
         function updateMinerUI() {
             const now = Date.now();
             const elapsed = now - minerLastPayout;
@@ -513,7 +575,7 @@
             playSound();
         }
 
-        // ===== Dice =====
+        // Dice
         function playDice(dir) {
             const bet = parseFloat(document.getElementById("diceBet").value);
             if (isNaN(bet) || bet <= 0) return alert("Введите ставку");
@@ -538,7 +600,7 @@
             updateUI();
         }
 
-        // ===== Чат =====
+        // Чат
         function sendChat() {
             const input = document.getElementById("chatInput");
             const text = input.value.trim();
@@ -568,6 +630,40 @@
                 </div>`;
             }).join("");
             box.scrollTop = box.scrollHeight;
+        }
+
+        // ===== ТОП 100 =====
+        function renderLeaderboard(users) {
+            const box = document.getElementById("leaderboardList");
+            if (!users) {
+                box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
+                return;
+            }
+
+            const sorted = Object.entries(users)
+                .map(([id, data]) => ({
+                    id,
+                    name: data.name || "Игрок",
+                    balance: Number(data.balance) || 0
+                }))
+                .filter(u => u.balance > 0)
+                .sort((a, b) => b.balance - a.balance)
+                .slice(0, 100);   // Топ 100
+
+            if (sorted.length === 0) {
+                box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
+                return;
+            }
+
+            box.innerHTML = sorted.map((u, i) => `
+                <div class="lb-item">
+                    <div class="lb-left">
+                        <span class="lb-rank">${i + 1}.</span>
+                        <span class="lb-name">${escapeHtml(u.name)}</span>
+                    </div>
+                    <span class="lb-bal">${u.balance.toLocaleString("ru")}</span>
+                </div>
+            `).join("");
         }
 
         // Вспомогательные
