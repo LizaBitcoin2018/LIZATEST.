@@ -54,7 +54,7 @@
     .chart-box {
         background: #0d0d18;
         border-radius: 10px;
-        height: 270px;
+        height: 280px;
         margin-bottom: 14px;
         position: relative;
         overflow: hidden;
@@ -114,14 +114,14 @@
         margin-bottom: 7px;
     }
     .history {
-        max-height: 160px;
+        max-height: 170px;
         overflow-y: auto;
         font-size: 0.83rem;
     }
     .trade-item {
         display: flex;
         justify-content: space-between;
-        padding: 4px 0;
+        padding: 5px 0;
         border-bottom: 1px solid #222;
     }
 
@@ -257,13 +257,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const INITIAL_POOL = 10000000; // увеличил пул → цена будет двигаться гораздо спокойнее
+const INITIAL_POOL = 10000000;
 
 let nick = "";
 let balLiza = 0;
 let balYo = 0;
 let poolLiza = INITIAL_POOL;
 let poolYo = INITIAL_POOL;
+
+// Локальные массивы — главный источник правды
 let candles = [];
 let trades = [];
 
@@ -328,20 +330,38 @@ function start(n, data) {
         updatePrice();
     });
 
-    // Свечи
-    db.ref('exchange/candles').limitToLast(60).on('value', snap => {
-        const val = snap.val();
-        if (val) {
-            candles = Object.values(val).sort((a, b) => a.t - b.t);
+    // === Свечи: сначала загружаем всё, потом только добавляем новые ===
+    db.ref('exchange/candles').limitToLast(80).once('value').then(snap => {
+        const val = snap.val() || {};
+        candles = Object.values(val).sort((a, b) => a.t - b.t);
+        draw();
+    });
+
+    // Слушаем только новые свечи
+    db.ref('exchange/candles').limitToLast(1).on('child_added', snap => {
+        const c = snap.val();
+        if (!c) return;
+        // Добавляем только если такой свечи ещё нет
+        if (candles.length === 0 || c.t > candles[candles.length - 1].t) {
+            candles.push(c);
+            if (candles.length > 80) candles.shift();
             draw();
         }
     });
 
-    // История
-    db.ref('exchange/trades').limitToLast(25).on('value', snap => {
-        const val = snap.val();
-        if (val) {
-            trades = Object.values(val).sort((a, b) => b.t - a.t);
+    // === История сделок ===
+    db.ref('exchange/trades').limitToLast(30).once('value').then(snap => {
+        const val = snap.val() || {};
+        trades = Object.values(val).sort((a, b) => b.t - a.t);
+        renderHistory();
+    });
+
+    db.ref('exchange/trades').limitToLast(1).on('child_added', snap => {
+        const t = snap.val();
+        if (!t) return;
+        if (trades.length === 0 || t.t > trades[0].t) {
+            trades.unshift(t);
+            if (trades.length > 30) trades.pop();
             renderHistory();
         }
     });
@@ -383,9 +403,9 @@ function buy() {
     const now = Date.now();
 
     const candle = {
-        o: price * 0.9997,
-        h: price * 1.0012,
-        l: price * 0.9988,
+        o: price * 0.9996,
+        h: price * 1.0014,
+        l: price * 0.9986,
         c: price,
         v: amount,
         t: now
@@ -399,18 +419,18 @@ function buy() {
         t: now
     };
 
-    // Локально
+    // Сразу локально
     candles.push(candle);
-    if (candles.length > 60) candles.shift();
+    if (candles.length > 80) candles.shift();
     trades.unshift(trade);
-    if (trades.length > 25) trades.pop();
+    if (trades.length > 30) trades.pop();
 
     draw();
     renderHistory();
     updateBalance();
     updatePrice();
 
-    // Firebase
+    // В Firebase
     db.ref('users/' + nick).update({ balance: balLiza, yoBalance: balYo });
     db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
     db.ref('exchange/candles').push(candle);
@@ -438,9 +458,9 @@ function sell() {
     const now = Date.now();
 
     const candle = {
-        o: price * 1.0003,
-        h: price * 1.0012,
-        l: price * 0.9988,
+        o: price * 1.0004,
+        h: price * 1.0014,
+        l: price * 0.9986,
         c: price,
         v: got,
         t: now
@@ -455,9 +475,9 @@ function sell() {
     };
 
     candles.push(candle);
-    if (candles.length > 60) candles.shift();
+    if (candles.length > 80) candles.shift();
     trades.unshift(trade);
-    if (trades.length > 25) trades.pop();
+    if (trades.length > 30) trades.pop();
 
     draw();
     renderHistory();
@@ -515,13 +535,13 @@ function draw() {
         return;
     }
 
-    const data = candles.slice(-45);
-    const chartH = h * 0.67;
-    const volH = h * 0.27;
+    const data = candles.slice(-50);
+    const chartH = h * 0.66;
+    const volH = h * 0.28;
 
     let minP = Math.min(...data.map(c => c.l));
     let maxP = Math.max(...data.map(c => c.h));
-    const pad = (maxP - minP) * 0.15 || 0.01;
+    const pad = (maxP - minP) * 0.14 || 0.008;
     minP -= pad;
     maxP += pad;
     const range = maxP - minP;
@@ -543,10 +563,10 @@ function draw() {
         ctx.fillText(p.toFixed(4), 4, y + 3);
     }
 
-    const cw = Math.max(4, (w - 65) / data.length - 2);
+    const cw = Math.max(4, (w - 65) / data.length - 1.8);
 
     data.forEach((c, i) => {
-        const x = 52 + i * (cw + 2);
+        const x = 52 + i * (cw + 1.8);
 
         const yH = 15 + ((maxP - c.h) / range) * (chartH - 12);
         const yL = 15 + ((maxP - c.l) / range) * (chartH - 12);
