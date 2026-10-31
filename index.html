@@ -125,7 +125,7 @@
         .chart-container {
             background: #0a0a15;
             border-radius: 10px;
-            height: 190px;
+            height: 210px;
             margin-bottom: 18px;
             position: relative;
             overflow: hidden;
@@ -467,7 +467,6 @@
             document.getElementById('game').style.display = 'flex';
             document.getElementById('userDisplay').innerText = myNick;
 
-            // Загружаем пул
             db.ref('exchange/pool').once('value').then(snap => {
                 const d = snap.val();
                 if (!d) {
@@ -481,7 +480,6 @@
                 updateExchangeUI();
             });
 
-            // Слушаем изменения пула от других игроков
             db.ref('exchange/pool').on('value', snap => {
                 const d = snap.val();
                 if (d) {
@@ -492,7 +490,7 @@
             });
 
             updateUI();
-            drawChart(); // первый рисунок
+            drawChart();
 
             document.getElementById('buyBtn').onclick = buyYO;
             document.getElementById('sellBtn').onclick = sellYO;
@@ -531,8 +529,6 @@
             `).join('');
         }
 
-        // ====================== ОСНОВНЫЕ ФУНКЦИИ ТОРГОВЛИ ======================
-
         function buyYO() {
             const lizaIn = parseFloat(document.getElementById('buyAmount').value);
             if (isNaN(lizaIn) || lizaIn <= 0) return alert("Введите сумму LIZA");
@@ -545,7 +541,6 @@
 
             if (yoOut <= 0.0001) return alert("Слишком маленькая сумма");
 
-            // Обновляем балансы
             myBalance -= lizaIn;
             myYoBalance += yoOut;
             poolLiza = newPoolLiza;
@@ -554,28 +549,18 @@
             const price = getPrice();
             const now = Date.now();
 
-            // === Сразу обновляем интерфейс ===
             updateUI();
             updateExchangeUI();
 
-            // Добавляем в историю сделок (локально)
-            const trade = {
-                type: 'buy',
-                amount: yoOut,
-                price: price,
-                user: myNick,
-                t: now
-            };
+            const trade = { type: 'buy', amount: yoOut, price: price, user: myNick, t: now };
             recentTrades.unshift(trade);
             if (recentTrades.length > 30) recentTrades.pop();
             renderRecentTrades();
 
-            // Добавляем точку на график
             priceHistory.push({ p: price, t: now });
-            if (priceHistory.length > 80) priceHistory.shift();
+            if (priceHistory.length > 60) priceHistory.shift();
             drawChart();
 
-            // Сохраняем в Firebase
             db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
             db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
             db.ref('exchange/trades').push(trade);
@@ -605,26 +590,18 @@
             const price = getPrice();
             const now = Date.now();
 
-            // === Сразу обновляем интерфейс ===
             updateUI();
             updateExchangeUI();
 
-            const trade = {
-                type: 'sell',
-                amount: yoIn,
-                price: price,
-                user: myNick,
-                t: now
-            };
+            const trade = { type: 'sell', amount: yoIn, price: price, user: myNick, t: now };
             recentTrades.unshift(trade);
             if (recentTrades.length > 30) recentTrades.pop();
             renderRecentTrades();
 
             priceHistory.push({ p: price, t: now });
-            if (priceHistory.length > 80) priceHistory.shift();
+            if (priceHistory.length > 60) priceHistory.shift();
             drawChart();
 
-            // Firebase
             db.ref('users/' + myNick).update({ balance: myBalance, yoBalance: myYoBalance });
             db.ref('exchange/pool').set({ liza: poolLiza, yo: poolYo });
             db.ref('exchange/trades').push(trade);
@@ -651,6 +628,7 @@
             `).join('');
         }
 
+        // ====================== СВЕЧНОЙ ГРАФИК ======================
         function drawChart() {
             const canvas = document.getElementById('priceChart');
             if (!canvas) return;
@@ -680,42 +658,60 @@
                 return;
             }
 
-            const prices = priceHistory.map(p => p.p);
+            // Создаём свечи из истории цен
+            const candles = [];
+            for (let i = 1; i < priceHistory.length; i++) {
+                const open = priceHistory[i - 1].p;
+                const close = priceHistory[i].p;
+                const high = Math.max(open, close) * (1 + Math.random() * 0.004);
+                const low = Math.min(open, close) * (1 - Math.random() * 0.004);
+                candles.push({ open, high, low, close });
+            }
+
+            // Берём последние 40 свечей
+            const visible = candles.slice(-40);
+            if (visible.length === 0) return;
+
+            const prices = visible.flatMap(c => [c.high, c.low]);
             let minP = Math.min(...prices);
             let maxP = Math.max(...prices);
-
             if (maxP - minP < 0.0001) {
                 minP -= 0.002;
                 maxP += 0.002;
             }
-
             const range = maxP - minP;
 
-            // Линия
-            ctx.beginPath();
-            ctx.strokeStyle = '#00c6ff';
-            ctx.lineWidth = 2.8;
-            ctx.lineJoin = 'round';
+            const candleWidth = Math.max(6, (w - 30) / visible.length - 3);
+            const gap = 3;
 
-            priceHistory.forEach((p, i) => {
-                const x = (i / (priceHistory.length - 1)) * (w - 20) + 10;
-                const y = h - 18 - ((p.p - minP) / range) * (h - 36);
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+            visible.forEach((c, i) => {
+                const x = 15 + i * (candleWidth + gap);
+                const openY = h - 20 - ((c.open - minP) / range) * (h - 40);
+                const closeY = h - 20 - ((c.close - minP) / range) * (h - 40);
+                const highY = h - 20 - ((c.high - minP) / range) * (h - 40);
+                const lowY = h - 20 - ((c.low - minP) / range) * (h - 40);
+
+                const isGreen = c.close >= c.open;
+                const color = isGreen ? '#00c853' : '#ff1744';
+
+                // Тень (wick)
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(x + candleWidth / 2, highY);
+                ctx.lineTo(x + candleWidth / 2, lowY);
+                ctx.stroke();
+
+                // Тело свечи
+                const bodyTop = Math.min(openY, closeY);
+                const bodyHeight = Math.max(2, Math.abs(closeY - openY));
+
+                ctx.fillStyle = color;
+                ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
             });
-            ctx.stroke();
 
-            // Точка
-            const last = prices[prices.length - 1];
-            const lastX = w - 10;
-            const lastY = h - 18 - ((last - minP) / range) * (h - 36);
-            
-            ctx.beginPath();
-            ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
-            ctx.fillStyle = '#00ff88';
-            ctx.fill();
-
-            // Цена
+            // Последняя цена
+            const last = visible[visible.length - 1].close;
             ctx.fillStyle = '#00ff88';
             ctx.font = 'bold 13px sans-serif';
             ctx.textAlign = 'right';
