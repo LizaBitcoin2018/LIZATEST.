@@ -34,11 +34,11 @@
             50% { opacity: 1; }
         }
 
-        /* ===== Объёмные прозрачные шарики ===== */
+        /* Обычные шарики (уменьшены в 2 раза) */
         .flying-ball {
             position: fixed;
-            width: 64px;
-            height: 64px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -50,55 +50,89 @@
             user-select: none;
             text-align: center;
             line-height: 1.1;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             transition: transform 0.15s;
             animation: ballFloat 5s ease-in-out infinite;
             box-shadow: 
-                inset 0 -8px 16px rgba(0,0,0,0.25),
-                inset 0 8px 12px rgba(255,255,255,0.35),
-                0 0 20px rgba(255,255,255,0.15);
+                inset 0 -4px 8px rgba(0,0,0,0.25),
+                inset 0 4px 6px rgba(255,255,255,0.35),
+                0 0 12px rgba(255,255,255,0.15);
         }
-        .flying-ball:active {
-            transform: scale(0.88);
-        }
+        .flying-ball:active { transform: scale(0.88); }
 
-        /* Жёлтый Bitcoin */
         .ball-bitcoin {
             background: radial-gradient(circle at 30% 30%, 
                 rgba(255,230,120,0.75), 
                 rgba(247,147,26,0.55) 60%, 
                 rgba(180,90,0,0.45));
             border: 1px solid rgba(255,200,80,0.5);
-            font-size: 0.72rem;
+            font-size: 0.48rem;
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
-
-        /* Синий YO */
         .ball-yo {
             background: radial-gradient(circle at 30% 30%, 
                 rgba(150,220,255,0.7), 
                 rgba(0,150,255,0.5) 60%, 
                 rgba(0,80,180,0.4));
             border: 1px solid rgba(100,200,255,0.5);
-            font-size: 1rem;
+            font-size: 0.65rem;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
-
-        /* Зелёный LIZA */
         .ball-liza {
             background: radial-gradient(circle at 30% 30%, 
                 rgba(150,255,180,0.7), 
                 rgba(0,200,100,0.5) 60%, 
                 rgba(0,120,60,0.4));
             border: 1px solid rgba(100,255,150,0.5);
-            font-size: 0.78rem;
+            font-size: 0.5rem;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
+        /* Большой огненный Yobit */
+        .ball-yobit {
+            position: fixed;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: #fff;
+            cursor: pointer;
+            z-index: 45;
+            user-select: none;
+            text-align: center;
+            line-height: 1.1;
+            text-shadow: 0 0 8px #fff, 0 0 12px #00f;
+            background: radial-gradient(circle at 30% 25%,
+                rgba(255,255,255,0.9),
+                rgba(180,220,255,0.7) 35%,
+                rgba(0,120,255,0.6) 65%,
+                rgba(0,40,120,0.5));
+            border: 2px solid rgba(200,230,255,0.7);
+            box-shadow:
+                0 0 25px rgba(100,180,255,0.7),
+                0 0 50px rgba(0,100,255,0.4),
+                inset 0 -10px 20px rgba(0,0,80,0.3),
+                inset 0 10px 15px rgba(255,255,255,0.5);
+            animation: yobitFloat 3.5s ease-in-out infinite, yobitGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes yobitFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-28px) scale(1.05); }
+        }
+        @keyframes yobitGlow {
+            0% { box-shadow: 0 0 20px rgba(100,180,255,0.6), 0 0 40px rgba(0,100,255,0.3); }
+            100% { box-shadow: 0 0 35px rgba(150,220,255,0.9), 0 0 70px rgba(0,150,255,0.5); }
+        }
+        .ball-yobit:active { transform: scale(0.9); }
+
         @keyframes ballFloat {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-22px) rotate(6deg); }
+            50% { transform: translateY(-18px) rotate(6deg); }
         }
         .ball-explode {
             animation: ballPop 0.45s forwards !important;
@@ -106,7 +140,7 @@
         }
         @keyframes ballPop {
             0%   { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.4); opacity: 0; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
 
         .header {
@@ -488,10 +522,10 @@
         const CYCLE_MS = 60 * 1000;
         const START_BANK = 9223372036854775807;
 
-        // Награды за шарики
         const REWARD_BITCOIN = 17000000;
         const REWARD_YO = 1700000;
         const REWARD_LIZA = 1700000;
+        const REWARD_YOBIT = 1700000000;   // 1.7 миллиарда
 
         let myId = null;
         let myName = "Игрок";
@@ -499,6 +533,7 @@
         let minerLastPayout = Date.now();
         let yoClicks = 0;
         let diceBank = START_BANK;
+        let yobitTimer = null;
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
@@ -514,8 +549,8 @@
             galaxy.appendChild(s);
         }
 
-        // ===== Шарики =====
-        function spawnBall(type, reward, label, className) {
+        // ===== Обычные шарики =====
+        function spawnBall(reward, label, className) {
             const ball = document.createElement('div');
             ball.className = 'flying-ball ' + className;
             ball.innerHTML = label;
@@ -539,26 +574,74 @@
 
                 setTimeout(() => {
                     if (ball.parentNode) ball.remove();
-                    // Респавн через 2-4 секунды
-                    setTimeout(() => spawnBall(type, reward, label, className), 2000 + Math.random() * 2000);
+                    setTimeout(() => spawnBall(reward, label, className), 2000 + Math.random() * 2500);
                 }, 450);
             };
 
             document.body.appendChild(ball);
         }
 
-        function startBalls() {
-            // 1 жёлтый Bitcoin
-            spawnBall('bitcoin', REWARD_BITCOIN, 'Bitcoin', 'ball-bitcoin');
+        function startNormalBalls() {
+            // 1 Bitcoin
+            spawnBall(REWARD_BITCOIN, 'Bitcoin', 'ball-bitcoin');
+            // 2 YO
+            spawnBall(REWARD_YO, 'YO', 'ball-yo');
+            setTimeout(() => spawnBall(REWARD_YO, 'YO', 'ball-yo'), 400);
+            // 3 LIZA
+            spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza');
+            setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 300);
+            setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 700);
+        }
 
-            // 2 синих YO
-            spawnBall('yo', REWARD_YO, 'YO', 'ball-yo');
-            setTimeout(() => spawnBall('yo', REWARD_YO, 'YO', 'ball-yo'), 400);
+        // ===== Большой Yobit (появляется 1 раз в 1-5 минут) =====
+        function spawnYobit() {
+            // Удаляем старый, если вдруг остался
+            document.querySelectorAll('.ball-yobit').forEach(el => el.remove());
 
-            // 3 зелёных LIZA
-            spawnBall('liza', REWARD_LIZA, 'LIZA', 'ball-liza');
-            setTimeout(() => spawnBall('liza', REWARD_LIZA, 'LIZA', 'ball-liza'), 300);
-            setTimeout(() => spawnBall('liza', REWARD_LIZA, 'LIZA', 'ball-liza'), 700);
+            const ball = document.createElement('div');
+            ball.className = 'ball-yobit';
+            ball.innerHTML = 'Yobit';
+
+            ball.style.left = (15 + Math.random() * 55) + 'vw';
+            ball.style.top  = (18 + Math.random() * 45) + 'vh';
+
+            ball.onclick = function(e) {
+                if (!myId) return;
+                e.stopPropagation();
+
+                ball.classList.add('ball-explode');
+                playSound();
+                showFloat("+" + REWARD_YOBIT.toLocaleString('ru'), e.clientX, e.clientY);
+
+                myBalance = Math.min(Number(MAX_BALANCE), myBalance + REWARD_YOBIT);
+                saveUser();
+                updateUI();
+
+                setTimeout(() => {
+                    if (ball.parentNode) ball.remove();
+                }, 500);
+
+                // Планируем следующее появление
+                scheduleYobit();
+            };
+
+            document.body.appendChild(ball);
+
+            // Автоудаление через 25 секунд, если не кликнули
+            setTimeout(() => {
+                if (ball.parentNode && !ball.classList.contains('ball-explode')) {
+                    ball.classList.add('ball-explode');
+                    setTimeout(() => ball.remove(), 500);
+                    scheduleYobit();
+                }
+            }, 25000);
+        }
+
+        function scheduleYobit() {
+            if (yobitTimer) clearTimeout(yobitTimer);
+            // Случайный интервал от 1 до 5 минут
+            const delay = (60 + Math.random() * 240) * 1000; // 60–300 сек
+            yobitTimer = setTimeout(spawnYobit, delay);
         }
 
         // ===== Сохранение =====
@@ -673,7 +756,9 @@
             }, 60000);
 
             // Запускаем шарики
-            startBalls();
+            startNormalBalls();
+            // Первый Yobit через 30–90 секунд после входа, потом каждые 1–5 мин
+            setTimeout(spawnYobit, 30000 + Math.random() * 60000);
         }
 
         function updateUI() {
