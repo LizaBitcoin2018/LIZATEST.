@@ -50,13 +50,11 @@
             text-align: center;
             line-height: 1.1;
             backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
             transition: transform 0.15s;
             animation: ballFloat 5s ease-in-out infinite;
             box-shadow: inset 0 -4px 8px rgba(0,0,0,0.25), inset 0 4px 6px rgba(255,255,255,0.35), 0 0 12px rgba(255,255,255,0.15);
         }
         .flying-ball:active { transform: scale(0.88); }
-
         .ball-bitcoin {
             background: radial-gradient(circle at 30% 30%, rgba(255,230,120,0.75), rgba(247,147,26,0.55) 60%, rgba(180,90,0,0.45));
             border: 1px solid rgba(255,200,80,0.5);
@@ -72,7 +70,6 @@
             border: 1px solid rgba(100,255,150,0.5);
             font-size: 0.5rem;
         }
-
         .ball-yobit {
             position: fixed;
             width: 90px;
@@ -91,7 +88,7 @@
             text-shadow: 0 0 8px #fff, 0 0 12px #00f;
             background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.9), rgba(180,220,255,0.7) 35%, rgba(0,120,255,0.6) 65%, rgba(0,40,120,0.5));
             border: 2px solid rgba(200,230,255,0.7);
-            box-shadow: 0 0 25px rgba(100,180,255,0.7), 0 0 50px rgba(0,100,255,0.4), inset 0 -10px 20px rgba(0,0,80,0.3), inset 0 10px 15px rgba(255,255,255,0.5);
+            box-shadow: 0 0 25px rgba(100,180,255,0.7), 0 0 50px rgba(0,100,255,0.4);
             animation: yobitFloat 3.5s ease-in-out infinite, yobitGlow 2s ease-in-out infinite alternate;
         }
         @keyframes yobitFloat {
@@ -102,8 +99,6 @@
             0% { box-shadow: 0 0 20px rgba(100,180,255,0.6), 0 0 40px rgba(0,100,255,0.3); }
             100% { box-shadow: 0 0 35px rgba(150,220,255,0.9), 0 0 70px rgba(0,150,255,0.5); }
         }
-        .ball-yobit:active { transform: scale(0.9); }
-
         @keyframes ballFloat {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-18px) rotate(6deg); }
@@ -206,7 +201,7 @@
             margin-bottom: 18px;
         }
 
-        /* ===== Майнер ===== */
+        /* Майнер */
         .miner-card {
             background: rgba(30,30,50,0.9);
             border-radius: 12px;
@@ -256,7 +251,8 @@
             flex-wrap: wrap;
         }
         .miner-card .timer { color: #00ffcc; font-weight: bold; font-size: 1.15rem; }
-        .claim-btn, .upgrade-btn, .quantum-btn, .quazarite-btn {
+
+        .claim-btn, .upgrade-btn, .quantum-btn, .quazarite-btn, .processor-btn {
             border: none;
             padding: 8px 12px;
             border-radius: 6px;
@@ -264,46 +260,35 @@
             cursor: pointer;
             font-size: 0.9rem;
         }
-        .claim-btn {
-            background: #00aa77;
-            color: white;
-        }
-        .claim-btn:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-        }
-        .upgrade-btn {
-            background: linear-gradient(90deg, #ff6b00, #ff9500);
-            color: #000;
-        }
-        .upgrade-btn:disabled {
-            background: #444;
-            color: #777;
-            cursor: not-allowed;
-        }
+        .claim-btn { background: #00aa77; color: white; }
+        .claim-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .upgrade-btn { background: linear-gradient(90deg, #ff6b00, #ff9500); color: #000; }
+        .upgrade-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
         .quantum-btn {
             background: linear-gradient(90deg, #00f0ff, #0080ff);
             color: #000;
             box-shadow: 0 0 14px rgba(0,200,255,0.55);
         }
-        .quantum-btn:disabled {
-            background: #333;
-            color: #777;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
+        .quantum-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
         .quazarite-btn {
             background: linear-gradient(90deg, #c084fc, #a855f7, #7c3aed);
             color: #fff;
             box-shadow: 0 0 16px rgba(168,85,247,0.6);
         }
-        .quazarite-btn:disabled {
-            background: #333;
-            color: #777;
-            box-shadow: none;
-            cursor: not-allowed;
+        .quazarite-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
+
+        /* Огненно-синяя кнопка Процессор */
+        .processor-btn {
+            background: linear-gradient(90deg, #00d4ff, #0066ff, #0033cc);
+            color: #fff;
+            box-shadow: 0 0 18px rgba(0,150,255,0.7), 0 0 30px rgba(0,100,255,0.4);
+            border: 1px solid rgba(100,200,255,0.6);
+            text-shadow: 0 0 6px #fff;
         }
+        .processor-btn:active {
+            transform: scale(0.96);
+        }
+
         .upgrade-cost, .quantum-info, .quazarite-info {
             font-size: 0.75rem;
             margin-top: 2px;
@@ -312,7 +297,6 @@
         .quantum-info { color: #00e5ff; }
         .quazarite-info { color: #d8b4fe; }
 
-        /* Кристалл Квазарит */
         .quazarite-crystal {
             display: none;
             width: 54px;
@@ -322,10 +306,7 @@
             transform: rotate(45deg);
             background: linear-gradient(135deg, #e9d5ff, #c084fc, #7c3aed, #4c1d95);
             border-radius: 8px;
-            box-shadow: 
-                0 0 20px rgba(192,132,252,0.8),
-                0 0 40px rgba(124,58,237,0.5),
-                inset 0 0 12px rgba(255,255,255,0.4);
+            box-shadow: 0 0 20px rgba(192,132,252,0.8), 0 0 40px rgba(124,58,237,0.5), inset 0 0 12px rgba(255,255,255,0.4);
             animation: crystalPulse 2.5s ease-in-out infinite;
         }
         .quazarite-crystal::before {
@@ -358,6 +339,98 @@
             text-shadow: 0 0 8px rgba(192,132,252,0.8);
         }
 
+        /* ===== ПРОЦЕССОРНАЯ ===== */
+        #processorPage {
+            display: none;
+            position: relative;
+            z-index: 10;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px 14px 40px;
+        }
+        .processor-card {
+            background: linear-gradient(180deg, rgba(10,20,50,0.95), rgba(5,10,30,0.98));
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(0,150,255,0.4);
+            box-shadow: 0 0 30px rgba(0,100,255,0.25);
+            text-align: center;
+        }
+        .processor-card h2 {
+            color: #00d4ff;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 12px rgba(0,200,255,0.6);
+        }
+        .processor-desc {
+            color: #88ccff;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .chip-visual {
+            width: 100px;
+            height: 70px;
+            margin: 0 auto 16px;
+            background: linear-gradient(145deg, #1a3a6e, #0a1a3a);
+            border-radius: 8px;
+            border: 2px solid #00aaff;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,150,255,0.5), inset 0 0 15px rgba(0,100,255,0.3);
+        }
+        .chip-visual::before {
+            content: 'CHIP';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 8px #00f;
+        }
+        .chip-status {
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            color: #aaa;
+        }
+        .chip-status.owned {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        .buy-chip-btn {
+            background: linear-gradient(90deg, #00d4ff, #0066ff);
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0,150,255,0.6);
+            margin-bottom: 10px;
+        }
+        .buy-chip-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .chip-price {
+            font-size: 0.85rem;
+            color: #88ccff;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
         .dice-panel {
             background: rgba(20,20,40,0.95);
             border-radius: 12px;
@@ -365,11 +438,7 @@
             margin-bottom: 16px;
             border: 1px solid rgba(0,150,255,0.3);
         }
-        .dice-panel h4 {
-            color: #00aaff;
-            text-align: center;
-            margin-bottom: 8px;
-        }
+        .dice-panel h4 { color: #00aaff; text-align: center; margin-bottom: 8px; }
         .dice-bank {
             text-align: center;
             color: #ffcc00;
@@ -533,7 +602,8 @@
         <div class="user-info" id="userDisplay">Загрузка...</div>
     </div>
 
-    <div class="content">
+    <!-- ===== ГЛАВНАЯ СТРАНИЦА ===== -->
+    <div class="content" id="mainPage">
         <div class="balance-block">
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
@@ -549,13 +619,13 @@
                 <div class="miner-level" id="minerLevel">Ур. 1</div>
             </div>
 
-            <!-- Кристалл Квазарит -->
             <div class="quazarite-crystal" id="quazariteCrystal"></div>
             <div class="quazarite-label" id="quazariteLabel">✦ Кристалл Квазарит ✦</div>
 
             <div class="earned" id="minerEarned">Намайнено: 0</div>
             <div class="reward-info">
                 Награда за цикл: <span id="minerReward">17 000 000</span> LIZA
+                <span id="cycleInfo" style="display:block;font-size:0.8rem;color:#88f;margin-top:2px;"></span>
             </div>
             <div class="miner-bottom">
                 <div class="timer" id="minerTimer">1:00</div>
@@ -571,8 +641,10 @@
                     </div>
                     <div style="text-align:center;" id="quazariteBlock">
                         <button class="quazarite-btn" id="quazariteBtn">Купить Квазарит</button>
-                        <div class="quazarite-info">250 млрд • ×2 к майнеру</div>
+                        <div class="quazarite-info">250 млрд • ×2</div>
                     </div>
+                    <!-- Огненно-синяя кнопка -->
+                    <button class="processor-btn" id="processorBtn">Процессор</button>
                 </div>
             </div>
         </div>
@@ -617,6 +689,27 @@
         </div>
     </div>
 
+    <!-- ===== СТРАНИЦА ПРОЦЕССОРНОЙ ===== -->
+    <div id="processorPage">
+        <div class="processor-card">
+            <h2>⚙ Процессорная</h2>
+            <div class="processor-desc">
+                Здесь устанавливается ускоряющий чип.<br>
+                Чип сокращает время цикла майнинга на 20 секунд.
+            </div>
+
+            <div class="chip-visual"></div>
+
+            <div class="chip-status" id="chipStatus">Чип не установлен</div>
+
+            <button class="buy-chip-btn" id="buyChipBtn">Купить Чип</button>
+            <div class="chip-price">Стоимость: 1 000 000 000 000 LIZA</div>
+
+            <br>
+            <button class="back-btn" id="backBtn">← Вернуться в шахту</button>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
@@ -642,13 +735,15 @@
 
         const MAX_BALANCE = 9223372036854775807n;
         const BASE_MINER_REWARD = 17000000;
-        const CYCLE_MS = 60 * 1000;
+        const BASE_CYCLE_MS = 60 * 1000;
+        const CHIP_CYCLE_MS = 40 * 1000;          // с чипом 40 сек
         const START_BANK = 9223372036854775807;
         const MAX_MINER_LEVEL = 100;
         const GROWTH = 1.05;
         const QUANTUM_COST = 100000000000;
         const QUANTUM_BONUS = 1000000000;
-        const QUAZARITE_COST = 250000000000;   // 250 миллиардов
+        const QUAZARITE_COST = 250000000000;
+        const CHIP_COST = 1000000000000;          // 1 триллион
 
         const REWARD_BITCOIN = 170000000;
         const REWARD_YO = 170000000;
@@ -662,9 +757,14 @@
         let minerLevel = 1;
         let quantumLevel = 0;
         let hasQuazarite = false;
+        let hasChip = false;
         let yoClicks = 0;
         let diceBank = START_BANK;
         let yobitTimer = null;
+
+        function getCycleMs() {
+            return hasChip ? CHIP_CYCLE_MS : BASE_CYCLE_MS;
+        }
 
         // Звёзды
         const galaxy = document.getElementById('galaxy');
@@ -686,7 +786,7 @@
 
         function getMinerReward() {
             let reward = getBaseReward() + (quantumLevel * QUANTUM_BONUS);
-            if (hasQuazarite) reward *= 2;          // Квазарит даёт ×2
+            if (hasQuazarite) reward *= 2;
             return Math.floor(reward);
         }
 
@@ -776,6 +876,7 @@
                 minerLevel: minerLevel,
                 quantumLevel: quantumLevel,
                 hasQuazarite: hasQuazarite,
+                hasChip: hasChip,
                 lastActive: Date.now(),
                 fromTelegram: myId.startsWith("tg_")
             }).catch(err => console.error("Ошибка сохранения:", err));
@@ -812,17 +913,11 @@
                     minerLevel = Number(data.minerLevel) || 1;
                     quantumLevel = Number(data.quantumLevel) || 0;
                     hasQuazarite = !!data.hasQuazarite;
+                    hasChip = !!data.hasChip;
                     if (minerLevel < 1) minerLevel = 1;
                     if (minerLevel > MAX_MINER_LEVEL) minerLevel = MAX_MINER_LEVEL;
-                } else {
-                    myBalance = 0;
-                    minerLastPayout = Date.now();
-                    minerLevel = 1;
-                    quantumLevel = 0;
-                    hasQuazarite = false;
                 }
 
-                // Аккуратное сохранение без затирания баланса
                 userRef.update({
                     name: myName,
                     balance: myBalance,
@@ -830,12 +925,14 @@
                     minerLevel: minerLevel,
                     quantumLevel: quantumLevel,
                     hasQuazarite: hasQuazarite,
+                    hasChip: hasChip,
                     lastActive: Date.now(),
                     fromTelegram: myId.startsWith("tg_")
                 });
 
                 updateUI();
                 updateMinerUI();
+                updateProcessorUI();
             });
 
             userRef.on("value", snap => {
@@ -867,6 +964,9 @@
             document.getElementById("upgradeBtn").onclick = upgradeMiner;
             document.getElementById("quantumBtn").onclick = sharpenMiner;
             document.getElementById("quazariteBtn").onclick = buyQuazarite;
+            document.getElementById("processorBtn").onclick = openProcessor;
+            document.getElementById("backBtn").onclick = closeProcessor;
+            document.getElementById("buyChipBtn").onclick = buyChip;
             document.getElementById("diceLow").onclick = () => playDice("low");
             document.getElementById("diceHigh").onclick = () => playDice("high");
             document.getElementById("chatBtn").onclick = sendChat;
@@ -879,6 +979,52 @@
 
             startNormalBalls();
             setTimeout(spawnYobit, 30000 + Math.random() * 60000);
+        }
+
+        // ===== Переключение страниц =====
+        function openProcessor() {
+            document.getElementById("mainPage").style.display = "none";
+            document.getElementById("processorPage").style.display = "block";
+            updateProcessorUI();
+        }
+
+        function closeProcessor() {
+            document.getElementById("processorPage").style.display = "none";
+            document.getElementById("mainPage").style.display = "block";
+        }
+
+        function updateProcessorUI() {
+            const status = document.getElementById("chipStatus");
+            const btn = document.getElementById("buyChipBtn");
+
+            if (hasChip) {
+                status.innerText = "✅ Чип установлен (−20 сек)";
+                status.className = "chip-status owned";
+                btn.style.display = "none";
+                document.querySelector(".chip-price").style.display = "none";
+            } else {
+                status.innerText = "Чип не установлен";
+                status.className = "chip-status";
+                btn.style.display = "inline-block";
+                document.querySelector(".chip-price").style.display = "block";
+                btn.disabled = myBalance < CHIP_COST;
+            }
+        }
+
+        function buyChip() {
+            if (hasChip) return;
+            if (myBalance < CHIP_COST) {
+                alert("Нужно 1 триллион LIZA");
+                return;
+            }
+            myBalance -= CHIP_COST;
+            hasChip = true;
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            updateProcessorUI();
+            playSound();
+            showFloat("ЧИП УСТАНОВЛЕН! −20 сек");
         }
 
         function updateUI() {
@@ -897,12 +1043,13 @@
         }
 
         function updateMinerUI() {
+            const cycle = getCycleMs();
             const now = Date.now();
             const elapsed = now - minerLastPayout;
-            const left = CYCLE_MS - (elapsed % CYCLE_MS);
+            const left = cycle - (elapsed % cycle);
             const mins = Math.floor(left / 60000);
             const secs = Math.floor((left % 60000) / 1000);
-            const periods = Math.floor(elapsed / CYCLE_MS);
+            const periods = Math.floor(elapsed / cycle);
             const reward = getMinerReward();
             const earned = periods * reward;
 
@@ -911,18 +1058,24 @@
             document.getElementById("minerReward").innerText = reward.toLocaleString("ru");
             document.getElementById("claimBtn").disabled = periods <= 0;
 
+            // Инфо о цикле
+            const cycleInfo = document.getElementById("cycleInfo");
+            if (hasChip) {
+                cycleInfo.innerText = "⚡ Цикл: 40 сек (чип активен)";
+            } else {
+                cycleInfo.innerText = "Цикл: 60 сек";
+            }
+
             const levelEl = document.getElementById("minerLevel");
             const titleEl = document.getElementById("minerTitle");
             const cardEl = document.getElementById("minerCard");
             const upgradeBlock = document.getElementById("upgradeBlock");
             const quantumBlock = document.getElementById("quantumBlock");
             const quantumBtn = document.getElementById("quantumBtn");
-            const quazariteBlock = document.getElementById("quazariteBlock");
             const quazariteBtn = document.getElementById("quazariteBtn");
             const crystal = document.getElementById("quazariteCrystal");
             const crystalLabel = document.getElementById("quazariteLabel");
 
-            // Квазарит визуал
             if (hasQuazarite) {
                 crystal.style.display = "block";
                 crystalLabel.style.display = "block";
@@ -954,21 +1107,20 @@
                 upgradeBlock.style.display = "block";
                 quantumBlock.style.display = "none";
                 const cost = getUpgradeCost();
-                const upBtn = document.getElementById("upgradeBtn");
-                upBtn.disabled = myBalance < cost;
+                document.getElementById("upgradeBtn").disabled = myBalance < cost;
                 document.getElementById("upgradeCost").innerText = cost.toLocaleString("ru");
             } else {
                 upgradeBlock.style.display = "none";
                 quantumBlock.style.display = "block";
                 quantumBtn.disabled = myBalance < QUANTUM_COST;
-                document.getElementById("quantumInfo").innerText = 
-                    "100 млрд • 80% • +" + quantumLevel + " млрд";
+                document.getElementById("quantumInfo").innerText = "100 млрд • 80% • +" + quantumLevel + " млрд";
             }
         }
 
         function claimMiner() {
+            const cycle = getCycleMs();
             const now = Date.now();
-            const periods = Math.floor((now - minerLastPayout) / CYCLE_MS);
+            const periods = Math.floor((now - minerLastPayout) / cycle);
             if (periods <= 0) return;
 
             const safe = Math.min(periods, 50);
@@ -976,7 +1128,7 @@
             const earned = safe * reward;
 
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
-            minerLastPayout += safe * CYCLE_MS;
+            minerLastPayout += safe * cycle;
 
             saveUser();
             updateUI();
@@ -988,10 +1140,7 @@
         function upgradeMiner() {
             if (minerLevel >= MAX_MINER_LEVEL) return;
             const cost = getUpgradeCost();
-            if (myBalance < cost) {
-                alert("Недостаточно LIZA");
-                return;
-            }
+            if (myBalance < cost) return alert("Недостаточно LIZA");
             myBalance -= cost;
             minerLevel++;
             saveUser();
@@ -1003,10 +1152,7 @@
 
         function sharpenMiner() {
             if (minerLevel < MAX_MINER_LEVEL) return;
-            if (myBalance < QUANTUM_COST) {
-                alert("Нужно 100 миллиардов LIZA");
-                return;
-            }
+            if (myBalance < QUANTUM_COST) return alert("Нужно 100 миллиардов LIZA");
 
             myBalance -= QUANTUM_COST;
             const success = Math.random() < 0.80;
@@ -1027,13 +1173,9 @@
             }
         }
 
-        // ===== Покупка Квазарита =====
         function buyQuazarite() {
             if (hasQuazarite) return;
-            if (myBalance < QUAZARITE_COST) {
-                alert("Нужно 250 миллиардов LIZA");
-                return;
-            }
+            if (myBalance < QUAZARITE_COST) return alert("Нужно 250 миллиардов LIZA");
 
             myBalance -= QUAZARITE_COST;
             hasQuazarite = true;
