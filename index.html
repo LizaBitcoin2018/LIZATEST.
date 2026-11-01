@@ -91,6 +91,18 @@
         .balance-block { text-align: center; margin-bottom: 16px; }
         .balance-label { color: #aaa; font-size: 0.9rem; }
         .balance { font-size: 1.9rem; font-weight: bold; color: #f7931a; word-break: break-all; margin: 4px 0; }
+        
+        .ultra-balance {
+            margin-top: 8px;
+            font-size: 1.05rem;
+            color: #ff99ff;
+            font-weight: 600;
+        }
+        .ultra-supply {
+            font-size: 0.82rem;
+            color: #cc88ff;
+            margin-top: 3px;
+        }
 
         .airdrop-btn {
             display: inline-block; margin: 8px 0; padding: 9px 18px;
@@ -155,6 +167,7 @@
         .burn-btn {
             background: linear-gradient(90deg, #ff00cc, #ff0066);
             color: #fff; box-shadow: 0 0 18px rgba(255,0,100,0.6);
+            margin: 3px 0;
         }
         .burn-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
 
@@ -318,7 +331,6 @@
         .chat-msg .author { color: #f7931a; font-weight: bold; }
         .chat-msg .time { color: #666; font-size: 0.75rem; margin-left: 6px; }
         
-        /* Админ @BitcoinLiza — зелёный текст */
         .chat-msg.admin .author {
             color: #00ff88 !important;
             text-shadow: 0 0 8px rgba(0,255,136,0.5);
@@ -373,6 +385,13 @@
             0% { opacity: 1; transform: translateY(0) scale(1); }
             100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
         }
+
+        .burn-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+        }
     </style>
 </head>
 <body>
@@ -389,6 +408,11 @@
         <div class="balance-block">
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
+            
+            <!-- НОВЫЙ БЛОК УЛЬТРА-КВАНТОВ -->
+            <div class="ultra-balance">◈ Ультра-Квант: <span id="ultraBalanceDisplay">0</span></div>
+            <div class="ultra-supply">Собрано: <span id="ultraTotalDisplay">0</span> / 100 000 000</div>
+
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="airdrop-btn">AIRDROP 27.12.2026</a>
         </div>
 
@@ -426,10 +450,14 @@
                         <div class="quazarite-info">2.5 • ×2</div>
                     </div>
                     <button class="processor-btn" id="processorBtn">Процессор</button>
+                    
+                    <!-- БЛОК СЖИГАНИЯ -->
                     <div style="text-align:center; display:none;" id="burnBlock">
-                        <div class="burn-info" id="burnAmountText">Сжигается: 10 LIZA</div>
-                        <button class="burn-btn" id="burnBtn">Сжечь</button>
-                        <div class="burn-info">→ +1 Ультра-Квант</div>
+                        <div class="burn-buttons">
+                            <button class="burn-btn" id="burnBtn10">Сжечь 10 → +1</button>
+                            <button class="burn-btn" id="burnBtn100">Сжечь 100 → +10</button>
+                            <button class="burn-btn" id="burnBtn1000">Сжечь 1000 → +100</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -544,7 +572,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Админ
         const ADMIN_NAME = "@BitcoinLiza";
 
         const MAX_BALANCE = 9223372036854775807n;
@@ -560,7 +587,12 @@
         const QUAZARITE_COST = 2.5;
         const CHIP_COST = 10;
         const CORE_COST = 250;
-        const BURN_COST = 10;
+        
+        // Ультра-Кванты
+        const ULTRA_MAX_SUPPLY = 100000000; // 100 миллионов
+        const BURN_10 = { cost: 10, amount: 1 };
+        const BURN_100 = { cost: 100, amount: 10 };
+        const BURN_1000 = { cost: 1000, amount: 100 };
 
         const REWARD_BITCOIN = 0.017;
         const REWARD_YO = 0.017;
@@ -571,6 +603,7 @@
         let minerLastPayout = Date.now(), minerLevel = 1, quantumLevel = 0;
         let hasQuazarite = false, hasChip = false, hasCore = false;
         let ultraQuants = 0;
+        let ultraTotal = 0; // глобальный соплай
         let yoClicks = 0, diceBank = START_BANK;
 
         function getCycleMs() {
@@ -741,6 +774,12 @@
                 }
             });
 
+            // Глобальный соплай Ультра-Квантов
+            db.ref("global/ultraTotal").on("value", snap => {
+                ultraTotal = Number(snap.val()) || 0;
+                document.getElementById("ultraTotalDisplay").innerText = formatNum(ultraTotal);
+            });
+
             db.ref("global/diceBank").on("value", snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
@@ -774,7 +813,12 @@
             document.getElementById("crystalBtn").onclick = openNode;
             document.getElementById("backToProcessorBtn").onclick = closeNode;
             document.getElementById("buyCoreBtn").onclick = buyCore;
-            document.getElementById("burnBtn").onclick = burnForUltra;
+            
+            // Кнопки сжигания
+            document.getElementById("burnBtn10").onclick = () => burnForUltra(BURN_10);
+            document.getElementById("burnBtn100").onclick = () => burnForUltra(BURN_100);
+            document.getElementById("burnBtn1000").onclick = () => burnForUltra(BURN_1000);
+
             document.getElementById("diceLow").onclick = () => playDice("low");
             document.getElementById("diceHigh").onclick = () => playDice("high");
             document.getElementById("chatBtn").onclick = sendChat;
@@ -863,13 +907,30 @@
             playSound(); showFloat("СЕРДЦЕВИНА УСТАНОВЛЕНА!");
         }
 
-        function burnForUltra() {
-            if (!hasCore) return;
-            if (myBalance < BURN_COST) return alert("Недостаточно LIZA");
-            myBalance -= BURN_COST;
-            ultraQuants++;
-            saveUser(); updateUI(); updateMinerUI();
-            playSound(); showFloat("УЛЬТРА-КВАНТ +" + ultraQuants);
+        // ===== НОВАЯ ФУНКЦИЯ СЖИГАНИЯ =====
+        function burnForUltra(option) {
+            if (!hasCore) return alert("Нужна Сердцевина!");
+            if (myBalance < option.cost) return alert("Недостаточно LIZA");
+            
+            if (ultraTotal + option.amount > ULTRA_MAX_SUPPLY) {
+                return alert("Достигнут максимальный соплай Ультра-Квантов (100 млн)!");
+            }
+
+            myBalance -= option.cost;
+            ultraQuants += option.amount;
+
+            // Увеличиваем глобальный соплай
+            db.ref("global/ultraTotal").transaction(current => {
+                const cur = Number(current) || 0;
+                if (cur + option.amount > ULTRA_MAX_SUPPLY) return; // отмена
+                return cur + option.amount;
+            });
+
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            playSound();
+            showFloat("+" + option.amount + " УЛЬТРА-КВАНТ");
         }
 
         function updateUI() {
@@ -877,6 +938,9 @@
             document.getElementById("balanceDisplay").innerText = txt;
             document.getElementById("diceBalanceDisplay").innerText = txt;
             document.getElementById("diceBal").innerText = txt;
+            
+            // Обновляем баланс ультра-квантов
+            document.getElementById("ultraBalanceDisplay").innerText = formatNum(ultraQuants);
         }
 
         function clickYO() {
@@ -920,13 +984,16 @@
                 ultraLabel.style.display = "none";
             }
 
+            // Кнопки сжигания
             const burnBlock = document.getElementById("burnBlock");
-            const burnBtn = document.getElementById("burnBtn");
             if (hasCore) {
                 burnBlock.style.display = "block";
-                burnBtn.disabled = myBalance < BURN_COST;
-                document.getElementById("burnAmountText").innerText = "Сжигается: " + formatNum(BURN_COST) + " LIZA";
-            } else burnBlock.style.display = "none";
+                document.getElementById("burnBtn10").disabled = myBalance < 10 || ultraTotal + 1 > ULTRA_MAX_SUPPLY;
+                document.getElementById("burnBtn100").disabled = myBalance < 100 || ultraTotal + 10 > ULTRA_MAX_SUPPLY;
+                document.getElementById("burnBtn1000").disabled = myBalance < 1000 || ultraTotal + 100 > ULTRA_MAX_SUPPLY;
+            } else {
+                burnBlock.style.display = "none";
+            }
 
             const levelEl = document.getElementById("minerLevel");
             const titleEl = document.getElementById("minerTitle");
