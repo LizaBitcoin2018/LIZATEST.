@@ -53,10 +53,7 @@
             -webkit-backdrop-filter: blur(3px);
             transition: transform 0.15s;
             animation: ballFloat 5s ease-in-out infinite;
-            box-shadow: 
-                inset 0 -4px 8px rgba(0,0,0,0.25),
-                inset 0 4px 6px rgba(255,255,255,0.35),
-                0 0 12px rgba(255,255,255,0.15);
+            box-shadow: inset 0 -4px 8px rgba(0,0,0,0.25), inset 0 4px 6px rgba(255,255,255,0.35), 0 0 12px rgba(255,255,255,0.15);
         }
         .flying-ball:active { transform: scale(0.88); }
 
@@ -216,6 +213,11 @@
             padding: 14px;
             margin-bottom: 16px;
             border-left: 4px solid #f7931a;
+            transition: all 0.3s;
+        }
+        .miner-card.quantum {
+            border-left-color: #00f0ff;
+            box-shadow: 0 0 22px rgba(0,240,255,0.3);
         }
         .miner-top {
             display: flex;
@@ -232,6 +234,10 @@
             padding: 3px 8px;
             border-radius: 6px;
         }
+        .miner-level.quantum-lvl {
+            background: linear-gradient(90deg, #00f0ff, #0080ff);
+            color: #000;
+        }
         .miner-card .earned { color: #00ff88; font-size: 0.95rem; margin-bottom: 4px; }
         .miner-card .reward-info {
             font-size: 0.85rem;
@@ -243,9 +249,10 @@
             justify-content: space-between;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .miner-card .timer { color: #00ffcc; font-weight: bold; font-size: 1.15rem; }
-        .claim-btn, .upgrade-btn {
+        .claim-btn, .upgrade-btn, .quantum-btn {
             border: none;
             padding: 8px 12px;
             border-radius: 6px;
@@ -271,11 +278,23 @@
             color: #777;
             cursor: not-allowed;
         }
-        .upgrade-cost {
+        .quantum-btn {
+            background: linear-gradient(90deg, #00f0ff, #0080ff);
+            color: #000;
+            box-shadow: 0 0 14px rgba(0,200,255,0.55);
+        }
+        .quantum-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .upgrade-cost, .quantum-info {
             font-size: 0.75rem;
-            color: #ffb347;
             margin-top: 2px;
         }
+        .upgrade-cost { color: #ffb347; }
+        .quantum-info { color: #00e5ff; }
 
         .dice-panel {
             background: rgba(20,20,40,0.95);
@@ -462,9 +481,9 @@
         </div>
 
         <!-- Майнер -->
-        <div class="miner-card">
+        <div class="miner-card" id="minerCard">
             <div class="miner-top">
-                <div class="title">Майнер</div>
+                <div class="title" id="minerTitle">Майнер</div>
                 <div class="miner-level" id="minerLevel">Ур. 1</div>
             </div>
             <div class="earned" id="minerEarned">Намайнено: 0</div>
@@ -473,11 +492,15 @@
             </div>
             <div class="miner-bottom">
                 <div class="timer" id="minerTimer">1:00</div>
-                <div style="display:flex; gap:8px; align-items:center;">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                     <button class="claim-btn" id="claimBtn" disabled>Claim</button>
-                    <div style="text-align:center;">
+                    <div style="text-align:center;" id="upgradeBlock">
                         <button class="upgrade-btn" id="upgradeBtn">Апгрейд</button>
                         <div class="upgrade-cost" id="upgradeCost">170 000 000</div>
+                    </div>
+                    <div style="text-align:center; display:none;" id="quantumBlock">
+                        <button class="quantum-btn" id="quantumBtn">Заточить</button>
+                        <div class="quantum-info" id="quantumInfo">100 млрд • 80%</div>
                     </div>
                 </div>
             </div>
@@ -551,7 +574,9 @@
         const CYCLE_MS = 60 * 1000;
         const START_BANK = 9223372036854775807;
         const MAX_MINER_LEVEL = 100;
-        const GROWTH = 1.05;          // +5% за уровень
+        const GROWTH = 1.05;
+        const QUANTUM_COST = 100000000000;   // 100 миллиардов
+        const QUANTUM_BONUS = 1000000000;    // +1 миллиард за точку
 
         const REWARD_BITCOIN = 17000000;
         const REWARD_YO = 1700000;
@@ -563,6 +588,7 @@
         let myBalance = 0;
         let minerLastPayout = Date.now();
         let minerLevel = 1;
+        let quantumLevel = 0;
         let yoClicks = 0;
         let diceBank = START_BANK;
         let yobitTimer = null;
@@ -581,12 +607,16 @@
             galaxy.appendChild(s);
         }
 
-        // Награда майнера (+5% за уровень)
-        function getMinerReward() {
+        // Базовая награда по уровню
+        function getBaseReward() {
             return Math.floor(BASE_MINER_REWARD * Math.pow(GROWTH, minerLevel - 1));
         }
 
-        // Стоимость апгрейда = 10 × текущая награда
+        // Итоговая награда = база + квантовые точки
+        function getMinerReward() {
+            return getBaseReward() + (quantumLevel * QUANTUM_BONUS);
+        }
+
         function getUpgradeCost() {
             return getMinerReward() * 10;
         }
@@ -671,6 +701,7 @@
                 balance: myBalance,
                 minerLastPayout: minerLastPayout,
                 minerLevel: minerLevel,
+                quantumLevel: quantumLevel,
                 lastActive: Date.now(),
                 fromTelegram: myId.startsWith("tg_")
             }).catch(err => console.error("Ошибка сохранения:", err));
@@ -705,12 +736,14 @@
                     myBalance = Number(data.balance) || 0;
                     minerLastPayout = data.minerLastPayout || Date.now();
                     minerLevel = Number(data.minerLevel) || 1;
+                    quantumLevel = Number(data.quantumLevel) || 0;
                     if (minerLevel < 1) minerLevel = 1;
                     if (minerLevel > MAX_MINER_LEVEL) minerLevel = MAX_MINER_LEVEL;
                 } else {
                     myBalance = 0;
                     minerLastPayout = Date.now();
                     minerLevel = 1;
+                    quantumLevel = 0;
                 }
 
                 userRef.set({
@@ -718,22 +751,13 @@
                     balance: myBalance,
                     minerLastPayout: minerLastPayout,
                     minerLevel: minerLevel,
+                    quantumLevel: quantumLevel,
                     lastActive: Date.now(),
                     fromTelegram: myId.startsWith("tg_")
                 });
 
                 updateUI();
                 updateMinerUI();
-            }).catch(err => {
-                console.error("Ошибка загрузки:", err);
-                userRef.set({
-                    name: myName,
-                    balance: 0,
-                    minerLastPayout: Date.now(),
-                    minerLevel: 1,
-                    lastActive: Date.now(),
-                    fromTelegram: myId.startsWith("tg_")
-                });
             });
 
             userRef.on("value", snap => {
@@ -757,23 +781,17 @@
                 document.getElementById("diceBank").innerText = Math.floor(diceBank).toLocaleString("ru");
             });
 
-            db.ref("users").on("value", snap => {
-                renderLeaderboard(snap.val());
-            });
-
-            db.ref("chat").orderByChild("time").limitToLast(40).on("value", snap => {
-                renderChat(snap.val());
-            });
+            db.ref("users").on("value", snap => renderLeaderboard(snap.val()));
+            db.ref("chat").orderByChild("time").limitToLast(40).on("value", snap => renderChat(snap.val()));
 
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
             document.getElementById("upgradeBtn").onclick = upgradeMiner;
+            document.getElementById("quantumBtn").onclick = sharpenMiner;
             document.getElementById("diceLow").onclick = () => playDice("low");
             document.getElementById("diceHigh").onclick = () => playDice("high");
             document.getElementById("chatBtn").onclick = sendChat;
-            document.getElementById("chatInput").onkeydown = e => {
-                if (e.key === "Enter") sendChat();
-            };
+            document.getElementById("chatInput").onkeydown = e => { if (e.key === "Enter") sendChat(); };
 
             setInterval(updateMinerUI, 1000);
             setInterval(() => {
@@ -808,25 +826,46 @@
             const periods = Math.floor(elapsed / CYCLE_MS);
             const reward = getMinerReward();
             const earned = periods * reward;
-            const cost = getUpgradeCost();
 
             document.getElementById("minerTimer").innerText = mins + ":" + secs.toString().padStart(2, "0");
             document.getElementById("minerEarned").innerText = "Намайнено: " + earned.toLocaleString("ru");
             document.getElementById("minerReward").innerText = reward.toLocaleString("ru");
-            document.getElementById("minerLevel").innerText = "Ур. " + minerLevel;
             document.getElementById("claimBtn").disabled = periods <= 0;
 
-            const upBtn = document.getElementById("upgradeBtn");
-            const costEl = document.getElementById("upgradeCost");
+            const levelEl = document.getElementById("minerLevel");
+            const titleEl = document.getElementById("minerTitle");
+            const cardEl = document.getElementById("minerCard");
+            const upgradeBlock = document.getElementById("upgradeBlock");
+            const quantumBlock = document.getElementById("quantumBlock");
+            const quantumBtn = document.getElementById("quantumBtn");
 
-            if (minerLevel >= MAX_MINER_LEVEL) {
-                upBtn.disabled = true;
-                upBtn.innerText = "MAX";
-                costEl.innerText = "Макс. уровень";
+            if (quantumLevel > 0) {
+                titleEl.innerText = "Квантовый Майнер";
+                levelEl.innerText = "Q+" + quantumLevel;
+                levelEl.classList.add("quantum-lvl");
+                cardEl.classList.add("quantum");
             } else {
+                titleEl.innerText = "Майнер";
+                levelEl.innerText = "Ур. " + minerLevel;
+                levelEl.classList.remove("quantum-lvl");
+                cardEl.classList.remove("quantum");
+            }
+
+            if (minerLevel < MAX_MINER_LEVEL) {
+                // Обычный апгрейд
+                upgradeBlock.style.display = "block";
+                quantumBlock.style.display = "none";
+                const cost = getUpgradeCost();
+                const upBtn = document.getElementById("upgradeBtn");
                 upBtn.disabled = myBalance < cost;
-                upBtn.innerText = "Апгрейд";
-                costEl.innerText = cost.toLocaleString("ru");
+                document.getElementById("upgradeCost").innerText = cost.toLocaleString("ru");
+            } else {
+                // 100 уровень — показываем Заточить
+                upgradeBlock.style.display = "none";
+                quantumBlock.style.display = "block";
+                quantumBtn.disabled = myBalance < QUANTUM_COST;
+                document.getElementById("quantumInfo").innerText = 
+                    "100 млрд • 80% • сейчас +" + quantumLevel + " млрд";
             }
         }
 
@@ -851,21 +890,49 @@
 
         function upgradeMiner() {
             if (minerLevel >= MAX_MINER_LEVEL) return;
-
             const cost = getUpgradeCost();
             if (myBalance < cost) {
-                alert("Недостаточно LIZA для апгрейда");
+                alert("Недостаточно LIZA");
                 return;
             }
-
             myBalance -= cost;
             minerLevel++;
-
             saveUser();
             updateUI();
             updateMinerUI();
             playSound();
             showFloat("Уровень " + minerLevel + "!");
+        }
+
+        // ===== ЗАТОЧКА =====
+        function sharpenMiner() {
+            if (minerLevel < MAX_MINER_LEVEL) return;
+            if (myBalance < QUANTUM_COST) {
+                alert("Нужно 100 миллиардов LIZA");
+                return;
+            }
+
+            // Списываем стоимость
+            myBalance -= QUANTUM_COST;
+
+            const success = Math.random() < 0.80;
+
+            if (success) {
+                quantumLevel++;
+                saveUser();
+                updateUI();
+                updateMinerUI();
+                playSound();
+                showFloat("Успех! +" + quantumLevel + " млрд");
+            } else {
+                // Провал — сгорает на 1 уровень
+                minerLevel = Math.max(1, minerLevel - 1);
+                // При сгорании ниже 100 квант оставляем (или можно сбрасывать — сейчас оставляем)
+                saveUser();
+                updateUI();
+                updateMinerUI();
+                showFloat("СГОРЕЛ! -1 уровень");
+            }
         }
 
         function playDice(dir) {
@@ -896,11 +963,7 @@
             const input = document.getElementById("chatInput");
             const text = input.value.trim();
             if (!text || !myId) return;
-            db.ref("chat").push({
-                user: myName,
-                text: text,
-                time: Date.now()
-            });
+            db.ref("chat").push({ user: myName, text: text, time: Date.now() });
             input.value = "";
         }
 
