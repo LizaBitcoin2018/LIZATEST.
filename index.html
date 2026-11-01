@@ -14,45 +14,27 @@
             color: #eee;
             overflow-x: hidden;
         }
-        body { padding-bottom: 40px; }
+        body { padding-bottom: 70px; }
 
         #galaxy {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
+            position: fixed; inset: 0; z-index: 0;
             background: radial-gradient(ellipse at center, #0a0a2a 0%, #000 70%);
             pointer-events: none;
         }
         .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
+            position: absolute; background: white; border-radius: 50%;
             animation: twinkle var(--dur) infinite ease-in-out;
         }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
         .flying-ball {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #fff;
-            cursor: pointer;
-            z-index: 40;
-            user-select: none;
-            text-align: center;
-            line-height: 1.1;
-            backdrop-filter: blur(3px);
-            transition: transform 0.15s;
+            position: fixed; width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; cursor: pointer; z-index: 40;
+            user-select: none; text-align: center; line-height: 1.1;
+            backdrop-filter: blur(3px); transition: transform 0.15s;
             animation: ballFloat 5s ease-in-out infinite;
-            box-shadow: inset 0 -4px 8px rgba(0,0,0,0.25), inset 0 4px 6px rgba(255,255,255,0.35), 0 0 12px rgba(255,255,255,0.15);
+            box-shadow: inset 0 -4px 8px rgba(0,0,0,0.25), inset 0 4px 6px rgba(255,255,255,0.35);
         }
         .flying-ball:active { transform: scale(0.88); }
         .ball-bitcoin { background: radial-gradient(circle at 30% 30%, rgba(255,230,120,0.75), rgba(247,147,26,0.55) 60%, rgba(180,90,0,0.45)); border: 1px solid rgba(255,200,80,0.5); font-size: 0.48rem; }
@@ -65,12 +47,12 @@
             text-shadow: 0 0 8px #fff, 0 0 12px #00f;
             background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.9), rgba(180,220,255,0.7) 35%, rgba(0,120,255,0.6) 65%, rgba(0,40,120,0.5));
             border: 2px solid rgba(200,230,255,0.7);
-            box-shadow: 0 0 25px rgba(100,180,255,0.7), 0 0 50px rgba(0,100,255,0.4);
+            box-shadow: 0 0 25px rgba(100,180,255,0.7);
             animation: yobitFloat 3.5s ease-in-out infinite, yobitGlow 2s ease-in-out infinite alternate;
         }
         @keyframes yobitFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-28px) scale(1.05); } }
         @keyframes yobitGlow {
-            0% { box-shadow: 0 0 20px rgba(100,180,255,0.6), 0 0 40px rgba(0,100,255,0.3); }
+            0% { box-shadow: 0 0 20px rgba(100,180,255,0.6); }
             100% { box-shadow: 0 0 35px rgba(150,220,255,0.9), 0 0 70px rgba(0,150,255,0.5); }
         }
         @keyframes ballFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-18px) rotate(6deg); } }
@@ -87,28 +69,41 @@
         .header h1 { color: #f7931a; font-size: 1.25rem; }
         .user-info { color: #00ffcc; font-size: 0.9rem; }
 
-        .content, #processorPage, #nodePage {
-            position: relative; z-index: 10;
-            max-width: 480px; margin: 0 auto; padding: 16px 14px 40px;
+        .tabs {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+            display: flex; background: rgba(10,10,20,0.97);
+            border-top: 1px solid #333;
+            padding: 6px 4px env(safe-area-inset-bottom);
         }
-        #processorPage, #nodePage { display: none; }
+        .tab-btn {
+            flex: 1; padding: 10px 4px; border: none; background: transparent;
+            color: #888; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            border-radius: 8px;
+        }
+        .tab-btn.active {
+            color: #f7931a;
+            background: rgba(247,147,26,0.12);
+        }
+
+        .page { display: none; position: relative; z-index: 10; max-width: 480px; margin: 0 auto; padding: 16px 14px 20px; }
+        .page.active { display: block; }
 
         .balance-block { text-align: center; margin-bottom: 16px; }
         .balance-label { color: #aaa; font-size: 0.9rem; }
-        .balance { font-size: 2rem; font-weight: bold; color: #f7931a; word-break: break-all; margin: 4px 0; }
+        .balance { font-size: 1.9rem; font-weight: bold; color: #f7931a; word-break: break-all; margin: 4px 0; }
 
         .airdrop-btn {
-            display: inline-block; margin: 10px 0; padding: 10px 20px;
+            display: inline-block; margin: 8px 0; padding: 9px 18px;
             background: linear-gradient(90deg, #0066ff, #00aaff);
-            color: white; font-weight: bold; font-size: 0.95rem;
+            color: white; font-weight: bold; font-size: 0.9rem;
             border-radius: 8px; text-decoration: none;
         }
 
         .yo-wrap { display: flex; flex-direction: column; align-items: center; margin: 18px 0; }
         .yo-btn {
-            width: 170px; height: 170px; border-radius: 50%;
+            width: 160px; height: 160px; border-radius: 50%;
             background: linear-gradient(145deg, #00c6ff, #0072ff);
-            border: none; color: white; font-weight: bold; font-size: 2.8rem;
+            border: none; color: white; font-weight: bold; font-size: 2.6rem;
             cursor: pointer; box-shadow: 0 0 40px rgba(0,150,255,0.7);
         }
         .yo-btn:active { transform: scale(0.93); }
@@ -119,14 +114,13 @@
             background: linear-gradient(90deg, #f7931a, #ffb347);
             border: none; border-radius: 10px; color: #000;
             font-weight: bold; font-size: 1rem; text-align: center;
-            text-decoration: none; margin-bottom: 18px;
+            text-decoration: none; margin-bottom: 16px;
         }
 
-        /* Майнер */
         .miner-card {
             background: rgba(30,30,50,0.9);
             border-radius: 12px; padding: 14px; margin-bottom: 16px;
-            border-left: 4px solid #f7931a; transition: all 0.3s;
+            border-left: 4px solid #f7931a;
         }
         .miner-card.quantum { border-left-color: #00f0ff; box-shadow: 0 0 22px rgba(0,240,255,0.3); }
         .miner-card.quazarite { border-left-color: #c084fc; box-shadow: 0 0 25px rgba(192,132,252,0.4); }
@@ -152,228 +146,223 @@
         .upgrade-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
         .quantum-btn { background: linear-gradient(90deg, #00f0ff, #0080ff); color: #000; box-shadow: 0 0 14px rgba(0,200,255,0.55); }
         .quantum-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
-        .quazarite-btn { background: linear-gradient(90deg, #c084fc, #a855f7, #7c3aed); color: #fff; box-shadow: 0 0 16px rgba(168,85,247,0.6); }
+        .quazarite-btn { background: linear-gradient(90deg, #c084fc, #a855f7); color: #fff; box-shadow: 0 0 16px rgba(168,85,247,0.6); }
         .quazarite-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
         .processor-btn {
-            background: linear-gradient(90deg, #00d4ff, #0066ff, #0033cc);
+            background: linear-gradient(90deg, #00d4ff, #0066ff);
             color: #fff; box-shadow: 0 0 18px rgba(0,150,255,0.7);
-            border: 1px solid rgba(100,200,255,0.6); text-shadow: 0 0 6px #fff;
         }
         .burn-btn {
-            background: linear-gradient(90deg, #ff00cc, #ff0066, #ff3300);
+            background: linear-gradient(90deg, #ff00cc, #ff0066);
             color: #fff; box-shadow: 0 0 18px rgba(255,0,100,0.6);
-            border: 1px solid rgba(255,100,200,0.5);
         }
         .burn-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
 
-        .upgrade-cost, .quantum-info, .quazarite-info, .burn-info {
-            font-size: 0.75rem; margin-top: 2px;
-        }
+        .upgrade-cost, .quantum-info, .quazarite-info, .burn-info { font-size: 0.75rem; margin-top: 2px; }
         .upgrade-cost { color: #ffb347; }
         .quantum-info { color: #00e5ff; }
         .quazarite-info { color: #d8b4fe; }
         .burn-info { color: #ff66aa; }
 
-        /* Ультра-Квазарный Квант (только визуал) */
         .ultra-crystal {
-            display: none;
-            width: 64px; height: 64px;
-            margin: 10px auto 6px;
-            position: relative;
-            transform: rotate(45deg);
+            display: none; width: 64px; height: 64px; margin: 10px auto 6px;
+            position: relative; transform: rotate(45deg);
             background: conic-gradient(from 0deg, #fff, #ff00cc, #00f0ff, #ffff00, #ff00cc, #fff);
             border-radius: 10px;
-            box-shadow: 0 0 25px rgba(255,0,200,0.8), 0 0 50px rgba(0,240,255,0.5), inset 0 0 15px rgba(255,255,255,0.6);
+            box-shadow: 0 0 25px rgba(255,0,200,0.8), 0 0 50px rgba(0,240,255,0.5);
             animation: ultraSpin 4s linear infinite, ultraPulse 2s ease-in-out infinite;
         }
         .ultra-crystal::after {
-            content: '◈';
-            position: absolute;
-            top: 50%; left: 50%;
+            content: '◈'; position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 1.4rem; color: #fff;
-            text-shadow: 0 0 10px #fff, 0 0 20px #ff00cc;
+            font-size: 1.4rem; color: #fff; text-shadow: 0 0 10px #fff;
         }
-        @keyframes ultraSpin {
-            from { filter: hue-rotate(0deg); }
-            to { filter: hue-rotate(360deg); }
-        }
+        @keyframes ultraSpin { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
         @keyframes ultraPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(255,0,200,0.7), 0 0 40px rgba(0,240,255,0.4); transform: rotate(45deg) scale(1); }
-            50% { box-shadow: 0 0 35px rgba(255,100,255,1), 0 0 70px rgba(0,255,255,0.7); transform: rotate(45deg) scale(1.08); }
+            0%, 100% { transform: rotate(45deg) scale(1); }
+            50% { transform: rotate(45deg) scale(1.08); }
         }
         .ultra-label {
-            display: none;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #ff99ff;
-            margin-bottom: 6px;
-            text-shadow: 0 0 10px rgba(255,0,200,0.8);
+            display: none; text-align: center; font-size: 0.8rem;
+            color: #ff99ff; margin-bottom: 6px;
         }
 
         .quazarite-crystal {
             display: none; width: 54px; height: 54px; margin: 8px auto 4px;
             position: relative; transform: rotate(45deg);
-            background: linear-gradient(135deg, #e9d5ff, #c084fc, #7c3aed, #4c1d95);
+            background: linear-gradient(135deg, #e9d5ff, #c084fc, #7c3aed);
             border-radius: 8px;
-            box-shadow: 0 0 20px rgba(192,132,252,0.8), 0 0 40px rgba(124,58,237,0.5);
+            box-shadow: 0 0 20px rgba(192,132,252,0.8);
             animation: crystalPulse 2.5s ease-in-out infinite;
         }
         .quazarite-crystal::after {
             content: '◆'; position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 1.1rem; color: #fff; text-shadow: 0 0 8px #fff;
+            font-size: 1.1rem; color: #fff;
         }
         @keyframes crystalPulse {
             0%, 100% { box-shadow: 0 0 18px rgba(192,132,252,0.7); }
-            50% { box-shadow: 0 0 28px rgba(216,180,254,0.95), 0 0 55px rgba(168,85,247,0.6); }
+            50% { box-shadow: 0 0 28px rgba(216,180,254,0.95); }
         }
         .quazarite-label { display: none; text-align: center; font-size: 0.78rem; color: #e9d5ff; margin-bottom: 6px; }
 
-        /* Процессорная */
-        .processor-card {
-            background: linear-gradient(180deg, rgba(10,20,50,0.95), rgba(5,10,30,0.98));
+        .processor-card, .node-card {
+            background: rgba(15,20,40,0.95);
             border-radius: 16px; padding: 20px;
-            border: 1px solid rgba(0,150,255,0.4);
-            box-shadow: 0 0 30px rgba(0,100,255,0.25);
-            text-align: center; position: relative; overflow: hidden;
+            border: 1px solid rgba(0,150,255,0.35);
+            text-align: center;
         }
-        .processor-card h2 { color: #00d4ff; font-size: 1.4rem; margin-bottom: 8px; text-shadow: 0 0 12px rgba(0,200,255,0.6); }
-        .processor-desc { color: #88ccff; font-size: 0.9rem; margin-bottom: 18px; line-height: 1.4; }
+        .node-card {
+            background: radial-gradient(ellipse at center, #1a0a2e 0%, #0a0515 70%);
+            border-color: rgba(192,132,252,0.5);
+        }
+        .processor-card h2, .node-card h2 { color: #00d4ff; font-size: 1.3rem; margin-bottom: 8px; }
+        .node-card h2 { color: #e9d5ff; }
+        .processor-desc, .node-subtitle { color: #88ccff; font-size: 0.9rem; margin-bottom: 16px; }
 
         .chip-visual {
             width: 110px; height: 78px; margin: 0 auto 16px;
             background: linear-gradient(145deg, #1a3a6e, #0a1a3a);
             border-radius: 10px; border: 2px solid #00aaff;
             position: relative; box-shadow: 0 0 25px rgba(0,150,255,0.5);
-            animation: chipShimmer 3s ease-in-out infinite; cursor: pointer;
+            animation: chipShimmer 3s ease-in-out infinite;
         }
         .chip-visual::before {
             content: 'CHIP'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 0.95rem; font-weight: bold;
-            color: #00d4ff; text-shadow: 0 0 10px #00f; z-index: 2;
+            transform: translate(-50%, -50%); font-weight: bold; color: #00d4ff;
         }
         .crystal-btn {
             position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
             width: 28px; height: 28px;
-            background: linear-gradient(135deg, #e9d5ff, #c084fc, #7c3aed);
+            background: linear-gradient(135deg, #e9d5ff, #c084fc);
             border-radius: 6px; border: 1px solid #fff;
             box-shadow: 0 0 12px rgba(192,132,252,0.9);
             cursor: pointer; z-index: 3;
             animation: crystalBtnPulse 2s ease-in-out infinite;
         }
         @keyframes crystalBtnPulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(192,132,252,0.8); transform: translateX(-50%) scale(1); }
-            50% { box-shadow: 0 0 20px rgba(216,180,254,1); transform: translateX(-50%) scale(1.1); }
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
         }
         @keyframes chipShimmer {
-            0% { box-shadow: 0 0 20px rgba(0,150,255,0.4); border-color: #00aaff; }
-            50% { box-shadow: 0 0 35px rgba(0,200,255,0.7); border-color: #80dfff; }
-            100% { box-shadow: 0 0 20px rgba(0,150,255,0.4); border-color: #00aaff; }
+            0%, 100% { box-shadow: 0 0 20px rgba(0,150,255,0.4); }
+            50% { box-shadow: 0 0 35px rgba(0,200,255,0.7); }
         }
 
-        .chip-status, .core-status { font-size: 0.95rem; margin-bottom: 16px; color: #aaa; }
+        .core-visual {
+            width: 90px; height: 90px; margin: 0 auto 16px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #e9d5ff 20%, #c084fc 50%, #7c3aed);
+            box-shadow: 0 0 30px rgba(192,132,252,0.8);
+            animation: corePulse 2.8s ease-in-out infinite; position: relative;
+        }
+        .core-visual::after {
+            content: '◆'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 1.8rem; color: #fff;
+        }
+        @keyframes corePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .chip-status, .core-status { font-size: 0.95rem; margin-bottom: 14px; color: #aaa; }
         .chip-status.owned, .core-status.owned { color: #00ff88; font-weight: bold; }
 
         .buy-chip-btn, .buy-core-btn {
             background: linear-gradient(90deg, #00d4ff, #0066ff);
-            color: #fff; border: none; padding: 14px 28px; border-radius: 10px;
-            font-size: 1.05rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 0 20px rgba(0,150,255,0.6); margin-bottom: 8px;
+            color: #fff; border: none; padding: 13px 26px; border-radius: 10px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 18px rgba(0,150,255,0.55); margin-bottom: 8px;
         }
         .buy-chip-btn:disabled, .buy-core-btn:disabled {
             background: #333; color: #777; box-shadow: none; cursor: not-allowed;
         }
-        .chip-price, .core-price { font-size: 0.85rem; color: #88ccff; margin-bottom: 18px; }
+        .chip-price, .core-price { font-size: 0.85rem; color: #88ccff; margin-bottom: 16px; }
         .back-btn {
             background: rgba(255,255,255,0.1); color: #ccc;
             border: 1px solid #555; padding: 10px 20px; border-radius: 8px;
             font-size: 0.95rem; cursor: pointer;
         }
 
-        /* Внутрислойный узел */
-        .node-card {
-            background: radial-gradient(ellipse at center, #1a0a2e 0%, #0a0515 70%);
-            border-radius: 16px; padding: 24px 20px;
-            border: 1px solid rgba(192,132,252,0.5);
-            box-shadow: 0 0 40px rgba(124,58,237,0.3);
-            text-align: center; position: relative; overflow: hidden;
-        }
-        .node-card::before {
-            content: ''; position: absolute; inset: -50%;
-            background: conic-gradient(from 0deg, transparent, rgba(192,132,252,0.15), transparent 30%, rgba(0,200,255,0.1), transparent 60%, rgba(168,85,247,0.12), transparent);
-            animation: cosmicRotate 12s linear infinite; z-index: 0;
-        }
-        @keyframes cosmicRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .node-card > * { position: relative; z-index: 1; }
-        .node-card h2 { color: #e9d5ff; font-size: 1.25rem; margin-bottom: 6px; text-shadow: 0 0 15px rgba(192,132,252,0.8); }
-        .node-subtitle { color: #c084fc; font-size: 0.85rem; margin-bottom: 18px; }
-
-        .core-visual {
-            width: 90px; height: 90px; margin: 0 auto 16px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fff, #e9d5ff 20%, #c084fc 50%, #7c3aed 80%, #4c1d95);
-            box-shadow: 0 0 30px rgba(192,132,252,0.8), 0 0 60px rgba(124,58,237,0.5);
-            animation: corePulse 2.8s ease-in-out infinite; position: relative;
-        }
-        .core-visual::after {
-            content: '◆'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 1.8rem; color: #fff; text-shadow: 0 0 12px #fff;
-        }
-        @keyframes corePulse {
-            0%, 100% { box-shadow: 0 0 25px rgba(192,132,252,0.7); transform: scale(1); }
-            50% { box-shadow: 0 0 40px rgba(216,180,254,1), 0 0 80px rgba(168,85,247,0.6); transform: scale(1.06); }
-        }
-
         .dice-panel {
-            background: rgba(20,20,40,0.95); border-radius: 12px; padding: 14px;
-            margin-bottom: 16px; border: 1px solid rgba(0,150,255,0.3);
+            background: rgba(20,20,40,0.95); border-radius: 12px; padding: 16px;
+            border: 1px solid rgba(0,150,255,0.3);
         }
-        .dice-panel h4 { color: #00aaff; text-align: center; margin-bottom: 8px; }
-        .dice-bank { text-align: center; color: #ffcc00; font-size: 0.9rem; margin-bottom: 10px; word-break: break-all; }
+        .dice-panel h4 { color: #00aaff; text-align: center; margin-bottom: 10px; }
+        .dice-balance {
+            text-align: center; color: #f7931a; font-size: 1.1rem;
+            font-weight: bold; margin-bottom: 8px;
+        }
+        .dice-bank { text-align: center; color: #ffcc00; font-size: 0.9rem; margin-bottom: 12px; }
         #diceBet {
             width: 100%; background: #1a1a2e; border: 1px solid #444;
-            color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 1rem;
+            color: white; padding: 11px; border-radius: 8px; margin-bottom: 12px; font-size: 1rem;
         }
-        .dice-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .dice-btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; }
+        .dice-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .dice-btn {
+            padding: 14px; border: none; border-radius: 8px;
+            font-weight: bold; color: white; cursor: pointer; font-size: 1rem;
+        }
         .dice-btn.low { background: linear-gradient(90deg, #0066ff, #0099ff); }
         .dice-btn.high { background: linear-gradient(90deg, #0066ff, #00ccff); }
-        .dice-result { text-align: center; font-weight: bold; min-height: 24px; margin-bottom: 8px; }
+        .dice-result { text-align: center; font-weight: bold; min-height: 26px; }
         .win { color: #00ff88; } .lose { color: #ff5555; }
 
         .chat-panel {
             background: rgba(15,15,30,0.95); border-radius: 12px;
-            border: 1px solid rgba(100,100,255,0.2); margin-bottom: 16px; overflow: hidden;
+            border: 1px solid rgba(100,100,255,0.2); overflow: hidden;
+            height: calc(100vh - 160px); display: flex; flex-direction: column;
         }
-        .chat-panel h3 { color: #f7931a; padding: 10px 14px; border-bottom: 1px solid #333; font-size: 1rem; }
-        .chat-messages { height: 160px; overflow-y: auto; padding: 10px 14px; }
-        .chat-msg { margin-bottom: 8px; font-size: 0.88rem; line-height: 1.35; }
+        .chat-panel h3 { color: #f7931a; padding: 12px 14px; border-bottom: 1px solid #333; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 12px 14px; }
+        .chat-msg { margin-bottom: 10px; font-size: 0.9rem; line-height: 1.35; }
         .chat-msg .author { color: #f7931a; font-weight: bold; }
-        .chat-msg .time { color: #666; font-size: 0.72rem; margin-left: 5px; }
-        .chat-input-area { display: flex; gap: 6px; padding: 8px; border-top: 1px solid #333; }
+        .chat-msg .time { color: #666; font-size: 0.75rem; margin-left: 6px; }
+        
+        /* Админ @BitcoinLiza — зелёный текст */
+        .chat-msg.admin .author {
+            color: #00ff88 !important;
+            text-shadow: 0 0 8px rgba(0,255,136,0.5);
+        }
+        .chat-msg.admin {
+            color: #00ff88;
+        }
+        .chat-msg.admin .admin-badge {
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+            color: #000;
+            font-size: 0.65rem;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        .chat-input-area {
+            display: flex; gap: 8px; padding: 10px;
+            border-top: 1px solid #333;
+        }
         .chat-input-area input {
             flex: 1; background: #252525; border: 1px solid #444;
-            color: white; padding: 9px 12px; border-radius: 6px; outline: none;
+            color: white; padding: 11px 12px; border-radius: 8px; outline: none;
         }
         .chat-input-area button {
             background: #f7931a; border: none; color: white;
-            padding: 0 14px; border-radius: 6px; font-weight: bold; cursor: pointer;
+            padding: 0 16px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
         .leaderboard {
             background: rgba(15,15,30,0.95); border-radius: 12px;
-            border: 1px solid rgba(100,100,255,0.25); overflow: hidden; margin-top: 8px;
+            border: 1px solid rgba(100,100,255,0.25); overflow: hidden;
         }
-        .leaderboard h3 { color: #f7931a; padding: 12px 14px; border-bottom: 1px solid #333; font-size: 1.05rem; }
+        .leaderboard h3 { color: #f7931a; padding: 14px; border-bottom: 1px solid #333; }
         .lb-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 9px 14px; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem;
+            padding: 11px 14px; border-bottom: 1px solid #2a2a2a; font-size: 0.92rem;
         }
         .lb-item:last-child { border-bottom: none; }
         .lb-left { display: flex; align-items: center; gap: 8px; max-width: 65%; }
-        .lb-rank { color: #888; min-width: 28px; font-size: 0.85rem; }
+        .lb-rank { color: #888; min-width: 28px; }
         .lb-name { color: #00ffcc; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .lb-bal { font-weight: bold; color: #f7931a; font-size: 0.9rem; }
+        .lb-bal { font-weight: bold; color: #f7931a; }
 
         .float-plus {
             position: fixed; color: #00ff88; font-weight: bold; font-size: 1.5rem;
@@ -395,8 +384,8 @@
         <div class="user-info" id="userDisplay">Загрузка...</div>
     </div>
 
-    <!-- ГЛАВНАЯ -->
-    <div class="content" id="mainPage">
+    <!-- МАЙНЕР -->
+    <div class="page active" id="page-miner">
         <div class="balance-block">
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
@@ -409,7 +398,6 @@
                 <div class="miner-level" id="minerLevel">Ур. 1</div>
             </div>
 
-            <!-- Ультра-Квазарный Квант (только визуал) -->
             <div class="ultra-crystal" id="ultraCrystal"></div>
             <div class="ultra-label" id="ultraLabel">◈ Ультра-Квазарный Квант ×0 ◈</div>
 
@@ -418,7 +406,7 @@
 
             <div class="earned" id="minerEarned">Намайнено: 0</div>
             <div class="reward-info">
-                Награда за цикл: <span id="minerReward">17 000 000</span> LIZA
+                Награда за цикл: <span id="minerReward">0.00017</span> LIZA
                 <span id="cycleInfo" style="display:block;font-size:0.8rem;color:#88f;margin-top:2px;"></span>
             </div>
             <div class="miner-bottom">
@@ -427,19 +415,20 @@
                     <button class="claim-btn" id="claimBtn" disabled>Claim</button>
                     <div style="text-align:center;" id="upgradeBlock">
                         <button class="upgrade-btn" id="upgradeBtn">Апгрейд</button>
-                        <div class="upgrade-cost" id="upgradeCost">170 000 000</div>
+                        <div class="upgrade-cost" id="upgradeCost">0.0017</div>
                     </div>
                     <div style="text-align:center; display:none;" id="quantumBlock">
                         <button class="quantum-btn" id="quantumBtn">Заточить</button>
-                        <div class="quantum-info" id="quantumInfo">100 млрд • 80%</div>
+                        <div class="quantum-info" id="quantumInfo">1 • 80%</div>
                     </div>
                     <div style="text-align:center;" id="quazariteBlock">
                         <button class="quazarite-btn" id="quazariteBtn">Купить Квазарит</button>
-                        <div class="quazarite-info">250 млрд • ×2</div>
+                        <div class="quazarite-info">2.5 • ×2</div>
                     </div>
                     <button class="processor-btn" id="processorBtn">Процессор</button>
                     <div style="text-align:center; display:none;" id="burnBlock">
-                        <button class="burn-btn" id="burnBtn">Сжечь 1 трлн</button>
+                        <div class="burn-info" id="burnAmountText">Сжигается: 10 LIZA</div>
+                        <button class="burn-btn" id="burnBtn">Сжечь</button>
                         <div class="burn-info">→ +1 Ультра-Квант</div>
                     </div>
                 </div>
@@ -448,22 +437,34 @@
 
         <div class="yo-wrap">
             <button class="yo-btn" id="yoBtn">YO</button>
-            <div class="yo-info">+170 000 000 за клик<br>каждый 10-й клик: <b>+1 700 000 000</b></div>
+            <div class="yo-info">+0.0017 за клик<br>каждый 10-й: <b>+0.017</b></div>
         </div>
 
         <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">Торговать LIZA на Yobit</a>
+    </div>
+
+    <!-- ДАЙС -->
+    <div class="page" id="page-dice">
+        <div class="balance-block">
+            <div class="balance-label">Твой баланс</div>
+            <div class="balance"><span id="diceBalanceDisplay">0</span> LIZA</div>
+        </div>
 
         <div class="dice-panel">
             <h4>DICE — Удвой LIZA</h4>
+            <div class="dice-balance">Баланс: <span id="diceBal">0</span></div>
             <div class="dice-bank">Банк: <strong id="diceBank">...</strong></div>
-            <input type="number" id="diceBet" placeholder="Ставка" value="1000" min="1">
+            <input type="number" id="diceBet" placeholder="Ставка" value="0.1" min="0.000001" step="any">
             <div class="dice-buttons">
                 <button class="dice-btn low" id="diceLow">Roll &lt; 48</button>
                 <button class="dice-btn high" id="diceHigh">Roll &gt; 52</button>
             </div>
             <div class="dice-result" id="diceResult">Сделай ставку</div>
         </div>
+    </div>
 
+    <!-- ЧАТ -->
+    <div class="page" id="page-chat">
         <div class="chat-panel">
             <h3>Чат майнеров</h3>
             <div class="chat-messages" id="chatMessages"></div>
@@ -472,39 +473,53 @@
                 <button id="chatBtn">➤</button>
             </div>
         </div>
+    </div>
 
+    <!-- ТОП -->
+    <div class="page" id="page-top">
         <div class="leaderboard">
             <h3>Топ 100 игроков</h3>
-            <div id="leaderboardList"><div style="padding:20px;text-align:center;color:#666;">Загрузка...</div></div>
+            <div id="leaderboardList">
+                <div style="padding:20px;text-align:center;color:#666;">Загрузка...</div>
+            </div>
         </div>
     </div>
 
-    <!-- ПРОЦЕССОРНАЯ -->
-    <div id="processorPage">
+    <!-- Процессор -->
+    <div class="page" id="page-processor" style="display:none;">
         <div class="processor-card">
             <h2>⚙ Процессорная</h2>
-            <div class="processor-desc">Установи ускоряющий чип.<br>Чип сокращает цикл майнинга на 20 секунд.</div>
-            <div class="chip-visual" id="chipVisual">
-                <div class="crystal-btn" id="crystalBtn" title="Войти во внутрислойный узел"></div>
+            <div class="processor-desc">Установи ускоряющий чип (−20 сек)</div>
+            <div class="chip-visual">
+                <div class="crystal-btn" id="crystalBtn"></div>
             </div>
             <div class="chip-status" id="chipStatus">Чип не установлен</div>
             <button class="buy-chip-btn" id="buyChipBtn">Купить Чип</button>
-            <div class="chip-price">Стоимость: 1 000 000 000 000 LIZA</div>
-            <button class="back-btn" id="backBtn">← Вернуться в шахту</button>
+            <div class="chip-price">10 LIZA</div>
+            <br>
+            <button class="back-btn" id="backBtn">← Назад</button>
         </div>
     </div>
 
-    <!-- ВНУТРИСЛОЙНЫЙ УЗЕЛ -->
-    <div id="nodePage">
+    <!-- Узел -->
+    <div class="page" id="page-node" style="display:none;">
         <div class="node-card">
             <h2>Внутрислойный узел</h2>
             <div class="node-subtitle">Quazarite Intra-Layer Node</div>
             <div class="core-visual"></div>
             <div class="core-status" id="coreStatus">Сердцевина не установлена</div>
             <button class="buy-core-btn" id="buyCoreBtn">Установить Сердцевину</button>
-            <div class="core-price">25 000 000 000 000 LIZA<br>−20 сек к циклу майнинга</div>
-            <button class="back-btn" id="backToProcessorBtn">← Назад в Процессорную</button>
+            <div class="core-price">250 LIZA<br>−20 сек</div>
+            <br>
+            <button class="back-btn" id="backToProcessorBtn">← Назад</button>
         </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-page="miner">Майнер</button>
+        <button class="tab-btn" data-page="dice">Дайс</button>
+        <button class="tab-btn" data-page="chat">Чат</button>
+        <button class="tab-btn" data-page="top">Топ 100</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -529,31 +544,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Админ
+        const ADMIN_NAME = "@BitcoinLiza";
+
         const MAX_BALANCE = 9223372036854775807n;
-        const BASE_MINER_REWARD = 17000000;
+        const BASE_MINER_REWARD = 0.00017;
         const BASE_CYCLE_MS = 60 * 1000;
         const CHIP_CYCLE_MS = 40 * 1000;
         const CORE_CYCLE_MS = 20 * 1000;
-        const START_BANK = 9223372036854775807;
+        const START_BANK = 1e12;
         const MAX_MINER_LEVEL = 100;
         const GROWTH = 1.05;
-        const QUANTUM_COST = 100000000000;
-        const QUANTUM_BONUS = 1000000000;
-        const QUAZARITE_COST = 250000000000;
-        const CHIP_COST = 1000000000000;
-        const CORE_COST = 25000000000000;
-        const BURN_COST = 1000000000000;
+        const QUANTUM_COST = 1;
+        const QUANTUM_BONUS = 0.01;
+        const QUAZARITE_COST = 2.5;
+        const CHIP_COST = 10;
+        const CORE_COST = 250;
+        const BURN_COST = 10;
 
-        const REWARD_BITCOIN = 170000000;
-        const REWARD_YO = 170000000;
-        const REWARD_LIZA = 170000000;
-        const REWARD_YOBIT = 17000000000;
+        const REWARD_BITCOIN = 0.017;
+        const REWARD_YO = 0.017;
+        const REWARD_LIZA = 0.017;
+        const REWARD_YOBIT = 0.17;
 
         let myId = null, myName = "Игрок", myBalance = 0;
         let minerLastPayout = Date.now(), minerLevel = 1, quantumLevel = 0;
         let hasQuazarite = false, hasChip = false, hasCore = false;
         let ultraQuants = 0;
-        let yoClicks = 0, diceBank = START_BANK, yobitTimer = null;
+        let yoClicks = 0, diceBank = START_BANK;
 
         function getCycleMs() {
             if (hasCore) return CORE_CYCLE_MS;
@@ -562,7 +580,7 @@
         }
 
         const galaxy = document.getElementById('galaxy');
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 70; i++) {
             const s = document.createElement('div');
             s.className = 'star';
             const size = Math.random() * 2 + 0.5;
@@ -573,32 +591,44 @@
         }
 
         function getBaseReward() {
-            return Math.floor(BASE_MINER_REWARD * Math.pow(GROWTH, minerLevel - 1));
+            return BASE_MINER_REWARD * Math.pow(GROWTH, minerLevel - 1);
         }
 
         function getMinerReward() {
             let reward = getBaseReward() + (quantumLevel * QUANTUM_BONUS);
             if (hasQuazarite) reward *= 2;
-            // Ультра-Кванты больше НЕ дают множитель
-            return Math.floor(reward);
+            return reward;
         }
 
         function getUpgradeCost() { return getMinerReward() * 10; }
 
+        function formatNum(n) {
+            if (n === 0) return '0';
+            if (Math.abs(n) < 0.000001) return n.toExponential(2);
+            if (Math.abs(n) < 1) return parseFloat(n.toFixed(8)).toString();
+            return n.toLocaleString('ru', { maximumFractionDigits: 8 });
+        }
+
+        function isAdmin(name) {
+            if (!name) return false;
+            const clean = name.replace(/^@/, '').toLowerCase();
+            return clean === "bitcoinliza";
+        }
+
+        // ===== Шарики =====
         function spawnBall(reward, label, className) {
             const ball = document.createElement('div');
             ball.className = 'flying-ball ' + className;
             ball.innerHTML = label;
             ball.style.left = (6 + Math.random() * 80) + 'vw';
-            ball.style.top  = (10 + Math.random() * 68) + 'vh';
+            ball.style.top  = (10 + Math.random() * 65) + 'vh';
             ball.style.animationDuration = (4 + Math.random() * 3) + 's';
-            ball.style.animationDelay = (Math.random() * 2) + 's';
             ball.onclick = function(e) {
                 if (!myId) return;
                 e.stopPropagation();
                 ball.classList.add('ball-explode');
                 playSound();
-                showFloat("+" + reward.toLocaleString('ru'), e.clientX, e.clientY);
+                showFloat("+" + formatNum(reward), e.clientX, e.clientY);
                 myBalance = Math.min(Number(MAX_BALANCE), myBalance + reward);
                 saveUser(); updateUI();
                 setTimeout(() => {
@@ -618,36 +648,40 @@
             setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 700);
         }
 
-        function spawnYobit() {
-            document.querySelectorAll('.ball-yobit').forEach(el => el.remove());
+        function spawnOneYobit() {
             const ball = document.createElement('div');
-            ball.className = 'ball-yobit'; ball.innerHTML = 'Yobit';
-            ball.style.left = (15 + Math.random() * 55) + 'vw';
-            ball.style.top  = (18 + Math.random() * 45) + 'vh';
+            ball.className = 'ball-yobit';
+            ball.innerHTML = 'Yobit';
+            ball.style.left = (10 + Math.random() * 70) + 'vw';
+            ball.style.top  = (12 + Math.random() * 55) + 'vh';
+
             ball.onclick = function(e) {
                 if (!myId) return;
                 e.stopPropagation();
                 ball.classList.add('ball-explode');
                 playSound();
-                showFloat("+" + REWARD_YOBIT.toLocaleString('ru'), e.clientX, e.clientY);
+                showFloat("+" + formatNum(REWARD_YOBIT), e.clientX, e.clientY);
                 myBalance = Math.min(Number(MAX_BALANCE), myBalance + REWARD_YOBIT);
                 saveUser(); updateUI();
                 setTimeout(() => { if (ball.parentNode) ball.remove(); }, 500);
-                scheduleYobit();
             };
             document.body.appendChild(ball);
+
             setTimeout(() => {
                 if (ball.parentNode && !ball.classList.contains('ball-explode')) {
                     ball.classList.add('ball-explode');
                     setTimeout(() => ball.remove(), 500);
-                    scheduleYobit();
                 }
-            }, 25000);
+            }, 20000 + Math.random() * 8000);
         }
 
-        function scheduleYobit() {
-            if (yobitTimer) clearTimeout(yobitTimer);
-            yobitTimer = setTimeout(spawnYobit, (60 + Math.random() * 240) * 1000);
+        function scheduleYobitGroup() {
+            document.querySelectorAll('.ball-yobit').forEach(el => el.remove());
+            spawnOneYobit();
+            setTimeout(spawnOneYobit, 300 + Math.random() * 800);
+            setTimeout(spawnOneYobit, 700 + Math.random() * 1200);
+            const delay = (60 + Math.random() * 120) * 1000;
+            setTimeout(scheduleYobitGroup, delay);
         }
 
         function saveUser() {
@@ -712,11 +746,22 @@
                 if (val === null || val === undefined) {
                     db.ref("global/diceBank").set(START_BANK); diceBank = START_BANK;
                 } else diceBank = Number(val);
-                document.getElementById("diceBank").innerText = Math.floor(diceBank).toLocaleString("ru");
+                document.getElementById("diceBank").innerText = formatNum(diceBank);
             });
 
             db.ref("users").on("value", snap => renderLeaderboard(snap.val()));
-            db.ref("chat").orderByChild("time").limitToLast(40).on("value", snap => renderChat(snap.val()));
+            db.ref("chat").orderByChild("time").limitToLast(50).on("value", snap => renderChat(snap.val()));
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    btn.classList.add('active');
+                    const page = btn.dataset.page;
+                    document.getElementById('page-' + page).classList.add('active');
+                    if (page === 'dice') updateUI();
+                };
+            });
 
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
@@ -739,27 +784,34 @@
             setInterval(() => { if (myId) db.ref("users/" + myId).update({ lastActive: Date.now() }); }, 60000);
 
             startNormalBalls();
-            setTimeout(spawnYobit, 30000 + Math.random() * 60000);
+            setTimeout(scheduleYobitGroup, 20000 + Math.random() * 20000);
         }
 
         function openProcessor() {
-            document.getElementById("mainPage").style.display = "none";
-            document.getElementById("nodePage").style.display = "none";
-            document.getElementById("processorPage").style.display = "block";
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-processor').style.display = 'block';
+            document.getElementById('page-processor').classList.add('active');
             updateProcessorUI();
         }
         function closeProcessor() {
-            document.getElementById("processorPage").style.display = "none";
-            document.getElementById("mainPage").style.display = "block";
+            document.getElementById('page-processor').style.display = 'none';
+            document.getElementById('page-processor').classList.remove('active');
+            document.getElementById('page-miner').classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-page="miner"]').classList.add('active');
         }
         function openNode() {
-            document.getElementById("processorPage").style.display = "none";
-            document.getElementById("nodePage").style.display = "block";
+            document.getElementById('page-processor').style.display = 'none';
+            document.getElementById('page-processor').classList.remove('active');
+            document.getElementById('page-node').style.display = 'block';
+            document.getElementById('page-node').classList.add('active');
             updateNodeUI();
         }
         function closeNode() {
-            document.getElementById("nodePage").style.display = "none";
-            document.getElementById("processorPage").style.display = "block";
+            document.getElementById('page-node').style.display = 'none';
+            document.getElementById('page-node').classList.remove('active');
+            document.getElementById('page-processor').style.display = 'block';
+            document.getElementById('page-processor').classList.add('active');
             updateProcessorUI();
         }
 
@@ -798,14 +850,14 @@
         }
 
         function buyChip() {
-            if (hasChip || myBalance < CHIP_COST) return alert("Нужно 1 триллион LIZA");
+            if (hasChip || myBalance < CHIP_COST) return alert("Недостаточно LIZA");
             myBalance -= CHIP_COST; hasChip = true;
             saveUser(); updateUI(); updateMinerUI(); updateProcessorUI();
             playSound(); showFloat("ЧИП УСТАНОВЛЕН!");
         }
 
         function buyCore() {
-            if (hasCore || myBalance < CORE_COST) return alert("Нужно 25 триллионов LIZA");
+            if (hasCore || myBalance < CORE_COST) return alert("Недостаточно LIZA");
             myBalance -= CORE_COST; hasCore = true;
             saveUser(); updateUI(); updateMinerUI(); updateNodeUI();
             playSound(); showFloat("СЕРДЦЕВИНА УСТАНОВЛЕНА!");
@@ -813,27 +865,27 @@
 
         function burnForUltra() {
             if (!hasCore) return;
-            if (myBalance < BURN_COST) return alert("Нужно 1 триллион LIZA");
+            if (myBalance < BURN_COST) return alert("Недостаточно LIZA");
             myBalance -= BURN_COST;
             ultraQuants++;
-            saveUser();
-            updateUI();
-            updateMinerUI();
-            playSound();
-            showFloat("УЛЬТРА-КВАНТ +" + ultraQuants);
+            saveUser(); updateUI(); updateMinerUI();
+            playSound(); showFloat("УЛЬТРА-КВАНТ +" + ultraQuants);
         }
 
         function updateUI() {
-            document.getElementById("balanceDisplay").innerText = myBalance.toLocaleString("ru");
+            const txt = formatNum(myBalance);
+            document.getElementById("balanceDisplay").innerText = txt;
+            document.getElementById("diceBalanceDisplay").innerText = txt;
+            document.getElementById("diceBal").innerText = txt;
         }
 
         function clickYO() {
             yoClicks++;
-            let add = 170000000;
-            if (yoClicks % 10 === 0) add = 1700000000;
+            let add = 0.0017;
+            if (yoClicks % 10 === 0) add = 0.017;
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
             saveUser(); updateUI();
-            showFloat("+" + add.toLocaleString("ru")); playSound();
+            showFloat("+" + formatNum(add)); playSound();
         }
 
         function updateMinerUI() {
@@ -848,16 +900,15 @@
             const earned = periods * reward;
 
             document.getElementById("minerTimer").innerText = mins + ":" + secs.toString().padStart(2, "0");
-            document.getElementById("minerEarned").innerText = "Намайнено: " + earned.toLocaleString("ru");
-            document.getElementById("minerReward").innerText = reward.toLocaleString("ru");
+            document.getElementById("minerEarned").innerText = "Намайнено: " + formatNum(earned);
+            document.getElementById("minerReward").innerText = formatNum(reward);
             document.getElementById("claimBtn").disabled = periods <= 0;
 
             const cycleInfo = document.getElementById("cycleInfo");
-            if (hasCore) cycleInfo.innerText = "⚡ Цикл: 20 сек (Сердцевина)";
-            else if (hasChip) cycleInfo.innerText = "⚡ Цикл: 40 сек (Чип)";
+            if (hasCore) cycleInfo.innerText = "⚡ Цикл: 20 сек";
+            else if (hasChip) cycleInfo.innerText = "⚡ Цикл: 40 сек";
             else cycleInfo.innerText = "Цикл: 60 сек";
 
-            // Ультра-Квант только визуал
             const ultraCrystal = document.getElementById("ultraCrystal");
             const ultraLabel = document.getElementById("ultraLabel");
             if (ultraQuants > 0) {
@@ -874,9 +925,8 @@
             if (hasCore) {
                 burnBlock.style.display = "block";
                 burnBtn.disabled = myBalance < BURN_COST;
-            } else {
-                burnBlock.style.display = "none";
-            }
+                document.getElementById("burnAmountText").innerText = "Сжигается: " + formatNum(BURN_COST) + " LIZA";
+            } else burnBlock.style.display = "none";
 
             const levelEl = document.getElementById("minerLevel");
             const titleEl = document.getElementById("minerTitle");
@@ -917,11 +967,11 @@
                 upgradeBlock.style.display = "block"; quantumBlock.style.display = "none";
                 const cost = getUpgradeCost();
                 document.getElementById("upgradeBtn").disabled = myBalance < cost;
-                document.getElementById("upgradeCost").innerText = cost.toLocaleString("ru");
+                document.getElementById("upgradeCost").innerText = formatNum(cost);
             } else {
                 upgradeBlock.style.display = "none"; quantumBlock.style.display = "block";
                 quantumBtn.disabled = myBalance < QUANTUM_COST;
-                document.getElementById("quantumInfo").innerText = "100 млрд • 80% • +" + quantumLevel + " млрд";
+                document.getElementById("quantumInfo").innerText = formatNum(QUANTUM_COST) + " • 80%";
             }
         }
 
@@ -936,7 +986,7 @@
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
             minerLastPayout += safe * cycle;
             saveUser(); updateUI(); updateMinerUI();
-            showFloat("+" + earned.toLocaleString("ru")); playSound();
+            showFloat("+" + formatNum(earned)); playSound();
         }
 
         function upgradeMiner() {
@@ -950,24 +1000,24 @@
 
         function sharpenMiner() {
             if (minerLevel < MAX_MINER_LEVEL) return;
-            if (myBalance < QUANTUM_COST) return alert("Нужно 100 миллиардов LIZA");
+            if (myBalance < QUANTUM_COST) return alert("Недостаточно LIZA");
             myBalance -= QUANTUM_COST;
             if (Math.random() < 0.80) {
                 quantumLevel++;
                 saveUser(); updateUI(); updateMinerUI();
-                playSound(); showFloat("Успех! +" + quantumLevel + " млрд");
+                playSound(); showFloat("Успех! +" + quantumLevel);
             } else {
                 minerLevel = Math.max(1, minerLevel - 1);
                 saveUser(); updateUI(); updateMinerUI();
-                showFloat("СГОРЕЛ! -1 уровень");
+                showFloat("СГОРЕЛ! -1");
             }
         }
 
         function buyQuazarite() {
-            if (hasQuazarite || myBalance < QUAZARITE_COST) return alert("Нужно 250 миллиардов LIZA");
+            if (hasQuazarite || myBalance < QUAZARITE_COST) return alert("Недостаточно LIZA");
             myBalance -= QUAZARITE_COST; hasQuazarite = true;
             saveUser(); updateUI(); updateMinerUI();
-            playSound(); showFloat("КВАЗАРИТ ПОЛУЧЕН! ×2");
+            playSound(); showFloat("КВАЗАРИТ ×2");
         }
 
         function playDice(dir) {
@@ -981,12 +1031,12 @@
             if (win) {
                 myBalance += bet;
                 db.ref("global/diceBank").transaction(cur => Math.max(0, (Number(cur) || START_BANK) - bet));
-                el.innerHTML = `<span class="win">ВЫИГРЫШ ${roll.toFixed(2)} → +${bet.toLocaleString("ru")}</span>`;
+                el.innerHTML = `<span class="win">ВЫИГРЫШ ${roll.toFixed(2)} → +${formatNum(bet)}</span>`;
                 playSound();
             } else {
                 myBalance -= bet;
                 db.ref("global/diceBank").transaction(cur => (Number(cur) || START_BANK) + bet);
-                el.innerHTML = `<span class="lose">ПРОИГРЫШ ${roll.toFixed(2)} → -${bet.toLocaleString("ru")}</span>`;
+                el.innerHTML = `<span class="lose">ПРОИГРЫШ ${roll.toFixed(2)} → -${formatNum(bet)}</span>`;
             }
             saveUser(); updateUI();
         }
@@ -1008,7 +1058,14 @@
             const list = Object.values(messages).sort((a, b) => a.time - b.time);
             box.innerHTML = list.map(m => {
                 const t = new Date(m.time).toLocaleTimeString("ru", { hour: "2-digit", minute: "2-digit" });
-                return `<div class="chat-msg"><span class="author">${escapeHtml(m.user)}</span><span class="time">${t}</span><br>${escapeHtml(m.text)}</div>`;
+                const admin = isAdmin(m.user);
+                const adminClass = admin ? " admin" : "";
+                const badge = admin ? '<span class="admin-badge">ADMIN</span>' : "";
+                return `<div class="chat-msg${adminClass}">
+                    <span class="author">${escapeHtml(m.user)}</span>${badge}
+                    <span class="time">${t}</span><br>
+                    ${escapeHtml(m.text)}
+                </div>`;
             }).join("");
             box.scrollTop = box.scrollHeight;
         }
@@ -1030,14 +1087,14 @@
             box.innerHTML = sorted.map((u, i) => `
                 <div class="lb-item">
                     <div class="lb-left"><span class="lb-rank">${i+1}.</span><span class="lb-name">${escapeHtml(u.name)}</span></div>
-                    <span class="lb-bal">${u.balance.toLocaleString("ru")}</span>
+                    <span class="lb-bal">${formatNum(u.balance)}</span>
                 </div>`).join("");
         }
 
         function showFloat(text, x, y) {
             const el = document.createElement("div");
             el.className = "float-plus"; el.innerText = text;
-            if (x && y) { el.style.left = (x - 45) + "px"; el.style.top = (y - 25) + "px"; }
+            if (x && y) { el.style.left = (x - 40) + "px"; el.style.top = (y - 25) + "px"; }
             else { el.style.left = "50%"; el.style.top = "40%"; el.style.transform = "translateX(-50%)"; }
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 1300);
