@@ -578,10 +578,10 @@
         const QUANTUM_COST = 100000000000;   // 100 миллиардов
         const QUANTUM_BONUS = 1000000000;    // +1 миллиард за точку
 
-        const REWARD_BITCOIN = 17000000;
-        const REWARD_YO = 1700000;
-        const REWARD_LIZA = 1700000;
-        const REWARD_YOBIT = 1700000000;
+        const REWARD_BITCOIN = 170000000;
+        const REWARD_YO = 170000000;
+        const REWARD_LIZA = 170000000;
+        const REWARD_YOBIT = 17000000000;
 
         let myId = null;
         let myName = "Игрок";
@@ -808,8 +808,8 @@
 
         function clickYO() {
             yoClicks++;
-            let add = 17000;
-            if (yoClicks % 10 === 0) add = 1700000;
+            let add = 170000000;
+            if (yoClicks % 10 === 0) add = 1700000000;
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
             saveUser();
             updateUI();
