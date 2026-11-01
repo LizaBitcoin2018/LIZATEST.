@@ -174,7 +174,7 @@
         .quazarite-info { color: #d8b4fe; }
         .burn-info { color: #ff66aa; }
 
-        /* Ультра-Квазарный Квант */
+        /* Ультра-Квазарный Квант (только визуал) */
         .ultra-crystal {
             display: none;
             width: 64px; height: 64px;
@@ -409,7 +409,7 @@
                 <div class="miner-level" id="minerLevel">Ур. 1</div>
             </div>
 
-            <!-- Ультра-Квазарный Квант -->
+            <!-- Ультра-Квазарный Квант (только визуал) -->
             <div class="ultra-crystal" id="ultraCrystal"></div>
             <div class="ultra-label" id="ultraLabel">◈ Ультра-Квазарный Квант ×0 ◈</div>
 
@@ -438,7 +438,6 @@
                         <div class="quazarite-info">250 млрд • ×2</div>
                     </div>
                     <button class="processor-btn" id="processorBtn">Процессор</button>
-                    <!-- Кнопка сжигания (появляется после Сердцевины) -->
                     <div style="text-align:center; display:none;" id="burnBlock">
                         <button class="burn-btn" id="burnBtn">Сжечь 1 трлн</button>
                         <div class="burn-info">→ +1 Ультра-Квант</div>
@@ -543,7 +542,7 @@
         const QUAZARITE_COST = 250000000000;
         const CHIP_COST = 1000000000000;
         const CORE_COST = 25000000000000;
-        const BURN_COST = 1000000000000;          // 1 трлн за 1 Ультра-Квант
+        const BURN_COST = 1000000000000;
 
         const REWARD_BITCOIN = 170000000;
         const REWARD_YO = 170000000;
@@ -580,8 +579,7 @@
         function getMinerReward() {
             let reward = getBaseReward() + (quantumLevel * QUANTUM_BONUS);
             if (hasQuazarite) reward *= 2;
-            // Каждый Ультра-Квант даёт ×1.35
-            if (ultraQuants > 0) reward *= Math.pow(1.35, ultraQuants);
+            // Ультра-Кванты больше НЕ дают множитель
             return Math.floor(reward);
         }
 
@@ -813,7 +811,6 @@
             playSound(); showFloat("СЕРДЦЕВИНА УСТАНОВЛЕНА!");
         }
 
-        // ===== СЖИГАНИЕ НА УЛЬТРА-КВАНТ =====
         function burnForUltra() {
             if (!hasCore) return;
             if (myBalance < BURN_COST) return alert("Нужно 1 триллион LIZA");
@@ -860,7 +857,7 @@
             else if (hasChip) cycleInfo.innerText = "⚡ Цикл: 40 сек (Чип)";
             else cycleInfo.innerText = "Цикл: 60 сек";
 
-            // Ультра-Квант визуал
+            // Ультра-Квант только визуал
             const ultraCrystal = document.getElementById("ultraCrystal");
             const ultraLabel = document.getElementById("ultraLabel");
             if (ultraQuants > 0) {
@@ -872,7 +869,6 @@
                 ultraLabel.style.display = "none";
             }
 
-            // Кнопка сжигания (только после Сердцевины)
             const burnBlock = document.getElementById("burnBlock");
             const burnBtn = document.getElementById("burnBtn");
             if (hasCore) {
