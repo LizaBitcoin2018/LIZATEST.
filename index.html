@@ -34,7 +34,6 @@
             50% { opacity: 1; }
         }
 
-        /* Обычные шарики (уменьшены в 2 раза) */
         .flying-ball {
             position: fixed;
             width: 32px;
@@ -62,34 +61,21 @@
         .flying-ball:active { transform: scale(0.88); }
 
         .ball-bitcoin {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(255,230,120,0.75), 
-                rgba(247,147,26,0.55) 60%, 
-                rgba(180,90,0,0.45));
+            background: radial-gradient(circle at 30% 30%, rgba(255,230,120,0.75), rgba(247,147,26,0.55) 60%, rgba(180,90,0,0.45));
             border: 1px solid rgba(255,200,80,0.5);
             font-size: 0.48rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
         .ball-yo {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(150,220,255,0.7), 
-                rgba(0,150,255,0.5) 60%, 
-                rgba(0,80,180,0.4));
+            background: radial-gradient(circle at 30% 30%, rgba(150,220,255,0.7), rgba(0,150,255,0.5) 60%, rgba(0,80,180,0.4));
             border: 1px solid rgba(100,200,255,0.5);
             font-size: 0.65rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         .ball-liza {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(150,255,180,0.7), 
-                rgba(0,200,100,0.5) 60%, 
-                rgba(0,120,60,0.4));
+            background: radial-gradient(circle at 30% 30%, rgba(150,255,180,0.7), rgba(0,200,100,0.5) 60%, rgba(0,120,60,0.4));
             border: 1px solid rgba(100,255,150,0.5);
             font-size: 0.5rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* Большой огненный Yobit */
         .ball-yobit {
             position: fixed;
             width: 90px;
@@ -105,19 +91,10 @@
             z-index: 45;
             user-select: none;
             text-align: center;
-            line-height: 1.1;
             text-shadow: 0 0 8px #fff, 0 0 12px #00f;
-            background: radial-gradient(circle at 30% 25%,
-                rgba(255,255,255,0.9),
-                rgba(180,220,255,0.7) 35%,
-                rgba(0,120,255,0.6) 65%,
-                rgba(0,40,120,0.5));
+            background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.9), rgba(180,220,255,0.7) 35%, rgba(0,120,255,0.6) 65%, rgba(0,40,120,0.5));
             border: 2px solid rgba(200,230,255,0.7);
-            box-shadow:
-                0 0 25px rgba(100,180,255,0.7),
-                0 0 50px rgba(0,100,255,0.4),
-                inset 0 -10px 20px rgba(0,0,80,0.3),
-                inset 0 10px 15px rgba(255,255,255,0.5);
+            box-shadow: 0 0 25px rgba(100,180,255,0.7), 0 0 50px rgba(0,100,255,0.4), inset 0 -10px 20px rgba(0,0,80,0.3), inset 0 10px 15px rgba(255,255,255,0.5);
             animation: yobitFloat 3.5s ease-in-out infinite, yobitGlow 2s ease-in-out infinite alternate;
         }
         @keyframes yobitFloat {
@@ -232,31 +209,72 @@
             margin-bottom: 18px;
         }
 
+        /* Майнер */
         .miner-card {
             background: rgba(30,30,50,0.9);
-            border-radius: 10px;
-            padding: 12px 14px;
+            border-radius: 12px;
+            padding: 14px;
             margin-bottom: 16px;
             border-left: 4px solid #f7931a;
+        }
+        .miner-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
         }
-        .miner-card .title { font-weight: 600; }
-        .miner-card .earned { color: #00ff88; font-size: 0.9rem; margin-top: 3px; }
-        .miner-card .timer { color: #00ffcc; font-weight: bold; font-size: 1.1rem; }
-        .claim-btn {
-            background: #00aa77;
-            color: white;
+        .miner-card .title { font-weight: 600; font-size: 1.05rem; }
+        .miner-level {
+            background: #f7931a;
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .miner-card .earned { color: #00ff88; font-size: 0.95rem; margin-bottom: 4px; }
+        .miner-card .reward-info {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        .miner-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .miner-card .timer { color: #00ffcc; font-weight: bold; font-size: 1.15rem; }
+        .claim-btn, .upgrade-btn {
             border: none;
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .claim-btn {
+            background: #00aa77;
+            color: white;
         }
         .claim-btn:disabled {
             background: #333;
             color: #666;
+            cursor: not-allowed;
+        }
+        .upgrade-btn {
+            background: linear-gradient(90deg, #ff6b00, #ff9500);
+            color: #000;
+        }
+        .upgrade-btn:disabled {
+            background: #444;
+            color: #777;
+            cursor: not-allowed;
+        }
+        .upgrade-cost {
+            font-size: 0.75rem;
+            color: #ffb347;
+            margin-top: 2px;
         }
 
         .dice-panel {
@@ -443,14 +461,25 @@
             </a>
         </div>
 
+        <!-- Майнер -->
         <div class="miner-card">
-            <div>
+            <div class="miner-top">
                 <div class="title">Майнер</div>
-                <div class="earned" id="minerEarned">Намайнено: 0</div>
+                <div class="miner-level" id="minerLevel">Ур. 1</div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;">
+            <div class="earned" id="minerEarned">Намайнено: 0</div>
+            <div class="reward-info">
+                Награда за цикл: <span id="minerReward">17 000 000</span> LIZA
+            </div>
+            <div class="miner-bottom">
                 <div class="timer" id="minerTimer">1:00</div>
-                <button class="claim-btn" id="claimBtn" disabled>Claim</button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="claim-btn" id="claimBtn" disabled>Claim</button>
+                    <div style="text-align:center;">
+                        <button class="upgrade-btn" id="upgradeBtn">Апгрейд</button>
+                        <div class="upgrade-cost" id="upgradeCost">170 000 000</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -518,19 +547,22 @@
         const db = firebase.database();
 
         const MAX_BALANCE = 9223372036854775807n;
-        const MINER_REWARD = 17000000;
+        const BASE_MINER_REWARD = 17000000;
         const CYCLE_MS = 60 * 1000;
         const START_BANK = 9223372036854775807;
+        const MAX_MINER_LEVEL = 100;
+        const GROWTH = 1.05;          // +5% за уровень
 
         const REWARD_BITCOIN = 17000000;
         const REWARD_YO = 1700000;
         const REWARD_LIZA = 1700000;
-        const REWARD_YOBIT = 1700000000;   // 1.7 миллиарда
+        const REWARD_YOBIT = 1700000000;
 
         let myId = null;
         let myName = "Игрок";
         let myBalance = 0;
         let minerLastPayout = Date.now();
+        let minerLevel = 1;
         let yoClicks = 0;
         let diceBank = START_BANK;
         let yobitTimer = null;
@@ -549,12 +581,21 @@
             galaxy.appendChild(s);
         }
 
-        // ===== Обычные шарики =====
+        // Награда майнера (+5% за уровень)
+        function getMinerReward() {
+            return Math.floor(BASE_MINER_REWARD * Math.pow(GROWTH, minerLevel - 1));
+        }
+
+        // Стоимость апгрейда = 10 × текущая награда
+        function getUpgradeCost() {
+            return getMinerReward() * 10;
+        }
+
+        // ===== Шарики =====
         function spawnBall(reward, label, className) {
             const ball = document.createElement('div');
             ball.className = 'flying-ball ' + className;
             ball.innerHTML = label;
-
             ball.style.left = (6 + Math.random() * 80) + 'vw';
             ball.style.top  = (10 + Math.random() * 68) + 'vh';
             ball.style.animationDuration = (4 + Math.random() * 3) + 's';
@@ -563,71 +604,51 @@
             ball.onclick = function(e) {
                 if (!myId) return;
                 e.stopPropagation();
-
                 ball.classList.add('ball-explode');
                 playSound();
                 showFloat("+" + reward.toLocaleString('ru'), e.clientX, e.clientY);
-
                 myBalance = Math.min(Number(MAX_BALANCE), myBalance + reward);
                 saveUser();
                 updateUI();
-
                 setTimeout(() => {
                     if (ball.parentNode) ball.remove();
                     setTimeout(() => spawnBall(reward, label, className), 2000 + Math.random() * 2500);
                 }, 450);
             };
-
             document.body.appendChild(ball);
         }
 
         function startNormalBalls() {
-            // 1 Bitcoin
             spawnBall(REWARD_BITCOIN, 'Bitcoin', 'ball-bitcoin');
-            // 2 YO
             spawnBall(REWARD_YO, 'YO', 'ball-yo');
             setTimeout(() => spawnBall(REWARD_YO, 'YO', 'ball-yo'), 400);
-            // 3 LIZA
             spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza');
             setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 300);
             setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 700);
         }
 
-        // ===== Большой Yobit (появляется 1 раз в 1-5 минут) =====
         function spawnYobit() {
-            // Удаляем старый, если вдруг остался
             document.querySelectorAll('.ball-yobit').forEach(el => el.remove());
-
             const ball = document.createElement('div');
             ball.className = 'ball-yobit';
             ball.innerHTML = 'Yobit';
-
             ball.style.left = (15 + Math.random() * 55) + 'vw';
             ball.style.top  = (18 + Math.random() * 45) + 'vh';
 
             ball.onclick = function(e) {
                 if (!myId) return;
                 e.stopPropagation();
-
                 ball.classList.add('ball-explode');
                 playSound();
                 showFloat("+" + REWARD_YOBIT.toLocaleString('ru'), e.clientX, e.clientY);
-
                 myBalance = Math.min(Number(MAX_BALANCE), myBalance + REWARD_YOBIT);
                 saveUser();
                 updateUI();
-
-                setTimeout(() => {
-                    if (ball.parentNode) ball.remove();
-                }, 500);
-
-                // Планируем следующее появление
+                setTimeout(() => { if (ball.parentNode) ball.remove(); }, 500);
                 scheduleYobit();
             };
-
             document.body.appendChild(ball);
 
-            // Автоудаление через 25 секунд, если не кликнули
             setTimeout(() => {
                 if (ball.parentNode && !ball.classList.contains('ball-explode')) {
                     ball.classList.add('ball-explode');
@@ -639,18 +660,17 @@
 
         function scheduleYobit() {
             if (yobitTimer) clearTimeout(yobitTimer);
-            // Случайный интервал от 1 до 5 минут
-            const delay = (60 + Math.random() * 240) * 1000; // 60–300 сек
+            const delay = (60 + Math.random() * 240) * 1000;
             yobitTimer = setTimeout(spawnYobit, delay);
         }
 
-        // ===== Сохранение =====
         function saveUser() {
             if (!myId) return;
             db.ref("users/" + myId).update({
                 name: myName,
                 balance: myBalance,
                 minerLastPayout: minerLastPayout,
+                minerLevel: minerLevel,
                 lastActive: Date.now(),
                 fromTelegram: myId.startsWith("tg_")
             }).catch(err => console.error("Ошибка сохранения:", err));
@@ -664,9 +684,7 @@
 
             if (tgUser && tgUser.id) {
                 myId = "tg_" + tgUser.id;
-                myName = tgUser.username 
-                    ? "@" + tgUser.username 
-                    : (tgUser.first_name || ("ID" + tgUser.id));
+                myName = tgUser.username ? "@" + tgUser.username : (tgUser.first_name || ("ID" + tgUser.id));
             } else {
                 let guestId = localStorage.getItem("liza_guest_id");
                 if (!guestId) {
@@ -686,15 +704,20 @@
                 if (data) {
                     myBalance = Number(data.balance) || 0;
                     minerLastPayout = data.minerLastPayout || Date.now();
+                    minerLevel = Number(data.minerLevel) || 1;
+                    if (minerLevel < 1) minerLevel = 1;
+                    if (minerLevel > MAX_MINER_LEVEL) minerLevel = MAX_MINER_LEVEL;
                 } else {
                     myBalance = 0;
                     minerLastPayout = Date.now();
+                    minerLevel = 1;
                 }
 
                 userRef.set({
                     name: myName,
                     balance: myBalance,
                     minerLastPayout: minerLastPayout,
+                    minerLevel: minerLevel,
                     lastActive: Date.now(),
                     fromTelegram: myId.startsWith("tg_")
                 });
@@ -707,6 +730,7 @@
                     name: myName,
                     balance: 0,
                     minerLastPayout: Date.now(),
+                    minerLevel: 1,
                     lastActive: Date.now(),
                     fromTelegram: myId.startsWith("tg_")
                 });
@@ -743,6 +767,7 @@
 
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
+            document.getElementById("upgradeBtn").onclick = upgradeMiner;
             document.getElementById("diceLow").onclick = () => playDice("low");
             document.getElementById("diceHigh").onclick = () => playDice("high");
             document.getElementById("chatBtn").onclick = sendChat;
@@ -755,9 +780,7 @@
                 if (myId) db.ref("users/" + myId).update({ lastActive: Date.now() });
             }, 60000);
 
-            // Запускаем шарики
             startNormalBalls();
-            // Первый Yobit через 30–90 секунд после входа, потом каждые 1–5 мин
             setTimeout(spawnYobit, 30000 + Math.random() * 60000);
         }
 
@@ -769,7 +792,6 @@
             yoClicks++;
             let add = 17000;
             if (yoClicks % 10 === 0) add = 1700000;
-
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
             saveUser();
             updateUI();
@@ -784,11 +806,28 @@
             const mins = Math.floor(left / 60000);
             const secs = Math.floor((left % 60000) / 1000);
             const periods = Math.floor(elapsed / CYCLE_MS);
-            const earned = periods * MINER_REWARD;
+            const reward = getMinerReward();
+            const earned = periods * reward;
+            const cost = getUpgradeCost();
 
             document.getElementById("minerTimer").innerText = mins + ":" + secs.toString().padStart(2, "0");
             document.getElementById("minerEarned").innerText = "Намайнено: " + earned.toLocaleString("ru");
+            document.getElementById("minerReward").innerText = reward.toLocaleString("ru");
+            document.getElementById("minerLevel").innerText = "Ур. " + minerLevel;
             document.getElementById("claimBtn").disabled = periods <= 0;
+
+            const upBtn = document.getElementById("upgradeBtn");
+            const costEl = document.getElementById("upgradeCost");
+
+            if (minerLevel >= MAX_MINER_LEVEL) {
+                upBtn.disabled = true;
+                upBtn.innerText = "MAX";
+                costEl.innerText = "Макс. уровень";
+            } else {
+                upBtn.disabled = myBalance < cost;
+                upBtn.innerText = "Апгрейд";
+                costEl.innerText = cost.toLocaleString("ru");
+            }
         }
 
         function claimMiner() {
@@ -797,7 +836,8 @@
             if (periods <= 0) return;
 
             const safe = Math.min(periods, 50);
-            const earned = safe * MINER_REWARD;
+            const reward = getMinerReward();
+            const earned = safe * reward;
 
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
             minerLastPayout += safe * CYCLE_MS;
@@ -807,6 +847,25 @@
             updateMinerUI();
             showFloat("+" + earned.toLocaleString("ru"));
             playSound();
+        }
+
+        function upgradeMiner() {
+            if (minerLevel >= MAX_MINER_LEVEL) return;
+
+            const cost = getUpgradeCost();
+            if (myBalance < cost) {
+                alert("Недостаточно LIZA для апгрейда");
+                return;
+            }
+
+            myBalance -= cost;
+            minerLevel++;
+
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            playSound();
+            showFloat("Уровень " + minerLevel + "!");
         }
 
         function playDice(dir) {
@@ -837,7 +896,6 @@
             const input = document.getElementById("chatInput");
             const text = input.value.trim();
             if (!text || !myId) return;
-
             db.ref("chat").push({
                 user: myName,
                 text: text,
@@ -870,7 +928,6 @@
                 box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
                 return;
             }
-
             const sorted = Object.entries(users)
                 .map(([id, data]) => ({
                     id,
@@ -885,7 +942,6 @@
                 box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
                 return;
             }
-
             box.innerHTML = sorted.map((u, i) => `
                 <div class="lb-item">
                     <div class="lb-left">
@@ -934,7 +990,6 @@
             return d.innerHTML;
         }
 
-        // Запуск
         init();
     </script>
 </body>
