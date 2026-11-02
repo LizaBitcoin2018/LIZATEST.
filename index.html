@@ -583,8 +583,8 @@
         <div class="yo-page">
             <button class="yo-btn-big" id="yoBtn">YO</button>
             <div class="yo-info-big">
-                +0.0017 за клик<br>
-                каждый 10-й клик: <b>+0.017</b>
+                +1 LIZA за клик<br>
+                каждый 10-й клик: <b>+10</b>
             </div>
             <div class="yo-balance">
                 Баланс: <span id="yoBalanceDisplay">0</span> LIZA
@@ -701,23 +701,23 @@
         const BURN_100 = { cost: 100, amount: 10 };
         const BURN_1000 = { cost: 1000, amount: 100 };
 
-        const REWARD_BITCOIN = 0.017;
-        const REWARD_LIZA = 0.017;
-        const REWARD_YOBIT = 0.17;
+        const REWARD_BITCOIN = 1;
+        const REWARD_LIZA = 1;
+        const REWARD_YOBIT = 50;
 
         // Красивые пони
         const PONIES = [
-    { id: 1, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rainbow' },
-    { id: 2, emoji: '<img src="https://i.postimg.cc/28C2dR24/ponysm2.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Pinkie' },
-    { id: 3, emoji: '<img src="https://i.postimg.cc/wjv2P5KR/ponysm3.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rarity' },
-    { id: 4, emoji: '<img src="https://i.postimg.cc/W4qnp212/ponysm4.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Applejack' },
-    { id: 5, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Fluttershy' },
-    { id: 6, emoji: '<img src="https://i.postimg.cc/DfPcwpnp/ponysm6.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Twilight' },
-    { id: 7, emoji: '<img src="https://i.postimg.cc/BQhcx88x/ponysm7.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Spike' },
-    { id: 8, emoji: '<img src="https://i.postimg.cc/9f9d5JLZ/ponysm8.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Celestia' },
-    { id: 9, emoji: '<img src="https://i.postimg.cc/26f4zhtK/ponysm9.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Luna' },
-    { id: 10, emoji: '<img src="https://i.postimg.cc/15Yw8LTS/ponysm10.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Starlight' }
-];
+            { id: 1, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rainbow' },
+            { id: 2, emoji: '<img src="https://i.postimg.cc/28C2dR24/ponysm2.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Pinkie' },
+            { id: 3, emoji: '<img src="https://i.postimg.cc/wjv2P5KR/ponysm3.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rarity' },
+            { id: 4, emoji: '<img src="https://i.postimg.cc/W4qnp212/ponysm4.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Applejack' },
+            { id: 5, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Fluttershy' },
+            { id: 6, emoji: '<img src="https://i.postimg.cc/DfPcwpnp/ponysm6.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Twilight' },
+            { id: 7, emoji: '<img src="https://i.postimg.cc/BQhcx88x/ponysm7.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Spike' },
+            { id: 8, emoji: '<img src="https://i.postimg.cc/9f9d5JLZ/ponysm8.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Celestia' },
+            { id: 9, emoji: '<img src="https://i.postimg.cc/26f4zhtK/ponysm9.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Luna' },
+            { id: 10, emoji: '<img src="https://i.postimg.cc/15Yw8LTS/ponysm10.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Starlight' }
+        ];
 
         let myId = null, myName = "Игрок", myBalance = 0;
         let minerLastPayout = Date.now();
@@ -1108,8 +1108,8 @@
 
         function clickYO() {
             yoClicks++;
-            let add = 0.0017;
-            if (yoClicks % 10 === 0) add = 0.017;
+            let add = 1;
+            if (yoClicks % 10 === 0) add = 10;
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + add);
             saveUser(); updateUI();
             showFloat("+" + formatNum(add)); playSound();
