@@ -38,7 +38,6 @@
         }
         .flying-ball:active { transform: scale(0.88); }
         .ball-bitcoin { background: radial-gradient(circle at 30% 30%, rgba(255,230,120,0.75), rgba(247,147,26,0.55) 60%, rgba(180,90,0,0.45)); border: 1px solid rgba(255,200,80,0.5); font-size: 0.48rem; }
-        .ball-yo { background: radial-gradient(circle at 30% 30%, rgba(150,220,255,0.7), rgba(0,150,255,0.5) 60%, rgba(0,80,180,0.4)); border: 1px solid rgba(100,200,255,0.5); font-size: 0.65rem; }
         .ball-liza { background: radial-gradient(circle at 30% 30%, rgba(150,255,180,0.7), rgba(0,200,100,0.5) 60%, rgba(0,120,60,0.4)); border: 1px solid rgba(100,255,150,0.5); font-size: 0.5rem; }
         .ball-yobit {
             position: fixed; width: 90px; height: 90px; border-radius: 50%;
@@ -77,7 +76,7 @@
         }
         .tab-btn {
             flex: 1; padding: 10px 4px; border: none; background: transparent;
-            color: #888; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            color: #888; font-size: 0.75rem; font-weight: 600; cursor: pointer;
             border-radius: 8px;
         }
         .tab-btn.active {
@@ -111,16 +110,6 @@
             border-radius: 8px; text-decoration: none;
         }
 
-        .yo-wrap { display: flex; flex-direction: column; align-items: center; margin: 18px 0; }
-        .yo-btn {
-            width: 160px; height: 160px; border-radius: 50%;
-            background: linear-gradient(145deg, #00c6ff, #0072ff);
-            border: none; color: white; font-weight: bold; font-size: 2.6rem;
-            cursor: pointer; box-shadow: 0 0 40px rgba(0,150,255,0.7);
-        }
-        .yo-btn:active { transform: scale(0.93); }
-        .yo-info { font-size: 0.85rem; color: #88ccff; text-align: center; margin-top: 10px; line-height: 1.4; }
-
         .yobit-btn {
             display: block; width: 100%; padding: 12px;
             background: linear-gradient(90deg, #f7931a, #ffb347);
@@ -129,66 +118,141 @@
             text-decoration: none; margin-bottom: 16px;
         }
 
-        .miner-card {
-            background: rgba(30,30,50,0.9);
-            border-radius: 12px; padding: 14px; margin-bottom: 16px;
-            border-left: 4px solid #f7931a;
+        /* YO страница */
+        .yo-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            text-align: center;
         }
-        .miner-card.quantum { border-left-color: #00f0ff; box-shadow: 0 0 22px rgba(0,240,255,0.3); }
-        .miner-card.quazarite { border-left-color: #c084fc; box-shadow: 0 0 25px rgba(192,132,252,0.4); }
-        .miner-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .miner-card .title { font-weight: 600; font-size: 1.05rem; }
-        .miner-level {
-            background: #f7931a; color: #000; font-size: 0.8rem;
-            font-weight: bold; padding: 3px 8px; border-radius: 6px;
+        .yo-btn-big {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #00c6ff, #0072ff);
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 3rem;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(0,150,255,0.7);
+            margin-bottom: 20px;
         }
-        .miner-level.quantum-lvl { background: linear-gradient(90deg, #00f0ff, #0080ff); color: #000; }
-        .miner-card .earned { color: #00ff88; font-size: 0.95rem; margin-bottom: 4px; }
-        .miner-card .reward-info { font-size: 0.85rem; color: #aaa; margin-bottom: 10px; }
-        .miner-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .miner-card .timer { color: #00ffcc; font-weight: bold; font-size: 1.15rem; }
+        .yo-btn-big:active { transform: scale(0.93); }
+        .yo-info-big {
+            font-size: 1rem;
+            color: #88ccff;
+            line-height: 1.6;
+        }
+        .yo-balance {
+            margin-top: 15px;
+            font-size: 1.3rem;
+            color: #f7931a;
+            font-weight: bold;
+        }
 
-        .claim-btn, .upgrade-btn, .quantum-btn, .quazarite-btn, .processor-btn, .burn-btn {
-            border: none; padding: 8px 12px; border-radius: 6px;
-            font-weight: bold; cursor: pointer; font-size: 0.9rem;
+        /* ПРОСТОЙ МАЙНЕР */
+        .miner-card {
+            background: rgba(30,30,50,0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(247,147,26,0.3);
+            text-align: center;
         }
-        .claim-btn { background: #00aa77; color: white; }
-        .claim-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
-        .upgrade-btn { background: linear-gradient(90deg, #ff6b00, #ff9500); color: #000; }
-        .upgrade-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
-        .quantum-btn { background: linear-gradient(90deg, #00f0ff, #0080ff); color: #000; box-shadow: 0 0 14px rgba(0,200,255,0.55); }
-        .quantum-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
-        .quazarite-btn { background: linear-gradient(90deg, #c084fc, #a855f7); color: #fff; box-shadow: 0 0 16px rgba(168,85,247,0.6); }
-        .quazarite-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
-        .processor-btn {
-            background: linear-gradient(90deg, #00d4ff, #0066ff);
-            color: #fff; box-shadow: 0 0 18px rgba(0,150,255,0.7);
+        .miner-card .title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f7931a;
+            margin-bottom: 12px;
+        }
+        .miner-card .earned {
+            color: #00ff88;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .miner-card .reward-info {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+        .miner-card .timer {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #00ffcc;
+            margin-bottom: 16px;
+        }
+        .claim-btn {
+            background: linear-gradient(90deg, #00aa77, #00cc88);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0,200,120,0.4);
+        }
+        .claim-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .burn-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #333;
+        }
+        .burn-section h4 {
+            color: #ff66aa;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        .burn-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         .burn-btn {
-            background: linear-gradient(90deg, #ff00cc, #ff0066);
-            color: #fff; box-shadow: 0 0 18px rgba(255,0,100,0.6);
-            margin: 3px 0;
+            background: linear-gradient(90deg, #ff0066, #ff00cc);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255,0,100,0.4);
         }
-        .burn-btn:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
-
-        .upgrade-cost, .quantum-info, .quazarite-info, .burn-info { font-size: 0.75rem; margin-top: 2px; }
-        .upgrade-cost { color: #ffb347; }
-        .quantum-info { color: #00e5ff; }
-        .quazarite-info { color: #d8b4fe; }
-        .burn-info { color: #ff66aa; }
+        .burn-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
 
         .ultra-crystal {
-            display: none; width: 64px; height: 64px; margin: 10px auto 6px;
-            position: relative; transform: rotate(45deg);
+            display: none;
+            width: 64px; height: 64px;
+            margin: 12px auto 6px;
+            position: relative;
+            transform: rotate(45deg);
             background: conic-gradient(from 0deg, #fff, #ff00cc, #00f0ff, #ffff00, #ff00cc, #fff);
             border-radius: 10px;
             box-shadow: 0 0 25px rgba(255,0,200,0.8), 0 0 50px rgba(0,240,255,0.5);
             animation: ultraSpin 4s linear infinite, ultraPulse 2s ease-in-out infinite;
         }
         .ultra-crystal::after {
-            content: '◈'; position: absolute; top: 50%; left: 50%;
+            content: 'YO';
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 1.4rem; color: #fff; text-shadow: 0 0 10px #fff;
+            font-size: 1.1rem; color: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #fff;
         }
         @keyframes ultraSpin { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
         @keyframes ultraPulse {
@@ -196,104 +260,11 @@
             50% { transform: rotate(45deg) scale(1.08); }
         }
         .ultra-label {
-            display: none; text-align: center; font-size: 0.8rem;
-            color: #ff99ff; margin-bottom: 6px;
-        }
-
-        .quazarite-crystal {
-            display: none; width: 54px; height: 54px; margin: 8px auto 4px;
-            position: relative; transform: rotate(45deg);
-            background: linear-gradient(135deg, #e9d5ff, #c084fc, #7c3aed);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(192,132,252,0.8);
-            animation: crystalPulse 2.5s ease-in-out infinite;
-        }
-        .quazarite-crystal::after {
-            content: '◆'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 1.1rem; color: #fff;
-        }
-        @keyframes crystalPulse {
-            0%, 100% { box-shadow: 0 0 18px rgba(192,132,252,0.7); }
-            50% { box-shadow: 0 0 28px rgba(216,180,254,0.95); }
-        }
-        .quazarite-label { display: none; text-align: center; font-size: 0.78rem; color: #e9d5ff; margin-bottom: 6px; }
-
-        .processor-card, .node-card {
-            background: rgba(15,20,40,0.95);
-            border-radius: 16px; padding: 20px;
-            border: 1px solid rgba(0,150,255,0.35);
+            display: none;
             text-align: center;
-        }
-        .node-card {
-            background: radial-gradient(ellipse at center, #1a0a2e 0%, #0a0515 70%);
-            border-color: rgba(192,132,252,0.5);
-        }
-        .processor-card h2, .node-card h2 { color: #00d4ff; font-size: 1.3rem; margin-bottom: 8px; }
-        .node-card h2 { color: #e9d5ff; }
-        .processor-desc, .node-subtitle { color: #88ccff; font-size: 0.9rem; margin-bottom: 16px; }
-
-        .chip-visual {
-            width: 110px; height: 78px; margin: 0 auto 16px;
-            background: linear-gradient(145deg, #1a3a6e, #0a1a3a);
-            border-radius: 10px; border: 2px solid #00aaff;
-            position: relative; box-shadow: 0 0 25px rgba(0,150,255,0.5);
-            animation: chipShimmer 3s ease-in-out infinite;
-        }
-        .chip-visual::before {
-            content: 'CHIP'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-weight: bold; color: #00d4ff;
-        }
-        .crystal-btn {
-            position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
-            width: 28px; height: 28px;
-            background: linear-gradient(135deg, #e9d5ff, #c084fc);
-            border-radius: 6px; border: 1px solid #fff;
-            box-shadow: 0 0 12px rgba(192,132,252,0.9);
-            cursor: pointer; z-index: 3;
-            animation: crystalBtnPulse 2s ease-in-out infinite;
-        }
-        @keyframes crystalBtnPulse {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.1); }
-        }
-        @keyframes chipShimmer {
-            0%, 100% { box-shadow: 0 0 20px rgba(0,150,255,0.4); }
-            50% { box-shadow: 0 0 35px rgba(0,200,255,0.7); }
-        }
-
-        .core-visual {
-            width: 90px; height: 90px; margin: 0 auto 16px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fff, #e9d5ff 20%, #c084fc 50%, #7c3aed);
-            box-shadow: 0 0 30px rgba(192,132,252,0.8);
-            animation: corePulse 2.8s ease-in-out infinite; position: relative;
-        }
-        .core-visual::after {
-            content: '◆'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 1.8rem; color: #fff;
-        }
-        @keyframes corePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.06); }
-        }
-
-        .chip-status, .core-status { font-size: 0.95rem; margin-bottom: 14px; color: #aaa; }
-        .chip-status.owned, .core-status.owned { color: #00ff88; font-weight: bold; }
-
-        .buy-chip-btn, .buy-core-btn {
-            background: linear-gradient(90deg, #00d4ff, #0066ff);
-            color: #fff; border: none; padding: 13px 26px; border-radius: 10px;
-            font-size: 1rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 0 18px rgba(0,150,255,0.55); margin-bottom: 8px;
-        }
-        .buy-chip-btn:disabled, .buy-core-btn:disabled {
-            background: #333; color: #777; box-shadow: none; cursor: not-allowed;
-        }
-        .chip-price, .core-price { font-size: 0.85rem; color: #88ccff; margin-bottom: 16px; }
-        .back-btn {
-            background: rgba(255,255,255,0.1); color: #ccc;
-            border: 1px solid #555; padding: 10px 20px; border-radius: 8px;
-            font-size: 0.95rem; cursor: pointer;
+            font-size: 0.85rem;
+            color: #ff99ff;
+            margin-bottom: 8px;
         }
 
         .dice-panel {
@@ -335,9 +306,7 @@
             color: #00ff88 !important;
             text-shadow: 0 0 8px rgba(0,255,136,0.5);
         }
-        .chat-msg.admin {
-            color: #00ff88;
-        }
+        .chat-msg.admin { color: #00ff88; }
         .chat-msg.admin .admin-badge {
             background: linear-gradient(90deg, #00ff88, #00cc66);
             color: #000;
@@ -385,13 +354,6 @@
             0% { opacity: 1; transform: translateY(0) scale(1); }
             100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
         }
-
-        .burn-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 6px;
-        }
     </style>
 </head>
 <body>
@@ -409,66 +371,52 @@
             <div class="balance-label">Твой баланс</div>
             <div class="balance"><span id="balanceDisplay">0</span> LIZA</div>
             
-            <!-- НОВЫЙ БЛОК УЛЬТРА-КВАНТОВ -->
-            <div class="ultra-balance">◈ Ультра-Квант: <span id="ultraBalanceDisplay">0</span></div>
+            <div class="ultra-balance">◈ YO: <span id="ultraBalanceDisplay">0</span></div>
             <div class="ultra-supply">Собрано: <span id="ultraTotalDisplay">0</span> / 100 000 000</div>
 
             <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="airdrop-btn">AIRDROP 27.12.2026</a>
         </div>
 
-        <div class="miner-card" id="minerCard">
-            <div class="miner-top">
-                <div class="title" id="minerTitle">Майнер</div>
-                <div class="miner-level" id="minerLevel">Ур. 1</div>
-            </div>
+        <div class="miner-card">
+            <div class="title">Майнер</div>
 
             <div class="ultra-crystal" id="ultraCrystal"></div>
-            <div class="ultra-label" id="ultraLabel">◈ Ультра-Квазарный Квант ×0 ◈</div>
-
-            <div class="quazarite-crystal" id="quazariteCrystal"></div>
-            <div class="quazarite-label" id="quazariteLabel">✦ Кристалл Квазарит ✦</div>
+            <div class="ultra-label" id="ultraLabel">◈ YO ×0 ◈</div>
 
             <div class="earned" id="minerEarned">Намайнено: 0</div>
-            <div class="reward-info">
-                Награда за цикл: <span id="minerReward">0.00017</span> LIZA
-                <span id="cycleInfo" style="display:block;font-size:0.8rem;color:#88f;margin-top:2px;"></span>
-            </div>
-            <div class="miner-bottom">
-                <div class="timer" id="minerTimer">1:00</div>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                    <button class="claim-btn" id="claimBtn" disabled>Claim</button>
-                    <div style="text-align:center;" id="upgradeBlock">
-                        <button class="upgrade-btn" id="upgradeBtn">Апгрейд</button>
-                        <div class="upgrade-cost" id="upgradeCost">0.0017</div>
-                    </div>
-                    <div style="text-align:center; display:none;" id="quantumBlock">
-                        <button class="quantum-btn" id="quantumBtn">Заточить</button>
-                        <div class="quantum-info" id="quantumInfo">1 • 80%</div>
-                    </div>
-                    <div style="text-align:center;" id="quazariteBlock">
-                        <button class="quazarite-btn" id="quazariteBtn">Купить Квазарит</button>
-                        <div class="quazarite-info">2.5 • ×2</div>
-                    </div>
-                    <button class="processor-btn" id="processorBtn">Процессор</button>
-                    
-                    <!-- БЛОК СЖИГАНИЯ -->
-                    <div style="text-align:center; display:none;" id="burnBlock">
-                        <div class="burn-buttons">
-                            <button class="burn-btn" id="burnBtn10">Сжечь 10 → +1</button>
-                            <button class="burn-btn" id="burnBtn100">Сжечь 100 → +10</button>
-                            <button class="burn-btn" id="burnBtn1000">Сжечь 1000 → +100</button>
-                        </div>
-                    </div>
+            <div class="reward-info">+1 LIZA каждые 60 секунд</div>
+            
+            <div class="timer" id="minerTimer">1:00</div>
+            
+            <button class="claim-btn" id="claimBtn" disabled>Claim</button>
+
+            <div class="burn-section">
+                <h4>Сжечь LIZA за YO</h4>
+                <div class="burn-buttons">
+                    <button class="burn-btn" id="burnBtn10">Сжечь 10 → +1 YO</button>
+                    <button class="burn-btn" id="burnBtn100">Сжечь 100 → +10 YO</button>
+                    <button class="burn-btn" id="burnBtn1000">Сжечь 1000 → +100 YO</button>
                 </div>
             </div>
         </div>
 
-        <div class="yo-wrap">
-            <button class="yo-btn" id="yoBtn">YO</button>
-            <div class="yo-info">+0.0017 за клик<br>каждый 10-й: <b>+0.017</b></div>
-        </div>
+        <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
+            Торговать LIZA на Yobit
+        </a>
+    </div>
 
-        <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">Торговать LIZA на Yobit</a>
+    <!-- YO -->
+    <div class="page" id="page-yo">
+        <div class="yo-page">
+            <button class="yo-btn-big" id="yoBtn">YO</button>
+            <div class="yo-info-big">
+                +0.0017 за клик<br>
+                каждый 10-й клик: <b>+0.017</b>
+            </div>
+            <div class="yo-balance">
+                Баланс: <span id="yoBalanceDisplay">0</span> LIZA
+            </div>
+        </div>
     </div>
 
     <!-- ДАЙС -->
@@ -513,39 +461,10 @@
         </div>
     </div>
 
-    <!-- Процессор -->
-    <div class="page" id="page-processor" style="display:none;">
-        <div class="processor-card">
-            <h2>⚙ Процессорная</h2>
-            <div class="processor-desc">Установи ускоряющий чип (−20 сек)</div>
-            <div class="chip-visual">
-                <div class="crystal-btn" id="crystalBtn"></div>
-            </div>
-            <div class="chip-status" id="chipStatus">Чип не установлен</div>
-            <button class="buy-chip-btn" id="buyChipBtn">Купить Чип</button>
-            <div class="chip-price">10 LIZA</div>
-            <br>
-            <button class="back-btn" id="backBtn">← Назад</button>
-        </div>
-    </div>
-
-    <!-- Узел -->
-    <div class="page" id="page-node" style="display:none;">
-        <div class="node-card">
-            <h2>Внутрислойный узел</h2>
-            <div class="node-subtitle">Quazarite Intra-Layer Node</div>
-            <div class="core-visual"></div>
-            <div class="core-status" id="coreStatus">Сердцевина не установлена</div>
-            <button class="buy-core-btn" id="buyCoreBtn">Установить Сердцевину</button>
-            <div class="core-price">250 LIZA<br>−20 сек</div>
-            <br>
-            <button class="back-btn" id="backToProcessorBtn">← Назад</button>
-        </div>
-    </div>
-
     <div class="tabs">
         <button class="tab-btn active" data-page="miner">Майнер</button>
         <button class="tab-btn" data-page="dice">Дайс</button>
+        <button class="tab-btn" data-page="yo">YO</button>
         <button class="tab-btn" data-page="chat">Чат</button>
         <button class="tab-btn" data-page="top">Топ 100</button>
     </div>
@@ -572,45 +491,25 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const ADMIN_NAME = "@BitcoinLiza";
-
         const MAX_BALANCE = 9223372036854775807n;
-        const BASE_MINER_REWARD = 0.00017;
-        const BASE_CYCLE_MS = 60 * 1000;
-        const CHIP_CYCLE_MS = 40 * 1000;
-        const CORE_CYCLE_MS = 20 * 1000;
+        const CYCLE_MS = 60 * 1000;
+        const MINER_REWARD = 1;
         const START_BANK = 1e12;
-        const MAX_MINER_LEVEL = 100;
-        const GROWTH = 1.05;
-        const QUANTUM_COST = 1;
-        const QUANTUM_BONUS = 0.01;
-        const QUAZARITE_COST = 2.5;
-        const CHIP_COST = 10;
-        const CORE_COST = 250;
         
-        // Ультра-Кванты
-        const ULTRA_MAX_SUPPLY = 100000000; // 100 миллионов
+        const ULTRA_MAX_SUPPLY = 100000000;
         const BURN_10 = { cost: 10, amount: 1 };
         const BURN_100 = { cost: 100, amount: 10 };
         const BURN_1000 = { cost: 1000, amount: 100 };
 
         const REWARD_BITCOIN = 0.017;
-        const REWARD_YO = 0.017;
         const REWARD_LIZA = 0.017;
         const REWARD_YOBIT = 0.17;
 
         let myId = null, myName = "Игрок", myBalance = 0;
-        let minerLastPayout = Date.now(), minerLevel = 1, quantumLevel = 0;
-        let hasQuazarite = false, hasChip = false, hasCore = false;
+        let minerLastPayout = Date.now();
         let ultraQuants = 0;
-        let ultraTotal = 0; // глобальный соплай
+        let ultraTotal = 0;
         let yoClicks = 0, diceBank = START_BANK;
-
-        function getCycleMs() {
-            if (hasCore) return CORE_CYCLE_MS;
-            if (hasChip) return CHIP_CYCLE_MS;
-            return BASE_CYCLE_MS;
-        }
 
         const galaxy = document.getElementById('galaxy');
         for (let i = 0; i < 70; i++) {
@@ -623,18 +522,6 @@
             galaxy.appendChild(s);
         }
 
-        function getBaseReward() {
-            return BASE_MINER_REWARD * Math.pow(GROWTH, minerLevel - 1);
-        }
-
-        function getMinerReward() {
-            let reward = getBaseReward() + (quantumLevel * QUANTUM_BONUS);
-            if (hasQuazarite) reward *= 2;
-            return reward;
-        }
-
-        function getUpgradeCost() { return getMinerReward() * 10; }
-
         function formatNum(n) {
             if (n === 0) return '0';
             if (Math.abs(n) < 0.000001) return n.toExponential(2);
@@ -644,11 +531,9 @@
 
         function isAdmin(name) {
             if (!name) return false;
-            const clean = name.replace(/^@/, '').toLowerCase();
-            return clean === "bitcoinliza";
+            return name.replace(/^@/, '').toLowerCase() === "bitcoinliza";
         }
 
-        // ===== Шарики =====
         function spawnBall(reward, label, className) {
             const ball = document.createElement('div');
             ball.className = 'flying-ball ' + className;
@@ -674,11 +559,9 @@
 
         function startNormalBalls() {
             spawnBall(REWARD_BITCOIN, 'Bitcoin', 'ball-bitcoin');
-            spawnBall(REWARD_YO, 'YO', 'ball-yo');
-            setTimeout(() => spawnBall(REWARD_YO, 'YO', 'ball-yo'), 400);
             spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza');
-            setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 300);
-            setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 700);
+            setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 400);
+            setTimeout(() => spawnBall(REWARD_LIZA, 'LIZA', 'ball-liza'), 800);
         }
 
         function spawnOneYobit() {
@@ -687,7 +570,6 @@
             ball.innerHTML = 'Yobit';
             ball.style.left = (10 + Math.random() * 70) + 'vw';
             ball.style.top  = (12 + Math.random() * 55) + 'vh';
-
             ball.onclick = function(e) {
                 if (!myId) return;
                 e.stopPropagation();
@@ -699,7 +581,6 @@
                 setTimeout(() => { if (ball.parentNode) ball.remove(); }, 500);
             };
             document.body.appendChild(ball);
-
             setTimeout(() => {
                 if (ball.parentNode && !ball.classList.contains('ball-explode')) {
                     ball.classList.add('ball-explode');
@@ -713,16 +594,18 @@
             spawnOneYobit();
             setTimeout(spawnOneYobit, 300 + Math.random() * 800);
             setTimeout(spawnOneYobit, 700 + Math.random() * 1200);
-            const delay = (60 + Math.random() * 120) * 1000;
-            setTimeout(scheduleYobitGroup, delay);
+            setTimeout(scheduleYobitGroup, (60 + Math.random() * 120) * 1000);
         }
 
         function saveUser() {
             if (!myId) return;
             db.ref("users/" + myId).update({
-                name: myName, balance: myBalance, minerLastPayout, minerLevel,
-                quantumLevel, hasQuazarite, hasChip, hasCore, ultraQuants,
-                lastActive: Date.now(), fromTelegram: myId.startsWith("tg_")
+                name: myName,
+                balance: myBalance,
+                minerLastPayout,
+                ultraQuants,
+                lastActive: Date.now(),
+                fromTelegram: myId.startsWith("tg_")
             }).catch(console.error);
         }
 
@@ -750,31 +633,28 @@
                 if (data) {
                     myBalance = Number(data.balance) || 0;
                     minerLastPayout = data.minerLastPayout || Date.now();
-                    minerLevel = Number(data.minerLevel) || 1;
-                    quantumLevel = Number(data.quantumLevel) || 0;
-                    hasQuazarite = !!data.hasQuazarite;
-                    hasChip = !!data.hasChip;
-                    hasCore = !!data.hasCore;
                     ultraQuants = Number(data.ultraQuants) || 0;
-                    if (minerLevel < 1) minerLevel = 1;
-                    if (minerLevel > MAX_MINER_LEVEL) minerLevel = MAX_MINER_LEVEL;
                 }
                 userRef.update({
-                    name: myName, balance: myBalance, minerLastPayout, minerLevel,
-                    quantumLevel, hasQuazarite, hasChip, hasCore, ultraQuants,
-                    lastActive: Date.now(), fromTelegram: myId.startsWith("tg_")
+                    name: myName,
+                    balance: myBalance,
+                    minerLastPayout,
+                    ultraQuants,
+                    lastActive: Date.now(),
+                    fromTelegram: myId.startsWith("tg_")
                 });
-                updateUI(); updateMinerUI(); updateProcessorUI(); updateNodeUI();
+                updateUI();
+                updateMinerUI();
             });
 
             userRef.on("value", snap => {
                 const data = snap.val();
                 if (data && typeof data.balance !== "undefined" && Number(data.balance) > myBalance) {
-                    myBalance = Number(data.balance); updateUI();
+                    myBalance = Number(data.balance);
+                    updateUI();
                 }
             });
 
-            // Глобальный соплай Ультра-Квантов
             db.ref("global/ultraTotal").on("value", snap => {
                 ultraTotal = Number(snap.val()) || 0;
                 document.getElementById("ultraTotalDisplay").innerText = formatNum(ultraTotal);
@@ -783,8 +663,11 @@
             db.ref("global/diceBank").on("value", snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
-                    db.ref("global/diceBank").set(START_BANK); diceBank = START_BANK;
-                } else diceBank = Number(val);
+                    db.ref("global/diceBank").set(START_BANK);
+                    diceBank = START_BANK;
+                } else {
+                    diceBank = Number(val);
+                }
                 document.getElementById("diceBank").innerText = formatNum(diceBank);
             });
 
@@ -798,23 +681,13 @@
                     btn.classList.add('active');
                     const page = btn.dataset.page;
                     document.getElementById('page-' + page).classList.add('active');
-                    if (page === 'dice') updateUI();
+                    if (page === 'dice' || page === 'yo') updateUI();
                 };
             });
 
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
-            document.getElementById("upgradeBtn").onclick = upgradeMiner;
-            document.getElementById("quantumBtn").onclick = sharpenMiner;
-            document.getElementById("quazariteBtn").onclick = buyQuazarite;
-            document.getElementById("processorBtn").onclick = openProcessor;
-            document.getElementById("backBtn").onclick = closeProcessor;
-            document.getElementById("buyChipBtn").onclick = buyChip;
-            document.getElementById("crystalBtn").onclick = openNode;
-            document.getElementById("backToProcessorBtn").onclick = closeNode;
-            document.getElementById("buyCoreBtn").onclick = buyCore;
             
-            // Кнопки сжигания
             document.getElementById("burnBtn10").onclick = () => burnForUltra(BURN_10);
             document.getElementById("burnBtn100").onclick = () => burnForUltra(BURN_100);
             document.getElementById("burnBtn1000").onclick = () => burnForUltra(BURN_1000);
@@ -831,115 +704,12 @@
             setTimeout(scheduleYobitGroup, 20000 + Math.random() * 20000);
         }
 
-        function openProcessor() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-processor').style.display = 'block';
-            document.getElementById('page-processor').classList.add('active');
-            updateProcessorUI();
-        }
-        function closeProcessor() {
-            document.getElementById('page-processor').style.display = 'none';
-            document.getElementById('page-processor').classList.remove('active');
-            document.getElementById('page-miner').classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector('[data-page="miner"]').classList.add('active');
-        }
-        function openNode() {
-            document.getElementById('page-processor').style.display = 'none';
-            document.getElementById('page-processor').classList.remove('active');
-            document.getElementById('page-node').style.display = 'block';
-            document.getElementById('page-node').classList.add('active');
-            updateNodeUI();
-        }
-        function closeNode() {
-            document.getElementById('page-node').style.display = 'none';
-            document.getElementById('page-node').classList.remove('active');
-            document.getElementById('page-processor').style.display = 'block';
-            document.getElementById('page-processor').classList.add('active');
-            updateProcessorUI();
-        }
-
-        function updateProcessorUI() {
-            const status = document.getElementById("chipStatus");
-            const btn = document.getElementById("buyChipBtn");
-            if (hasChip) {
-                status.innerText = "✅ Чип установлен (−20 сек)";
-                status.className = "chip-status owned";
-                btn.style.display = "none";
-                document.querySelector(".chip-price").style.display = "none";
-            } else {
-                status.innerText = "Чип не установлен";
-                status.className = "chip-status";
-                btn.style.display = "inline-block";
-                document.querySelector(".chip-price").style.display = "block";
-                btn.disabled = myBalance < CHIP_COST;
-            }
-        }
-
-        function updateNodeUI() {
-            const status = document.getElementById("coreStatus");
-            const btn = document.getElementById("buyCoreBtn");
-            if (hasCore) {
-                status.innerText = "✅ Сердцевина установлена (−20 сек)";
-                status.className = "core-status owned";
-                btn.style.display = "none";
-                document.querySelector(".core-price").style.display = "none";
-            } else {
-                status.innerText = "Сердцевина не установлена";
-                status.className = "core-status";
-                btn.style.display = "inline-block";
-                document.querySelector(".core-price").style.display = "block";
-                btn.disabled = myBalance < CORE_COST;
-            }
-        }
-
-        function buyChip() {
-            if (hasChip || myBalance < CHIP_COST) return alert("Недостаточно LIZA");
-            myBalance -= CHIP_COST; hasChip = true;
-            saveUser(); updateUI(); updateMinerUI(); updateProcessorUI();
-            playSound(); showFloat("ЧИП УСТАНОВЛЕН!");
-        }
-
-        function buyCore() {
-            if (hasCore || myBalance < CORE_COST) return alert("Недостаточно LIZA");
-            myBalance -= CORE_COST; hasCore = true;
-            saveUser(); updateUI(); updateMinerUI(); updateNodeUI();
-            playSound(); showFloat("СЕРДЦЕВИНА УСТАНОВЛЕНА!");
-        }
-
-        // ===== НОВАЯ ФУНКЦИЯ СЖИГАНИЯ =====
-        function burnForUltra(option) {
-            if (!hasCore) return alert("Нужна Сердцевина!");
-            if (myBalance < option.cost) return alert("Недостаточно LIZA");
-            
-            if (ultraTotal + option.amount > ULTRA_MAX_SUPPLY) {
-                return alert("Достигнут максимальный соплай Ультра-Квантов (100 млн)!");
-            }
-
-            myBalance -= option.cost;
-            ultraQuants += option.amount;
-
-            // Увеличиваем глобальный соплай
-            db.ref("global/ultraTotal").transaction(current => {
-                const cur = Number(current) || 0;
-                if (cur + option.amount > ULTRA_MAX_SUPPLY) return; // отмена
-                return cur + option.amount;
-            });
-
-            saveUser();
-            updateUI();
-            updateMinerUI();
-            playSound();
-            showFloat("+" + option.amount + " УЛЬТРА-КВАНТ");
-        }
-
         function updateUI() {
             const txt = formatNum(myBalance);
             document.getElementById("balanceDisplay").innerText = txt;
             document.getElementById("diceBalanceDisplay").innerText = txt;
             document.getElementById("diceBal").innerText = txt;
-            
-            // Обновляем баланс ультра-квантов
+            document.getElementById("yoBalanceDisplay").innerText = txt;
             document.getElementById("ultraBalanceDisplay").innerText = formatNum(ultraQuants);
         }
 
@@ -953,138 +723,72 @@
         }
 
         function updateMinerUI() {
-            const cycle = getCycleMs();
             const now = Date.now();
             const elapsed = now - minerLastPayout;
-            const left = cycle - (elapsed % cycle);
+            const left = CYCLE_MS - (elapsed % CYCLE_MS);
             const mins = Math.floor(left / 60000);
             const secs = Math.floor((left % 60000) / 1000);
-            const periods = Math.floor(elapsed / cycle);
-            const reward = getMinerReward();
-            const earned = periods * reward;
+            const periods = Math.floor(elapsed / CYCLE_MS);
+            const earned = periods * MINER_REWARD;
 
             document.getElementById("minerTimer").innerText = mins + ":" + secs.toString().padStart(2, "0");
             document.getElementById("minerEarned").innerText = "Намайнено: " + formatNum(earned);
-            document.getElementById("minerReward").innerText = formatNum(reward);
             document.getElementById("claimBtn").disabled = periods <= 0;
-
-            const cycleInfo = document.getElementById("cycleInfo");
-            if (hasCore) cycleInfo.innerText = "⚡ Цикл: 20 сек";
-            else if (hasChip) cycleInfo.innerText = "⚡ Цикл: 40 сек";
-            else cycleInfo.innerText = "Цикл: 60 сек";
 
             const ultraCrystal = document.getElementById("ultraCrystal");
             const ultraLabel = document.getElementById("ultraLabel");
             if (ultraQuants > 0) {
                 ultraCrystal.style.display = "block";
                 ultraLabel.style.display = "block";
-                ultraLabel.innerText = "◈ Ультра-Квазарный Квант ×" + ultraQuants + " ◈";
+                ultraLabel.innerText = "◈ YO ×" + ultraQuants + " ◈";
             } else {
                 ultraCrystal.style.display = "none";
                 ultraLabel.style.display = "none";
             }
 
-            // Кнопки сжигания
-            const burnBlock = document.getElementById("burnBlock");
-            if (hasCore) {
-                burnBlock.style.display = "block";
-                document.getElementById("burnBtn10").disabled = myBalance < 10 || ultraTotal + 1 > ULTRA_MAX_SUPPLY;
-                document.getElementById("burnBtn100").disabled = myBalance < 100 || ultraTotal + 10 > ULTRA_MAX_SUPPLY;
-                document.getElementById("burnBtn1000").disabled = myBalance < 1000 || ultraTotal + 100 > ULTRA_MAX_SUPPLY;
-            } else {
-                burnBlock.style.display = "none";
-            }
-
-            const levelEl = document.getElementById("minerLevel");
-            const titleEl = document.getElementById("minerTitle");
-            const cardEl = document.getElementById("minerCard");
-            const upgradeBlock = document.getElementById("upgradeBlock");
-            const quantumBlock = document.getElementById("quantumBlock");
-            const quantumBtn = document.getElementById("quantumBtn");
-            const quazariteBtn = document.getElementById("quazariteBtn");
-            const crystal = document.getElementById("quazariteCrystal");
-            const crystalLabel = document.getElementById("quazariteLabel");
-
-            if (hasQuazarite) {
-                crystal.style.display = "block"; crystalLabel.style.display = "block";
-                cardEl.classList.add("quazarite");
-                quazariteBtn.style.display = "none";
-                document.querySelector(".quazarite-info").style.display = "none";
-            } else {
-                crystal.style.display = "none"; crystalLabel.style.display = "none";
-                cardEl.classList.remove("quazarite");
-                quazariteBtn.style.display = "inline-block";
-                document.querySelector(".quazarite-info").style.display = "block";
-                quazariteBtn.disabled = myBalance < QUAZARITE_COST;
-            }
-
-            if (quantumLevel > 0) {
-                titleEl.innerText = hasQuazarite ? "Квазаритный Майнер" : "Квантовый Майнер";
-                levelEl.innerText = "Q+" + quantumLevel;
-                levelEl.classList.add("quantum-lvl");
-                cardEl.classList.add("quantum");
-            } else {
-                titleEl.innerText = hasQuazarite ? "Квазаритный Майнер" : "Майнер";
-                levelEl.innerText = "Ур. " + minerLevel;
-                levelEl.classList.remove("quantum-lvl");
-                if (!hasQuazarite) cardEl.classList.remove("quantum");
-            }
-
-            if (minerLevel < MAX_MINER_LEVEL) {
-                upgradeBlock.style.display = "block"; quantumBlock.style.display = "none";
-                const cost = getUpgradeCost();
-                document.getElementById("upgradeBtn").disabled = myBalance < cost;
-                document.getElementById("upgradeCost").innerText = formatNum(cost);
-            } else {
-                upgradeBlock.style.display = "none"; quantumBlock.style.display = "block";
-                quantumBtn.disabled = myBalance < QUANTUM_COST;
-                document.getElementById("quantumInfo").innerText = formatNum(QUANTUM_COST) + " • 80%";
-            }
+            document.getElementById("burnBtn10").disabled = myBalance < 10 || ultraTotal + 1 > ULTRA_MAX_SUPPLY;
+            document.getElementById("burnBtn100").disabled = myBalance < 100 || ultraTotal + 10 > ULTRA_MAX_SUPPLY;
+            document.getElementById("burnBtn1000").disabled = myBalance < 1000 || ultraTotal + 100 > ULTRA_MAX_SUPPLY;
         }
 
         function claimMiner() {
-            const cycle = getCycleMs();
             const now = Date.now();
-            const periods = Math.floor((now - minerLastPayout) / cycle);
+            const periods = Math.floor((now - minerLastPayout) / CYCLE_MS);
             if (periods <= 0) return;
-            const safe = Math.min(periods, 50);
-            const reward = getMinerReward();
-            const earned = safe * reward;
+
+            const safe = Math.min(periods, 100);
+            const earned = safe * MINER_REWARD;
+
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
-            minerLastPayout += safe * cycle;
-            saveUser(); updateUI(); updateMinerUI();
-            showFloat("+" + formatNum(earned)); playSound();
+            minerLastPayout += safe * CYCLE_MS;
+
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            showFloat("+" + formatNum(earned));
+            playSound();
         }
 
-        function upgradeMiner() {
-            if (minerLevel >= MAX_MINER_LEVEL) return;
-            const cost = getUpgradeCost();
-            if (myBalance < cost) return alert("Недостаточно LIZA");
-            myBalance -= cost; minerLevel++;
-            saveUser(); updateUI(); updateMinerUI();
-            playSound(); showFloat("Уровень " + minerLevel + "!");
-        }
-
-        function sharpenMiner() {
-            if (minerLevel < MAX_MINER_LEVEL) return;
-            if (myBalance < QUANTUM_COST) return alert("Недостаточно LIZA");
-            myBalance -= QUANTUM_COST;
-            if (Math.random() < 0.80) {
-                quantumLevel++;
-                saveUser(); updateUI(); updateMinerUI();
-                playSound(); showFloat("Успех! +" + quantumLevel);
-            } else {
-                minerLevel = Math.max(1, minerLevel - 1);
-                saveUser(); updateUI(); updateMinerUI();
-                showFloat("СГОРЕЛ! -1");
+        function burnForUltra(option) {
+            if (myBalance < option.cost) return alert("Недостаточно LIZA");
+            if (ultraTotal + option.amount > ULTRA_MAX_SUPPLY) {
+                return alert("Достигнут максимальный соплай YO!");
             }
-        }
 
-        function buyQuazarite() {
-            if (hasQuazarite || myBalance < QUAZARITE_COST) return alert("Недостаточно LIZA");
-            myBalance -= QUAZARITE_COST; hasQuazarite = true;
-            saveUser(); updateUI(); updateMinerUI();
-            playSound(); showFloat("КВАЗАРИТ ×2");
+            myBalance -= option.cost;
+            ultraQuants += option.amount;
+
+            db.ref("global/ultraTotal").transaction(current => {
+                const cur = Number(current) || 0;
+                if (cur + option.amount > ULTRA_MAX_SUPPLY) return;
+                return cur + option.amount;
+            });
+
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            playSound();
+            showFloat("+" + option.amount + " YO");
         }
 
         function playDice(dir) {
@@ -1092,9 +796,11 @@
             if (isNaN(bet) || bet <= 0) return alert("Введите ставку");
             if (bet > myBalance) return alert("Недостаточно LIZA");
             if (bet > diceBank) return alert("В банке мало средств");
+
             const roll = Math.random() * 100;
             const win = (dir === "low" && roll < 48) || (dir === "high" && roll > 52);
             const el = document.getElementById("diceResult");
+
             if (win) {
                 myBalance += bet;
                 db.ref("global/diceBank").transaction(cur => Math.max(0, (Number(cur) || START_BANK) - bet));
@@ -1146,23 +852,35 @@
             const sorted = Object.entries(users)
                 .map(([id, data]) => ({ id, name: data.name || "Игрок", balance: Number(data.balance) || 0 }))
                 .filter(u => u.balance > 0 || u.id.startsWith("tg_"))
-                .sort((a, b) => b.balance - a.balance).slice(0, 100);
+                .sort((a, b) => b.balance - a.balance)
+                .slice(0, 100);
+
             if (sorted.length === 0) {
                 box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
                 return;
             }
             box.innerHTML = sorted.map((u, i) => `
                 <div class="lb-item">
-                    <div class="lb-left"><span class="lb-rank">${i+1}.</span><span class="lb-name">${escapeHtml(u.name)}</span></div>
+                    <div class="lb-left">
+                        <span class="lb-rank">${i+1}.</span>
+                        <span class="lb-name">${escapeHtml(u.name)}</span>
+                    </div>
                     <span class="lb-bal">${formatNum(u.balance)}</span>
                 </div>`).join("");
         }
 
         function showFloat(text, x, y) {
             const el = document.createElement("div");
-            el.className = "float-plus"; el.innerText = text;
-            if (x && y) { el.style.left = (x - 40) + "px"; el.style.top = (y - 25) + "px"; }
-            else { el.style.left = "50%"; el.style.top = "40%"; el.style.transform = "translateX(-50%)"; }
+            el.className = "float-plus";
+            el.innerText = text;
+            if (x && y) {
+                el.style.left = (x - 40) + "px";
+                el.style.top = (y - 25) + "px";
+            } else {
+                el.style.left = "50%";
+                el.style.top = "40%";
+                el.style.transform = "translateX(-50%)";
+            }
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 1300);
         }
@@ -1170,9 +888,12 @@
         function playSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.frequency.value = 880; gain.gain.value = 0.12;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 880;
+                gain.gain.value = 0.12;
                 osc.start();
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
                 osc.stop(ctx.currentTime + 0.18);
@@ -1180,7 +901,9 @@
         }
 
         function escapeHtml(text) {
-            const d = document.createElement("div"); d.textContent = text; return d.innerHTML;
+            const d = document.createElement("div");
+            d.textContent = text;
+            return d.innerHTML;
         }
 
         init();
