@@ -76,7 +76,7 @@
         }
         .tab-btn {
             flex: 1; padding: 9px 2px; border: none; background: transparent;
-            color: #888; font-size: 0.68rem; font-weight: 600; cursor: pointer;
+            color: #888; font-size: 0.62rem; font-weight: 600; cursor: pointer;
             border-radius: 8px;
         }
         .tab-btn.active {
@@ -200,6 +200,39 @@
             cursor: not-allowed;
         }
 
+        .upgrade-section {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #333;
+        }
+        .upgrade-section h4 {
+            color: #f7931a;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .upgrade-info {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .upgrade-btn {
+            background: linear-gradient(90deg, #f7931a, #ffb347);
+            color: #000;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(247,147,26,0.4);
+        }
+        .upgrade-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
         .burn-section {
             margin-top: 20px;
             padding-top: 16px;
@@ -263,6 +296,109 @@
             font-size: 0.85rem;
             color: #ff99ff;
             margin-bottom: 8px;
+        }
+
+        /* ===== ПРОЦЕССОР ===== */
+        .processor-header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .processor-header h2 {
+            color: #00e5ff;
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+        .processor-stats {
+            background: rgba(0,40,60,0.6);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(0,200,220,0.3);
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        .processor-stats div { margin: 4px 0; }
+        .chip-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .chip {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .chip.empty {
+            background: rgba(30,30,50,0.8);
+            border: 1px dashed #444;
+            color: #555;
+        }
+        .chip.yo {
+            background: linear-gradient(145deg, #00c8ff, #0066aa, #00ffcc);
+            border: 1px solid #00e5ff;
+            box-shadow: 0 0 8px rgba(0,200,255,0.6), inset 0 0 6px rgba(255,255,255,0.3);
+            text-shadow: 0 0 4px #000;
+        }
+        .chip.liza {
+            background: linear-gradient(145deg, #00ff99, #00aa66, #00ccff);
+            border: 1px solid #00ffaa;
+            box-shadow: 0 0 8px rgba(0,255,150,0.5), inset 0 0 6px rgba(255,255,255,0.25);
+            text-shadow: 0 0 4px #000;
+        }
+        .buy-chip-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .buy-chip-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: #000;
+        }
+        .buy-chip-btn.yo-btn {
+            background: linear-gradient(90deg, #00c8ff, #00ffcc);
+            box-shadow: 0 0 12px rgba(0,200,255,0.4);
+        }
+        .buy-chip-btn.liza-btn {
+            background: linear-gradient(90deg, #00ff99, #00ccff);
+            box-shadow: 0 0 12px rgba(0,255,150,0.4);
+        }
+        .buy-chip-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .chip-claim-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #00aa77, #00cc88);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 18px rgba(0,200,120,0.4);
+        }
+        .chip-claim-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
         /* ===== YOPONY ===== */
@@ -551,17 +687,27 @@
         </div>
 
         <div class="miner-card">
-            <div class="title">Майнер</div>
+            <div class="title">Майнер <span id="minerLevelDisplay">Ур. 1</span></div>
 
             <div class="ultra-crystal" id="ultraCrystal"></div>
             <div class="ultra-label" id="ultraLabel">◈ YO ×0 ◈</div>
 
             <div class="earned" id="minerEarned">Намайнено: 0</div>
-            <div class="reward-info">+1 LIZA каждые 60 секунд</div>
+            <div class="reward-info" id="rewardInfo">+1 LIZA каждые 60 секунд</div>
             
             <div class="timer" id="minerTimer">1:00</div>
             
             <button class="claim-btn" id="claimBtn" disabled>Claim</button>
+
+            <div class="upgrade-section">
+                <h4>Апгрейд майнера</h4>
+                <div class="upgrade-info" id="upgradeInfo">
+                    Следующий уровень: 2<br>
+                    Стоимость: 1000 LIZA<br>
+                    Награда станет: +2 LIZA / мин
+                </div>
+                <button class="upgrade-btn" id="upgradeBtn">Улучшить за 1000 LIZA</button>
+            </div>
 
             <div class="burn-section">
                 <h4>Сжечь LIZA за YO</h4>
@@ -576,6 +722,30 @@
         <a href="https://yobit.net/ru/trade/LIZA/RUR/?bonus=lZgQG" target="_blank" class="yobit-btn">
             Торговать LIZA на Yobit
         </a>
+    </div>
+
+    <!-- ПРОЦЕССОР -->
+    <div class="page" id="page-processor">
+        <div class="processor-header">
+            <h2>🖥 Процессорная</h2>
+            <div style="color:#88ccff;font-size:0.9rem;">64 чипа • сине-зелёный металлик</div>
+        </div>
+
+        <div class="processor-stats">
+            <div>YO-чипов: <b id="yoChipsCount">0</b> → <span id="yoPerMin">0</span> YO/мин</div>
+            <div>LIZA-чипов: <b id="lizaChipsCount">0</b> → <span id="lizaPerMin">0</span> LIZA/мин</div>
+            <div style="margin-top:8px;color:#00ffcc;">Накоплено: <span id="chipEarnedYo">0</span> YO + <span id="chipEarnedLiza">0</span> LIZA</div>
+            <div class="timer" id="chipTimer" style="font-size:1.4rem;margin-top:6px;">1:00</div>
+        </div>
+
+        <div class="chip-grid" id="chipGrid"></div>
+
+        <div class="buy-chip-btns">
+            <button class="buy-chip-btn yo-btn" id="buyYoChipBtn">Купить YO-чип — 20 000 LIZA<br><small>+1 YO / мин</small></button>
+            <button class="buy-chip-btn liza-btn" id="buyLizaChipBtn">Купить LIZA-чип — 10 000 LIZA<br><small>+1 LIZA / мин</small></button>
+        </div>
+
+        <button class="chip-claim-btn" id="chipClaimBtn" disabled>Claim чипы</button>
     </div>
 
     <!-- YO -->
@@ -661,6 +831,7 @@
 
     <div class="tabs">
         <button class="tab-btn active" data-page="miner">Майнер</button>
+        <button class="tab-btn" data-page="processor">Процессор</button>
         <button class="tab-btn" data-page="dice">Дайс</button>
         <button class="tab-btn" data-page="yo">YO</button>
         <button class="tab-btn" data-page="yopony">YOPONY</button>
@@ -692,7 +863,6 @@
 
         const MAX_BALANCE = 9223372036854775807n;
         const CYCLE_MS = 60 * 1000;
-        const MINER_REWARD = 1;
         const START_BANK = 1e12;
         const YOPONY_START_BANK = 5000000;
         
@@ -705,7 +875,13 @@
         const REWARD_LIZA = 1;
         const REWARD_YOBIT = 50;
 
-        // Красивые пони
+        const MAX_MINER_LEVEL = 100;
+        const UPGRADE_COST = 1000;
+
+        const MAX_CHIPS = 64;
+        const YO_CHIP_COST = 20000;
+        const LIZA_CHIP_COST = 10000;
+
         const PONIES = [
             { id: 1, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rainbow' },
             { id: 2, emoji: '<img src="https://i.postimg.cc/28C2dR24/ponysm2.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Pinkie' },
@@ -721,10 +897,16 @@
 
         let myId = null, myName = "Игрок", myBalance = 0;
         let minerLastPayout = Date.now();
+        let minerLevel = 1;
         let ultraQuants = 0;
         let ultraTotal = 0;
         let yoClicks = 0, diceBank = START_BANK;
         let yoponyBank = YOPONY_START_BANK;
+
+        // Процессор
+        let yoChips = 0;
+        let lizaChips = 0;
+        let chipLastPayout = Date.now();
 
         // YOPONY state
         let selectedPony = null;
@@ -755,6 +937,96 @@
         function isAdmin(name) {
             if (!name) return false;
             return name.replace(/^@/, '').toLowerCase() === "bitcoinliza";
+        }
+
+        // ===== ПРОЦЕССОР =====
+        function renderChips() {
+            const grid = document.getElementById('chipGrid');
+            let html = '';
+            const total = yoChips + lizaChips;
+            for (let i = 0; i < MAX_CHIPS; i++) {
+                if (i < yoChips) {
+                    html += `<div class="chip yo">YO</div>`;
+                } else if (i < total) {
+                    html += `<div class="chip liza">LIZA</div>`;
+                } else {
+                    html += `<div class="chip empty">+</div>`;
+                }
+            }
+            grid.innerHTML = html;
+        }
+
+        function updateChipUI() {
+            const now = Date.now();
+            const elapsed = now - chipLastPayout;
+            const left = CYCLE_MS - (elapsed % CYCLE_MS);
+            const mins = Math.floor(left / 60000);
+            const secs = Math.floor((left % 60000) / 1000);
+            const periods = Math.floor(elapsed / CYCLE_MS);
+
+            const earnedYo = periods * yoChips;
+            const earnedLiza = periods * lizaChips;
+
+            document.getElementById('yoChipsCount').innerText = yoChips;
+            document.getElementById('lizaChipsCount').innerText = lizaChips;
+            document.getElementById('yoPerMin').innerText = yoChips;
+            document.getElementById('lizaPerMin').innerText = lizaChips;
+            document.getElementById('chipEarnedYo').innerText = formatNum(earnedYo);
+            document.getElementById('chipEarnedLiza').innerText = formatNum(earnedLiza);
+            document.getElementById('chipTimer').innerText = mins + ":" + secs.toString().padStart(2, "0");
+
+            document.getElementById('chipClaimBtn').disabled = periods <= 0 || (yoChips + lizaChips) === 0;
+
+            const totalChips = yoChips + lizaChips;
+            document.getElementById('buyYoChipBtn').disabled = myBalance < YO_CHIP_COST || totalChips >= MAX_CHIPS;
+            document.getElementById('buyLizaChipBtn').disabled = myBalance < LIZA_CHIP_COST || totalChips >= MAX_CHIPS;
+
+            renderChips();
+        }
+
+        function buyYoChip() {
+            if (yoChips + lizaChips >= MAX_CHIPS) return alert('Все 64 слота заняты!');
+            if (myBalance < YO_CHIP_COST) return alert('Недостаточно LIZA!');
+            myBalance -= YO_CHIP_COST;
+            yoChips++;
+            saveUser();
+            updateUI();
+            updateChipUI();
+            playSound();
+            showFloat('+1 YO-чип');
+        }
+
+        function buyLizaChip() {
+            if (yoChips + lizaChips >= MAX_CHIPS) return alert('Все 64 слота заняты!');
+            if (myBalance < LIZA_CHIP_COST) return alert('Недостаточно LIZA!');
+            myBalance -= LIZA_CHIP_COST;
+            lizaChips++;
+            saveUser();
+            updateUI();
+            updateChipUI();
+            playSound();
+            showFloat('+1 LIZA-чип');
+        }
+
+        function claimChips() {
+            const now = Date.now();
+            const periods = Math.floor((now - chipLastPayout) / CYCLE_MS);
+            if (periods <= 0) return;
+
+            const safe = Math.min(periods, 100);
+            const earnedYo = safe * yoChips;
+            const earnedLiza = safe * lizaChips;
+
+            ultraQuants += earnedYo;
+            myBalance = Math.min(Number(MAX_BALANCE), myBalance + earnedLiza);
+            chipLastPayout += safe * CYCLE_MS;
+
+            saveUser();
+            updateUI();
+            updateChipUI();
+            playSound();
+            if (earnedYo > 0) showFloat('+' + earnedYo + ' YO');
+            if (earnedLiza > 0) setTimeout(() => showFloat('+' + earnedLiza + ' LIZA'), 400);
         }
 
         // ===== YOPONY =====
@@ -793,7 +1065,6 @@
 
             currentBet = betVal;
 
-            // Списываем ставку у игрока и добавляем в банк
             ultraQuants -= currentBet;
             db.ref("global/yoponyBank").transaction(cur => {
                 return (Number(cur) || YOPONY_START_BANK) + currentBet;
@@ -874,10 +1145,9 @@
             if (!canClaim) return;
             const winAmount = currentBet * 5;
 
-            // Забираем выигрыш из банка
             db.ref("global/yoponyBank").transaction(cur => {
                 const bank = Number(cur) || YOPONY_START_BANK;
-                if (bank < winAmount) return bank; // защита
+                if (bank < winAmount) return bank;
                 return bank - winAmount;
             });
 
@@ -980,7 +1250,11 @@
                 name: myName,
                 balance: myBalance,
                 minerLastPayout,
+                minerLevel,
                 ultraQuants,
+                yoChips,
+                lizaChips,
+                chipLastPayout,
                 lastActive: Date.now(),
                 fromTelegram: myId.startsWith("tg_")
             }).catch(console.error);
@@ -1010,18 +1284,29 @@
                 if (data) {
                     myBalance = Number(data.balance) || 0;
                     minerLastPayout = data.minerLastPayout || Date.now();
+                    minerLevel = Number(data.minerLevel) || 1;
+                    if (minerLevel < 1) minerLevel = 1;
+                    if (minerLevel > MAX_MINER_LEVEL) minerLevel = MAX_MINER_LEVEL;
                     ultraQuants = Number(data.ultraQuants) || 0;
+                    yoChips = Number(data.yoChips) || 0;
+                    lizaChips = Number(data.lizaChips) || 0;
+                    chipLastPayout = data.chipLastPayout || Date.now();
                 }
                 userRef.update({
                     name: myName,
                     balance: myBalance,
                     minerLastPayout,
+                    minerLevel,
                     ultraQuants,
+                    yoChips,
+                    lizaChips,
+                    chipLastPayout,
                     lastActive: Date.now(),
                     fromTelegram: myId.startsWith("tg_")
                 });
                 updateUI();
                 updateMinerUI();
+                updateChipUI();
                 renderTracks();
             });
 
@@ -1038,7 +1323,6 @@
                 document.getElementById("ultraTotalDisplay").innerText = formatNum(ultraTotal);
             });
 
-            // Банк YOPONY
             db.ref("global/yoponyBank").on("value", snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
@@ -1071,12 +1355,19 @@
                     btn.classList.add('active');
                     const page = btn.dataset.page;
                     document.getElementById('page-' + page).classList.add('active');
-                    if (page === 'dice' || page === 'yo' || page === 'yopony') updateUI();
+                    if (page === 'dice' || page === 'yo' || page === 'yopony' || page === 'processor') {
+                        updateUI();
+                        if (page === 'processor') updateChipUI();
+                    }
                 };
             });
 
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
+            document.getElementById("upgradeBtn").onclick = upgradeMiner;
+            document.getElementById("buyYoChipBtn").onclick = buyYoChip;
+            document.getElementById("buyLizaChipBtn").onclick = buyLizaChip;
+            document.getElementById("chipClaimBtn").onclick = claimChips;
             document.getElementById("startRaceBtn").onclick = startRace;
             document.getElementById("claimWinBtn").onclick = claimWin;
             
@@ -1090,6 +1381,7 @@
             document.getElementById("chatInput").onkeydown = e => { if (e.key === "Enter") sendChat(); };
 
             setInterval(updateMinerUI, 1000);
+            setInterval(updateChipUI, 1000);
             setInterval(() => { if (myId) db.ref("users/" + myId).update({ lastActive: Date.now() }); }, 60000);
 
             startNormalBalls();
@@ -1122,11 +1414,33 @@
             const mins = Math.floor(left / 60000);
             const secs = Math.floor((left % 60000) / 1000);
             const periods = Math.floor(elapsed / CYCLE_MS);
-            const earned = periods * MINER_REWARD;
+            const rewardPerCycle = minerLevel;
+            const earned = periods * rewardPerCycle;
 
             document.getElementById("minerTimer").innerText = mins + ":" + secs.toString().padStart(2, "0");
             document.getElementById("minerEarned").innerText = "Намайнено: " + formatNum(earned);
             document.getElementById("claimBtn").disabled = periods <= 0;
+
+            document.getElementById("minerLevelDisplay").innerText = "Ур. " + minerLevel;
+            document.getElementById("rewardInfo").innerText = `+${rewardPerCycle} LIZA каждые 60 секунд`;
+
+            const upgradeBtn = document.getElementById("upgradeBtn");
+            const upgradeInfo = document.getElementById("upgradeInfo");
+
+            if (minerLevel >= MAX_MINER_LEVEL) {
+                upgradeInfo.innerHTML = `Максимальный уровень достигнут!<br>Награда: +${minerLevel} LIZA / мин`;
+                upgradeBtn.disabled = true;
+                upgradeBtn.innerText = "Макс. уровень";
+            } else {
+                const nextLevel = minerLevel + 1;
+                upgradeInfo.innerHTML = `
+                    Следующий уровень: ${nextLevel}<br>
+                    Стоимость: ${UPGRADE_COST} LIZA<br>
+                    Награда станет: +${nextLevel} LIZA / мин
+                `;
+                upgradeBtn.disabled = myBalance < UPGRADE_COST;
+                upgradeBtn.innerText = `Улучшить за ${UPGRADE_COST} LIZA`;
+            }
 
             const ultraCrystal = document.getElementById("ultraCrystal");
             const ultraLabel = document.getElementById("ultraLabel");
@@ -1150,7 +1464,8 @@
             if (periods <= 0) return;
 
             const safe = Math.min(periods, 100);
-            const earned = safe * MINER_REWARD;
+            const rewardPerCycle = minerLevel;
+            const earned = safe * rewardPerCycle;
 
             myBalance = Math.min(Number(MAX_BALANCE), myBalance + earned);
             minerLastPayout += safe * CYCLE_MS;
@@ -1160,6 +1475,20 @@
             updateMinerUI();
             showFloat("+" + formatNum(earned));
             playSound();
+        }
+
+        function upgradeMiner() {
+            if (minerLevel >= MAX_MINER_LEVEL) return alert("Максимальный уровень уже достигнут!");
+            if (myBalance < UPGRADE_COST) return alert("Недостаточно LIZA!");
+
+            myBalance -= UPGRADE_COST;
+            minerLevel++;
+
+            saveUser();
+            updateUI();
+            updateMinerUI();
+            playSound();
+            showFloat("Уровень " + minerLevel + "!");
         }
 
         function burnForUltra(option) {
