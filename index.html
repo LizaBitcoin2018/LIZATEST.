@@ -72,11 +72,11 @@
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
             display: flex; background: rgba(10,10,20,0.97);
             border-top: 1px solid #333;
-            padding: 6px 4px env(safe-area-inset-bottom);
+            padding: 6px 2px env(safe-area-inset-bottom);
         }
         .tab-btn {
-            flex: 1; padding: 10px 4px; border: none; background: transparent;
-            color: #888; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            flex: 1; padding: 9px 2px; border: none; background: transparent;
+            color: #888; font-size: 0.68rem; font-weight: 600; cursor: pointer;
             border-radius: 8px;
         }
         .tab-btn.active {
@@ -118,7 +118,6 @@
             text-decoration: none; margin-bottom: 16px;
         }
 
-        /* YO страница */
         .yo-page {
             display: flex;
             flex-direction: column;
@@ -153,7 +152,6 @@
             font-weight: bold;
         }
 
-        /* ПРОСТОЙ МАЙНЕР */
         .miner-card {
             background: rgba(30,30,50,0.95);
             border-radius: 16px;
@@ -265,6 +263,181 @@
             font-size: 0.85rem;
             color: #ff99ff;
             margin-bottom: 8px;
+        }
+
+        /* ===== YOPONY ===== */
+        .yopony-header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .yopony-header h2 {
+            color: #ff99ff;
+            font-size: 1.35rem;
+            margin-bottom: 4px;
+        }
+        .yopony-balance {
+            color: #f7931a;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .yopony-bank {
+            text-align: center;
+            color: #00ffcc;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 6px 0 10px;
+            background: rgba(0,255,200,0.08);
+            padding: 6px;
+            border-radius: 8px;
+        }
+        .race-info {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+        }
+        .bet-input-wrap {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+        .bet-input-wrap input {
+            width: 110px;
+            background: #1a1a2e;
+            border: 1px solid #555;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .bet-input-wrap span {
+            color: #ff99ff;
+            font-weight: bold;
+        }
+        .race-track {
+            background: rgba(20,20,40,0.95);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+            margin-bottom: 12px;
+        }
+        .track-row {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-bottom: 1px solid #2a2a2a;
+            height: 44px;
+        }
+        .track-row:last-child { border-bottom: none; }
+        .track-row.winner {
+            background: rgba(0,255,136,0.15);
+        }
+        .track-num {
+            width: 26px;
+            font-weight: bold;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        .pony-icon {
+            width: 34px;
+            font-size: 1.45rem;
+            text-align: center;
+        }
+        .pony-name {
+            width: 70px;
+            font-size: 0.72rem;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .track-line {
+            flex: 1;
+            height: 7px;
+            background: #222;
+            border-radius: 4px;
+            position: relative;
+            margin: 0 6px;
+            overflow: visible;
+        }
+        .pony-runner {
+            position: absolute;
+            left: 0;
+            top: -13px;
+            font-size: 1.5rem;
+            transition: left 0.07s linear;
+            z-index: 2;
+        }
+        .pony-runner.running {
+            animation: ponyRun 0.22s infinite;
+        }
+        @keyframes ponyRun {
+            0%, 100% { transform: translateY(0) rotate(-6deg); }
+            50% { transform: translateY(-9px) rotate(6deg); }
+        }
+        .bet-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .bet-btn:disabled {
+            background: #444;
+            color: #777;
+            cursor: not-allowed;
+        }
+        .bet-btn.selected {
+            background: #f59e0b;
+            box-shadow: 0 0 10px rgba(245,158,11,0.6);
+        }
+        .race-controls {
+            text-align: center;
+            margin-top: 6px;
+        }
+        .start-race-btn {
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 18px rgba(168,85,247,0.5);
+        }
+        .start-race-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .claim-win-btn {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            margin-top: 10px;
+            box-shadow: 0 0 18px rgba(34,197,94,0.5);
+        }
+        .race-status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.92rem;
+            min-height: 22px;
+            color: #ff99ff;
+            font-weight: 600;
         }
 
         .dice-panel {
@@ -419,6 +592,31 @@
         </div>
     </div>
 
+    <!-- ===== YOPONY ===== -->
+    <div class="page" id="page-yopony">
+        <div class="yopony-header">
+            <h2>🦄 YOPONY RACE</h2>
+            <div class="yopony-balance">Твой YO: <span id="yoponyBalance">0</span></div>
+        </div>
+
+        <div class="yopony-bank">Банк: <span id="yoponyBankDisplay">5 000 000</span> YO</div>
+
+        <div class="race-info">Выбери пони → укажи ставку → Старт • Выигрыш <b>×5</b></div>
+
+        <div class="bet-input-wrap">
+            <input type="number" id="ponyBetAmount" value="1" min="1" step="1">
+            <span>YO</span>
+        </div>
+
+        <div class="race-track" id="raceTrack"></div>
+
+        <div class="race-controls">
+            <button class="start-race-btn" id="startRaceBtn">СТАРТ ЗАБЕГА</button>
+            <button class="claim-win-btn" id="claimWinBtn">🎉 CLAIM ×5</button>
+        </div>
+        <div class="race-status" id="raceStatus">Выбери пони и укажи сумму ставки</div>
+    </div>
+
     <!-- ДАЙС -->
     <div class="page" id="page-dice">
         <div class="balance-block">
@@ -465,8 +663,9 @@
         <button class="tab-btn active" data-page="miner">Майнер</button>
         <button class="tab-btn" data-page="dice">Дайс</button>
         <button class="tab-btn" data-page="yo">YO</button>
+        <button class="tab-btn" data-page="yopony">YOPONY</button>
         <button class="tab-btn" data-page="chat">Чат</button>
-        <button class="tab-btn" data-page="top">Топ 100</button>
+        <button class="tab-btn" data-page="top">Топ</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -495,6 +694,7 @@
         const CYCLE_MS = 60 * 1000;
         const MINER_REWARD = 1;
         const START_BANK = 1e12;
+        const YOPONY_START_BANK = 5000000;
         
         const ULTRA_MAX_SUPPLY = 100000000;
         const BURN_10 = { cost: 10, amount: 1 };
@@ -505,11 +705,34 @@
         const REWARD_LIZA = 0.017;
         const REWARD_YOBIT = 0.17;
 
+        // Красивые пони
+        const PONIES = [
+    { id: 1, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rainbow' },
+    { id: 2, emoji: '<img src="https://i.postimg.cc/28C2dR24/ponysm2.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Pinkie' },
+    { id: 3, emoji: '<img src="https://i.postimg.cc/wjv2P5KR/ponysm3.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rarity' },
+    { id: 4, emoji: '<img src="https://i.postimg.cc/W4qnp212/ponysm4.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Applejack' },
+    { id: 5, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Fluttershy' },
+    { id: 6, emoji: '<img src="https://i.postimg.cc/DfPcwpnp/ponysm6.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Twilight' },
+    { id: 7, emoji: '<img src="https://i.postimg.cc/BQhcx88x/ponysm7.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Spike' },
+    { id: 8, emoji: '<img src="https://i.postimg.cc/9f9d5JLZ/ponysm8.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Celestia' },
+    { id: 9, emoji: '<img src="https://i.postimg.cc/26f4zhtK/ponysm9.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Luna' },
+    { id: 10, emoji: '<img src="https://i.postimg.cc/15Yw8LTS/ponysm10.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Starlight' }
+];
+
         let myId = null, myName = "Игрок", myBalance = 0;
         let minerLastPayout = Date.now();
         let ultraQuants = 0;
         let ultraTotal = 0;
         let yoClicks = 0, diceBank = START_BANK;
+        let yoponyBank = YOPONY_START_BANK;
+
+        // YOPONY state
+        let selectedPony = null;
+        let currentBet = 0;
+        let isRacing = false;
+        let raceWinner = null;
+        let canClaim = false;
+        let raceInterval = null;
 
         const galaxy = document.getElementById('galaxy');
         for (let i = 0; i < 70; i++) {
@@ -526,7 +749,7 @@
             if (n === 0) return '0';
             if (Math.abs(n) < 0.000001) return n.toExponential(2);
             if (Math.abs(n) < 1) return parseFloat(n.toFixed(8)).toString();
-            return n.toLocaleString('ru', { maximumFractionDigits: 8 });
+            return n.toLocaleString('ru', { maximumFractionDigits: 0 });
         }
 
         function isAdmin(name) {
@@ -534,6 +757,160 @@
             return name.replace(/^@/, '').toLowerCase() === "bitcoinliza";
         }
 
+        // ===== YOPONY =====
+        function renderTracks() {
+            const track = document.getElementById('raceTrack');
+            track.innerHTML = PONIES.map(p => `
+                <div class="track-row" id="track-${p.id}">
+                    <div class="track-num">#${p.id}</div>
+                    <div class="pony-icon">${p.emoji}</div>
+                    <div class="pony-name">${p.name}</div>
+                    <div class="track-line">
+                        <div class="pony-runner" id="runner-${p.id}">${p.emoji}</div>
+                    </div>
+                    <button class="bet-btn" id="bet-${p.id}" onclick="selectPony(${p.id})">Выбрать</button>
+                </div>
+            `).join('');
+        }
+
+        function selectPony(id) {
+            if (isRacing) return;
+            selectedPony = id;
+            document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('bet-' + id).classList.add('selected');
+            const betVal = parseFloat(document.getElementById('ponyBetAmount').value) || 1;
+            document.getElementById('raceStatus').innerText = `Выбрана ${PONIES[id-1].name} • Ставка: ${betVal} YO`;
+        }
+
+        function startRace() {
+            if (isRacing) return;
+            if (!selectedPony) return alert('Сначала выбери пони!');
+
+            const betVal = parseFloat(document.getElementById('ponyBetAmount').value);
+            if (isNaN(betVal) || betVal < 1) return alert('Минимальная ставка 1 YO');
+            if (betVal > ultraQuants) return alert('Недостаточно YO!');
+            if (betVal * 5 > yoponyBank) return alert('В банке недостаточно YO для выплаты ×5');
+
+            currentBet = betVal;
+
+            // Списываем ставку у игрока и добавляем в банк
+            ultraQuants -= currentBet;
+            db.ref("global/yoponyBank").transaction(cur => {
+                return (Number(cur) || YOPONY_START_BANK) + currentBet;
+            });
+
+            saveUser();
+            updateUI();
+
+            isRacing = true;
+            canClaim = false;
+            raceWinner = null;
+            document.getElementById('startRaceBtn').disabled = true;
+            document.getElementById('claimWinBtn').style.display = 'none';
+            document.getElementById('raceStatus').innerText = '🏁 Забег начался!';
+
+            PONIES.forEach(p => {
+                const runner = document.getElementById('runner-' + p.id);
+                runner.style.left = '0%';
+                runner.classList.add('running');
+                document.getElementById('track-' + p.id).classList.remove('winner');
+            });
+
+            playGallopMusic();
+
+            const duration = 17000;
+            const startTime = Date.now();
+            const speeds = PONIES.map(() => 0.72 + Math.random() * 0.55);
+
+            raceInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                PONIES.forEach((p, i) => {
+                    const runner = document.getElementById('runner-' + p.id);
+                    const pos = Math.min(progress * speeds[i] * 100 + Math.sin(elapsed/160 + i)*3, 95);
+                    runner.style.left = pos + '%';
+                });
+
+                if (progress >= 1) {
+                    clearInterval(raceInterval);
+                    finishRace();
+                }
+            }, 40);
+        }
+
+        function finishRace() {
+            isRacing = false;
+
+            PONIES.forEach(p => {
+                document.getElementById('runner-' + p.id).classList.remove('running');
+            });
+
+            const positions = PONIES.map(p => {
+                const runner = document.getElementById('runner-' + p.id);
+                return { id: p.id, left: parseFloat(runner.style.left) };
+            });
+            positions.sort((a, b) => b.left - a.left);
+            raceWinner = positions[0].id;
+
+            document.getElementById('track-' + raceWinner).classList.add('winner');
+            document.getElementById('runner-' + raceWinner).style.left = '95%';
+
+            if (selectedPony === raceWinner) {
+                canClaim = true;
+                const winAmount = currentBet * 5;
+                document.getElementById('raceStatus').innerText = `🎉 ${PONIES[raceWinner-1].name} победила! Выигрыш: ${winAmount} YO`;
+                document.getElementById('claimWinBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('raceStatus').innerText = `Победила ${PONIES[raceWinner-1].name}. Ты ставил на ${PONIES[selectedPony-1].name}`;
+            }
+
+            document.getElementById('startRaceBtn').disabled = false;
+            selectedPony = null;
+            document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('selected'));
+        }
+
+        function claimWin() {
+            if (!canClaim) return;
+            const winAmount = currentBet * 5;
+
+            // Забираем выигрыш из банка
+            db.ref("global/yoponyBank").transaction(cur => {
+                const bank = Number(cur) || YOPONY_START_BANK;
+                if (bank < winAmount) return bank; // защита
+                return bank - winAmount;
+            });
+
+            ultraQuants += winAmount;
+            canClaim = false;
+            document.getElementById('claimWinBtn').style.display = 'none';
+            document.getElementById('raceStatus').innerText = `Получено +${winAmount} YO!`;
+            saveUser();
+            updateUI();
+            playSound();
+            showFloat('+' + winAmount + ' YO');
+        }
+
+        function playGallopMusic() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                for (let i = 0; i < 32; i++) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 100 + Math.random() * 60;
+                    gain.gain.value = 0.07;
+                    const t = now + i * 0.19;
+                    osc.start(t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+                    osc.stop(t + 0.08);
+                }
+            } catch(e) {}
+        }
+
+        // ===== Остальной код =====
         function spawnBall(reward, label, className) {
             const ball = document.createElement('div');
             ball.className = 'flying-ball ' + className;
@@ -645,6 +1022,7 @@
                 });
                 updateUI();
                 updateMinerUI();
+                renderTracks();
             });
 
             userRef.on("value", snap => {
@@ -658,6 +1036,18 @@
             db.ref("global/ultraTotal").on("value", snap => {
                 ultraTotal = Number(snap.val()) || 0;
                 document.getElementById("ultraTotalDisplay").innerText = formatNum(ultraTotal);
+            });
+
+            // Банк YOPONY
+            db.ref("global/yoponyBank").on("value", snap => {
+                const val = snap.val();
+                if (val === null || val === undefined) {
+                    db.ref("global/yoponyBank").set(YOPONY_START_BANK);
+                    yoponyBank = YOPONY_START_BANK;
+                } else {
+                    yoponyBank = Number(val);
+                }
+                document.getElementById("yoponyBankDisplay").innerText = formatNum(yoponyBank);
             });
 
             db.ref("global/diceBank").on("value", snap => {
@@ -681,12 +1071,14 @@
                     btn.classList.add('active');
                     const page = btn.dataset.page;
                     document.getElementById('page-' + page).classList.add('active');
-                    if (page === 'dice' || page === 'yo') updateUI();
+                    if (page === 'dice' || page === 'yo' || page === 'yopony') updateUI();
                 };
             });
 
             document.getElementById("yoBtn").onclick = clickYO;
             document.getElementById("claimBtn").onclick = claimMiner;
+            document.getElementById("startRaceBtn").onclick = startRace;
+            document.getElementById("claimWinBtn").onclick = claimWin;
             
             document.getElementById("burnBtn10").onclick = () => burnForUltra(BURN_10);
             document.getElementById("burnBtn100").onclick = () => burnForUltra(BURN_100);
@@ -711,6 +1103,7 @@
             document.getElementById("diceBal").innerText = txt;
             document.getElementById("yoBalanceDisplay").innerText = txt;
             document.getElementById("ultraBalanceDisplay").innerText = formatNum(ultraQuants);
+            document.getElementById("yoponyBalance").innerText = formatNum(ultraQuants);
         }
 
         function clickYO() {
@@ -905,6 +1298,8 @@
             d.textContent = text;
             return d.innerHTML;
         }
+
+        window.selectPony = selectPony;
 
         init();
     </script>
