@@ -73,11 +73,12 @@
             display: flex; background: rgba(10,10,20,0.97);
             border-top: 1px solid #333;
             padding: 6px 2px env(safe-area-inset-bottom);
+            overflow-x: auto;
         }
         .tab-btn {
-            flex: 1; padding: 9px 2px; border: none; background: transparent;
-            color: #888; font-size: 0.62rem; font-weight: 600; cursor: pointer;
-            border-radius: 8px;
+            flex: 1; min-width: 48px; padding: 9px 2px; border: none; background: transparent;
+            color: #888; font-size: 0.58rem; font-weight: 600; cursor: pointer;
+            border-radius: 8px; white-space: nowrap;
         }
         .tab-btn.active {
             color: #f7931a;
@@ -347,12 +348,6 @@
             box-shadow: 0 0 8px rgba(0,200,255,0.6), inset 0 0 6px rgba(255,255,255,0.3);
             text-shadow: 0 0 4px #000;
         }
-        .chip.liza {
-            background: linear-gradient(145deg, #00ff99, #00aa66, #00ccff);
-            border: 1px solid #00ffaa;
-            box-shadow: 0 0 8px rgba(0,255,150,0.5), inset 0 0 6px rgba(255,255,255,0.25);
-            text-shadow: 0 0 4px #000;
-        }
         .buy-chip-btns {
             display: flex;
             flex-direction: column;
@@ -372,10 +367,6 @@
             background: linear-gradient(90deg, #00c8ff, #00ffcc);
             box-shadow: 0 0 12px rgba(0,200,255,0.4);
         }
-        .buy-chip-btn.liza-btn {
-            background: linear-gradient(90deg, #00ff99, #00ccff);
-            box-shadow: 0 0 12px rgba(0,255,150,0.4);
-        }
         .buy-chip-btn:disabled {
             background: #333;
             color: #777;
@@ -393,8 +384,99 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 0 18px rgba(0,200,120,0.4);
+            margin-bottom: 12px;
         }
         .chip-claim-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btc-section {
+            margin-top: 14px;
+            padding: 14px;
+            background: rgba(40,30,0,0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(247,147,26,0.4);
+            text-align: center;
+        }
+        .btc-section h4 {
+            color: #f7931a;
+            margin-bottom: 10px;
+        }
+        .btc-info {
+            font-size: 0.92rem;
+            color: #ccc;
+            margin-bottom: 12px;
+            line-height: 1.55;
+        }
+        .btc-info b { color: #fff; }
+        .btc-burn-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(90deg, #f7931a, #ffb347);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(247,147,26,0.5);
+        }
+        .btc-burn-btn:disabled {
+            background: #333;
+            color: #777;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .sharpen-section {
+            margin-top: 10px;
+            padding: 14px;
+            background: rgba(40,0,40,0.55);
+            border-radius: 12px;
+            border: 1px solid rgba(255,0,150,0.35);
+            display: none;
+        }
+        .sharpen-section h4 {
+            color: #ff66cc;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+        .sharpen-info {
+            font-size: 0.85rem;
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 1.45;
+        }
+        .sharpen-warning {
+            background: rgba(255,0,0,0.18);
+            border: 1px solid #ff4444;
+            color: #ff8888;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            text-align: center;
+            display: none;
+            line-height: 1.4;
+        }
+        .sharpen-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(90deg, #ff00aa, #aa00ff);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255,0,170,0.5);
+        }
+        .sharpen-btn:disabled {
             background: #333;
             color: #777;
             box-shadow: none;
@@ -411,11 +493,47 @@
             font-size: 1.35rem;
             margin-bottom: 4px;
         }
-        .yopony-balance {
-            color: #f7931a;
-            font-size: 1.1rem;
-            font-weight: bold;
+        .yopony-balances {
+            background: rgba(0,0,0,0.25);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            text-align: center;
         }
+        .yopony-balances div { margin: 3px 0; }
+        .yopony-balances b { color: #fff; }
+
+        .currency-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .currency-btn {
+            flex: 1;
+            padding: 10px 4px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            background: #333;
+            color: #aaa;
+        }
+        .currency-btn.active {
+            background: linear-gradient(90deg, #00aaff, #0066ff);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0,150,255,0.5);
+        }
+        .currency-btn.yo.active {
+            background: linear-gradient(90deg, #ff00aa, #aa00ff);
+        }
+        .currency-btn.btc.active {
+            background: linear-gradient(90deg, #f7931a, #ffb347);
+            color: #000;
+        }
+
         .yopony-bank {
             text-align: center;
             color: #00ffcc;
@@ -576,15 +694,23 @@
             font-weight: 600;
         }
 
+        /* ===== DICE ===== */
         .dice-panel {
             background: rgba(20,20,40,0.95); border-radius: 12px; padding: 16px;
             border: 1px solid rgba(0,150,255,0.3);
+            margin-bottom: 16px;
         }
-        .dice-panel h4 { color: #00aaff; text-align: center; margin-bottom: 10px; }
-        .dice-balance {
-            text-align: center; color: #f7931a; font-size: 1.1rem;
-            font-weight: bold; margin-bottom: 8px;
+        .dice-panel h4 { color: #00aaff; text-align: center; margin-bottom: 12px; }
+        .dice-balances {
+            background: rgba(0,0,0,0.25);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
+        .dice-balances div { margin: 3px 0; }
+        .dice-balances b { color: #fff; }
         .dice-bank { text-align: center; color: #ffcc00; font-size: 0.9rem; margin-bottom: 12px; }
         #diceBet {
             width: 100%; background: #1a1a2e; border: 1px solid #444;
@@ -597,8 +723,62 @@
         }
         .dice-btn.low { background: linear-gradient(90deg, #0066ff, #0099ff); }
         .dice-btn.high { background: linear-gradient(90deg, #0066ff, #00ccff); }
-        .dice-result { text-align: center; font-weight: bold; min-height: 26px; }
+        .dice-result { text-align: center; font-weight: bold; min-height: 26px; margin-bottom: 8px; }
         .win { color: #00ff88; } .lose { color: #ff5555; }
+
+        .dice-history {
+            background: rgba(15,15,30,0.95);
+            border-radius: 12px;
+            border: 1px solid rgba(0,150,255,0.25);
+            overflow: hidden;
+            max-height: 420px;
+            display: flex;
+            flex-direction: column;
+        }
+        .dice-history h3 {
+            color: #00aaff;
+            padding: 12px 14px;
+            border-bottom: 1px solid #333;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 10px;
+            max-height: 360px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 6px;
+            border-bottom: 1px solid #222;
+            font-size: 0.8rem;
+            gap: 6px;
+        }
+        .history-item:last-child { border-bottom: none; }
+        .hist-user {
+            color: #00ffcc;
+            font-weight: 600;
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .hist-info {
+            flex: 1;
+            text-align: center;
+            color: #ccc;
+        }
+        .hist-result.win { color: #00ff88; font-weight: bold; }
+        .hist-result.lose { color: #ff5555; font-weight: bold; }
+        .hist-time {
+            color: #666;
+            font-size: 0.7rem;
+            min-width: 42px;
+            text-align: right;
+        }
 
         .chat-panel {
             background: rgba(15,15,30,0.95); border-radius: 12px;
@@ -639,20 +819,116 @@
             padding: 0 16px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
+        /* ===== ТОП ===== */
         .leaderboard {
             background: rgba(15,15,30,0.95); border-radius: 12px;
             border: 1px solid rgba(100,100,255,0.25); overflow: hidden;
         }
-        .leaderboard h3 { color: #f7931a; padding: 14px; border-bottom: 1px solid #333; }
+        .leaderboard h3 { color: #f7931a; padding: 14px; border-bottom: 1px solid #333; text-align: center; }
+        
+        .top-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 8px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid #333;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .top-stat-item { flex: 1; }
+        .top-stat-value {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #00ffcc;
+            margin-bottom: 2px;
+        }
+        .top-stat-label {
+            color: #888;
+            font-size: 0.75rem;
+        }
+
         .lb-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 11px 14px; border-bottom: 1px solid #2a2a2a; font-size: 0.92rem;
         }
         .lb-item:last-child { border-bottom: none; }
         .lb-left { display: flex; align-items: center; gap: 8px; max-width: 65%; }
-        .lb-rank { color: #888; min-width: 28px; }
+        .lb-rank { color: #888; min-width: 38px; }
         .lb-name { color: #00ffcc; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .lb-bal { font-weight: bold; color: #f7931a; }
+
+        /* ===== INFO ===== */
+        .info-panel {
+            background: rgba(15,15,30,0.95);
+            border-radius: 12px;
+            border: 1px solid rgba(247,147,26,0.3);
+            padding: 16px;
+            line-height: 1.55;
+            font-size: 0.9rem;
+        }
+        .info-panel h2 {
+            color: #f7931a;
+            text-align: center;
+            margin-bottom: 14px;
+            font-size: 1.25rem;
+        }
+        .info-panel h3 {
+            color: #00e5ff;
+            margin: 18px 0 8px;
+            font-size: 1.05rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+        }
+        .info-panel h4 {
+            color: #ff99ff;
+            margin: 12px 0 6px;
+            font-size: 0.95rem;
+        }
+        .info-panel p, .info-panel li {
+            color: #ccc;
+            margin-bottom: 6px;
+        }
+        .info-panel ul {
+            padding-left: 18px;
+            margin-bottom: 10px;
+        }
+        .info-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.82rem;
+        }
+        .info-panel th, .info-panel td {
+            border: 1px solid #333;
+            padding: 6px 8px;
+            text-align: center;
+        }
+        .info-panel th {
+            background: rgba(247,147,26,0.15);
+            color: #f7931a;
+        }
+        .info-panel .currency-table td:first-child {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+        .info-note {
+            background: rgba(0,150,255,0.1);
+            border-left: 3px solid #00aaff;
+            padding: 10px;
+            margin: 12px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: #aad4ff;
+        }
+        .info-warn {
+            background: rgba(255,50,50,0.12);
+            border-left: 3px solid #ff5555;
+            padding: 10px;
+            margin: 12px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: #ffaaaa;
+        }
 
         .float-plus {
             position: fixed; color: #00ff88; font-weight: bold; font-size: 1.5rem;
@@ -728,13 +1004,14 @@
     <div class="page" id="page-processor">
         <div class="processor-header">
             <h2>🖥 Процессорная</h2>
-            <div style="color:#88ccff;font-size:0.9rem;">64 чипа • сине-зелёный металлик</div>
+            <div style="color:#88ccff;font-size:0.9rem;">64 YO-чипа</div>
         </div>
 
         <div class="processor-stats">
+            <div>Баланс LIZA: <b id="procLizaBalance">0</b></div>
             <div>YO-чипов: <b id="yoChipsCount">0</b> → <span id="yoPerMin">0</span> YO/мин</div>
-            <div>LIZA-чипов: <b id="lizaChipsCount">0</b> → <span id="lizaPerMin">0</span> LIZA/мин</div>
-            <div style="margin-top:8px;color:#00ffcc;">Накоплено: <span id="chipEarnedYo">0</span> YO + <span id="chipEarnedLiza">0</span> LIZA</div>
+            <div>Заточка: <b id="sharpenLevelDisplay">0</b> • Цикл: <span id="chipCycleDisplay">60</span> сек</div>
+            <div style="margin-top:8px;color:#00ffcc;">Накоплено: <span id="chipEarnedYo">0</span> YO</div>
             <div class="timer" id="chipTimer" style="font-size:1.4rem;margin-top:6px;">1:00</div>
         </div>
 
@@ -742,10 +1019,29 @@
 
         <div class="buy-chip-btns">
             <button class="buy-chip-btn yo-btn" id="buyYoChipBtn">Купить YO-чип — 20 000 LIZA<br><small>+1 YO / мин</small></button>
-            <button class="buy-chip-btn liza-btn" id="buyLizaChipBtn">Купить LIZA-чип — 10 000 LIZA<br><small>+1 LIZA / мин</small></button>
         </div>
 
-        <button class="chip-claim-btn" id="chipClaimBtn" disabled>Claim чипы</button>
+        <button class="chip-claim-btn" id="chipClaimBtn" disabled>Claim YO</button>
+
+        <div class="btc-section">
+            <h4>₿ Bitcoin</h4>
+            <div class="btc-info">
+                Баланс LIZA: <b id="btcLizaBalance">0</b><br>
+                Баланс YO: <b id="btcYoBalance">0</b><br>
+                Твой Bitcoin: <b id="btcBalanceDisplay">0</b><br>
+                Саплай Bitcoin: <span id="btcTotalDisplay">0</span> / 21 000 000
+            </div>
+            <button class="btc-burn-btn" id="btcBurnBtn">Сжечь 100 000 YO → +1 Bitcoin</button>
+        </div>
+
+        <div class="sharpen-section" id="sharpenSection">
+            <h4>⚡ Точить процессор</h4>
+            <div class="sharpen-info" id="sharpenInfo">Заполни все 64 чипа, чтобы открыть заточку</div>
+            <div class="sharpen-warning" id="sharpenWarning">
+                ⚠️ ОПАСНО! С +4 точки при неудаче сгорают ВСЕ точки и 32 YO-чипа!
+            </div>
+            <button class="sharpen-btn" id="sharpenBtn">Точить</button>
+        </div>
     </div>
 
     <!-- YO -->
@@ -766,44 +1062,71 @@
     <div class="page" id="page-yopony">
         <div class="yopony-header">
             <h2>🦄 YOPONY RACE</h2>
-            <div class="yopony-balance">Твой YO: <span id="yoponyBalance">0</span></div>
         </div>
 
-        <div class="yopony-bank">Банк: <span id="yoponyBankDisplay">5 000 000</span> YO</div>
+        <div class="yopony-balances">
+            <div>LIZA: <b id="ponyLizaBal">0</b></div>
+            <div>YO: <b id="ponyYoBal">0</b></div>
+            <div>Bitcoin: <b id="ponyBtcBal">0</b></div>
+        </div>
 
-        <div class="race-info">Выбери пони → укажи ставку → Старт • Выигрыш <b>×5</b></div>
+        <div class="currency-selector">
+            <button class="currency-btn" id="ponyCurLiza" onclick="setPonyCurrency('liza')">LIZA</button>
+            <button class="currency-btn yo active" id="ponyCurYo" onclick="setPonyCurrency('yo')">YO</button>
+            <button class="currency-btn btc" id="ponyCurBtc" onclick="setPonyCurrency('btc')">Bitcoin</button>
+        </div>
+
+        <div class="yopony-bank" id="ponyBankInfo">Банк YO: <span id="yoponyBankDisplay">5 000 000</span></div>
+
+        <div class="race-info">Выбери пони → укажи ставку → Старт • Выигрыш <b>×10</b></div>
 
         <div class="bet-input-wrap">
             <input type="number" id="ponyBetAmount" value="1" min="1" step="1">
-            <span>YO</span>
+            <span id="ponyCurrencyLabel">YO</span>
         </div>
 
         <div class="race-track" id="raceTrack"></div>
 
         <div class="race-controls">
             <button class="start-race-btn" id="startRaceBtn">СТАРТ ЗАБЕГА</button>
-            <button class="claim-win-btn" id="claimWinBtn">🎉 CLAIM ×5</button>
+            <button class="claim-win-btn" id="claimWinBtn">🎉 CLAIM ×10</button>
         </div>
         <div class="race-status" id="raceStatus">Выбери пони и укажи сумму ставки</div>
     </div>
 
     <!-- ДАЙС -->
     <div class="page" id="page-dice">
-        <div class="balance-block">
-            <div class="balance-label">Твой баланс</div>
-            <div class="balance"><span id="diceBalanceDisplay">0</span> LIZA</div>
-        </div>
-
         <div class="dice-panel">
-            <h4>DICE — Удвой LIZA</h4>
-            <div class="dice-balance">Баланс: <span id="diceBal">0</span></div>
-            <div class="dice-bank">Банк: <strong id="diceBank">...</strong></div>
-            <input type="number" id="diceBet" placeholder="Ставка" value="0.1" min="0.000001" step="any">
+            <h4>DICE — Удвой ставку</h4>
+
+            <div class="dice-balances">
+                <div>LIZA: <b id="diceLizaBal">0</b></div>
+                <div>YO: <b id="diceYoBal">0</b></div>
+                <div>Bitcoin: <b id="diceBtcBal">0</b></div>
+            </div>
+
+            <div class="currency-selector">
+                <button class="currency-btn active" id="curLiza" onclick="setDiceCurrency('liza')">LIZA</button>
+                <button class="currency-btn yo" id="curYo" onclick="setDiceCurrency('yo')">YO</button>
+                <button class="currency-btn btc" id="curBtc" onclick="setDiceCurrency('btc')">Bitcoin</button>
+            </div>
+
+            <div class="dice-bank" id="diceBankInfo">Банк: <strong id="diceBankDisplay">1 000 000 000</strong></div>
+
+            <input type="number" id="diceBet" placeholder="Ставка" value="1" min="0.000001" step="any">
+
             <div class="dice-buttons">
                 <button class="dice-btn low" id="diceLow">Roll &lt; 48</button>
                 <button class="dice-btn high" id="diceHigh">Roll &gt; 52</button>
             </div>
-            <div class="dice-result" id="diceResult">Сделай ставку</div>
+            <div class="dice-result" id="diceResult">Выбери валюту и сделай ставку</div>
+        </div>
+
+        <div class="dice-history">
+            <h3>История ставок (все игроки)</h3>
+            <div class="history-list" id="diceHistoryList">
+                <div style="text-align:center;color:#666;padding:30px 10px;">Загрузка истории...</div>
+            </div>
         </div>
     </div>
 
@@ -822,9 +1145,170 @@
     <!-- ТОП -->
     <div class="page" id="page-top">
         <div class="leaderboard">
-            <h3>Топ 100 игроков</h3>
+            <h3>Топ 10 000 игроков</h3>
+            
+            <div class="top-stats">
+                <div class="top-stat-item">
+                    <div class="top-stat-value" id="onlineCount">0</div>
+                    <div class="top-stat-label">Онлайн сейчас</div>
+                </div>
+                <div class="top-stat-item">
+                    <div class="top-stat-value" id="telegramCount">0</div>
+                    <div class="top-stat-label">Через Telegram</div>
+                </div>
+                <div class="top-stat-item">
+                    <div class="top-stat-value" id="totalPlayers">0</div>
+                    <div class="top-stat-label">Всего игроков</div>
+                </div>
+            </div>
+
             <div id="leaderboardList">
                 <div style="padding:20px;text-align:center;color:#666;">Загрузка...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== INFO ===== -->
+    <div class="page" id="page-info">
+        <div class="info-panel">
+            <h2>📖 INFO — Описание игры</h2>
+
+            <h3>1. Общее</h3>
+            <ul>
+                <li>Telegram Mini App (работает внутри Telegram)</li>
+                <li>Все данные хранятся в Firebase</li>
+                <li>Тёмная космическая тема</li>
+                <li>Летающие шарики (LIZA, Bitcoin, Yobit)</li>
+                <li>Звуки кликов и действий</li>
+            </ul>
+
+            <h3>2. Валюты</h3>
+            <table class="currency-table">
+                <tr>
+                    <th>Валюта</th>
+                    <th>Как получить</th>
+                    <th>Саплай</th>
+                </tr>
+                <tr>
+                    <td>LIZA</td>
+                    <td>Майнинг, клики YO, шарики</td>
+                    <td>Без лимита</td>
+                </tr>
+                <tr>
+                    <td>YO</td>
+                    <td>Сжигание LIZA, чипы</td>
+                    <td>100 000 000</td>
+                </tr>
+                <tr>
+                    <td>Bitcoin</td>
+                    <td>Сжигание 100 000 YO</td>
+                    <td>21 000 000</td>
+                </tr>
+            </table>
+
+            <h3>3. Майнер</h3>
+            <ul>
+                <li>Каждые 60 секунд начисляется награда</li>
+                <li>Награда = уровень майнера (1–100)</li>
+                <li>Кнопка Claim — забрать накопленное</li>
+                <li>Апгрейд за 1000 LIZA → +1 LIZA/мин</li>
+                <li>Сжигание LIZA → YO:
+                    <br>10 → 1 YO
+                    <br>100 → 10 YO
+                    <br>1000 → 100 YO
+                </li>
+            </ul>
+
+            <h3>4. Процессор</h3>
+            <ul>
+                <li>64 слота для YO-чипов</li>
+                <li>1 чип = 20 000 LIZA → +1 YO/мин</li>
+                <li>Claim YO — забрать накопленные YO</li>
+            </ul>
+
+            <h4>Заточка процессора</h4>
+            <p>Открывается после заполнения всех 64 чипов.</p>
+            <table>
+                <tr>
+                    <th>Точка</th>
+                    <th>Стоимость</th>
+                    <th>Шанс</th>
+                    <th>Цикл</th>
+                </tr>
+                <tr><td>+1</td><td>200 000</td><td>100%</td><td>50 сек</td></tr>
+                <tr><td>+2</td><td>300 000</td><td>100%</td><td>40 сек</td></tr>
+                <tr><td>+3</td><td>400 000</td><td>100%</td><td>30 сек</td></tr>
+                <tr><td>+4</td><td>500 000</td><td>60%</td><td>15 сек</td></tr>
+                <tr><td>+5</td><td>1 000 000</td><td>50%</td><td>7 сек</td></tr>
+                <tr><td>+6</td><td>1 000 000</td><td>40%</td><td>4 сек</td></tr>
+                <tr><td>+7</td><td>1 000 000</td><td>30%</td><td>2 сек</td></tr>
+                <tr><td>+8</td><td>1 000 000</td><td>20%</td><td>1 сек</td></tr>
+            </table>
+            <div class="info-warn">
+                ⚠️ С +4 и выше — опасная заточка!<br>
+                При провале сгорают ВСЕ точки и 32 YO-чипа.
+            </div>
+
+            <h4>Bitcoin</h4>
+            <ul>
+                <li>100 000 YO = 1 Bitcoin</li>
+                <li>Максимальный саплай: 21 000 000</li>
+            </ul>
+
+            <h3>5. YO (кликер)</h3>
+            <ul>
+                <li>Каждый клик = +1 LIZA</li>
+                <li>Каждый 10-й клик = +10 LIZA</li>
+            </ul>
+
+            <h3>6. YOPONY (гонка)</h3>
+            <ul>
+                <li>10 пони с анимацией</li>
+                <li>Можно ставить LIZA / YO / Bitcoin</li>
+                <li>Множитель выигрыша <b>×10</b></li>
+                <li>Выбери пони → ставка → Старт</li>
+                <li>Если твоя пони победила — CLAIM ×10</li>
+            </ul>
+
+            <h3>7. Дайс</h3>
+            <ul>
+                <li>Игра на LIZA / YO / Bitcoin</li>
+                <li>Low (&lt;48) или High (&gt;52)</li>
+                <li>Выигрыш удваивает ставку</li>
+                <li>Отдельные банки для каждой валюты</li>
+                <li>Живая история ставок всех игроков</li>
+            </ul>
+            <div class="info-note">
+                Банки Дайса:<br>
+                LIZA — 1 000 000 000<br>
+                YO — 100 000 000<br>
+                Bitcoin — 1 000 000
+            </div>
+
+            <h3>8. Чат</h3>
+            <ul>
+                <li>Общий чат всех игроков</li>
+                <li>Админ (bitcoinliza) подсвечивается зелёным</li>
+            </ul>
+
+            <h3>9. Топ</h3>
+            <ul>
+                <li>Топ 10 000 игроков по балансу LIZA</li>
+                <li>Онлайн сейчас (активны последние 5 мин)</li>
+                <li>Сколько зашло через Telegram</li>
+                <li>Всего игроков</li>
+            </ul>
+
+            <h3>10. Летающие шарики</h3>
+            <ul>
+                <li>LIZA — +1</li>
+                <li>Bitcoin — +1</li>
+                <li>Yobit (большой) — +50</li>
+            </ul>
+
+            <div class="info-note" style="margin-top:20px;">
+                Игра полностью работает в Telegram.<br>
+                Все данные сохраняются автоматически.
             </div>
         </div>
     </div>
@@ -837,6 +1321,7 @@
         <button class="tab-btn" data-page="yopony">YOPONY</button>
         <button class="tab-btn" data-page="chat">Чат</button>
         <button class="tab-btn" data-page="top">Топ</button>
+        <button class="tab-btn" data-page="info">INFO</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -863,9 +1348,15 @@
 
         const MAX_BALANCE = 9223372036854775807n;
         const CYCLE_MS = 60 * 1000;
-        const START_BANK = 1e12;
-        const YOPONY_START_BANK = 5000000;
         
+        const LIZA_BANK_START = 1000000000;
+        const YO_BANK_START   = 100000000;
+        const BTC_BANK_START  = 1000000;
+
+        const YOPONY_LIZA_START = 500000000;
+        const YOPONY_YO_START   = 5000000;
+        const YOPONY_BTC_START  = 500000;
+
         const ULTRA_MAX_SUPPLY = 100000000;
         const BURN_10 = { cost: 10, amount: 1 };
         const BURN_100 = { cost: 100, amount: 10 };
@@ -880,7 +1371,23 @@
 
         const MAX_CHIPS = 64;
         const YO_CHIP_COST = 20000;
-        const LIZA_CHIP_COST = 10000;
+
+        const BTC_MAX_SUPPLY = 21000000;
+        const BTC_BURN_COST = 100000;
+
+        const ONLINE_THRESHOLD = 5 * 60 * 1000;
+
+        const SHARPEN_DATA = [
+            null,
+            { cost: 200000,  chance: 1.00, cycle: 50 },
+            { cost: 300000,  chance: 1.00, cycle: 40 },
+            { cost: 400000,  chance: 1.00, cycle: 30 },
+            { cost: 500000,  chance: 0.60, cycle: 15 },
+            { cost: 1000000, chance: 0.50, cycle: 7  },
+            { cost: 1000000, chance: 0.40, cycle: 4  },
+            { cost: 1000000, chance: 0.30, cycle: 2  },
+            { cost: 1000000, chance: 0.20, cycle: 1  }
+        ];
 
         const PONIES = [
             { id: 1, emoji: '<img src="https://i.postimg.cc/jqnbVNb3/ponysm1.gif" style="height:35px; width:auto; vertical-align:middle;">', name: 'Rainbow' },
@@ -900,15 +1407,26 @@
         let minerLevel = 1;
         let ultraQuants = 0;
         let ultraTotal = 0;
-        let yoClicks = 0, diceBank = START_BANK;
-        let yoponyBank = YOPONY_START_BANK;
+        let yoClicks = 0;
 
-        // Процессор
+        let lizaBank = LIZA_BANK_START;
+        let yoBank = YO_BANK_START;
+        let btcBank = BTC_BANK_START;
+
+        let ponyLizaBank = YOPONY_LIZA_START;
+        let ponyYoBank = YOPONY_YO_START;
+        let ponyBtcBank = YOPONY_BTC_START;
+
         let yoChips = 0;
-        let lizaChips = 0;
         let chipLastPayout = Date.now();
+        let chipSharpenLevel = 0;
 
-        // YOPONY state
+        let bitcoinBalance = 0;
+        let bitcoinTotal = 0;
+
+        let diceCurrency = 'liza';
+        let ponyCurrency = 'yo';
+
         let selectedPony = null;
         let currentBet = 0;
         let isRacing = false;
@@ -939,16 +1457,19 @@
             return name.replace(/^@/, '').toLowerCase() === "bitcoinliza";
         }
 
-        // ===== ПРОЦЕССОР =====
+        function getChipCycleMs() {
+            if (chipSharpenLevel >= 1 && chipSharpenLevel <= 8) {
+                return SHARPEN_DATA[chipSharpenLevel].cycle * 1000;
+            }
+            return CYCLE_MS;
+        }
+
         function renderChips() {
             const grid = document.getElementById('chipGrid');
             let html = '';
-            const total = yoChips + lizaChips;
             for (let i = 0; i < MAX_CHIPS; i++) {
                 if (i < yoChips) {
                     html += `<div class="chip yo">YO</div>`;
-                } else if (i < total) {
-                    html += `<div class="chip liza">LIZA</div>`;
                 } else {
                     html += `<div class="chip empty">+</div>`;
                 }
@@ -957,35 +1478,76 @@
         }
 
         function updateChipUI() {
+            const cycle = getChipCycleMs();
             const now = Date.now();
             const elapsed = now - chipLastPayout;
-            const left = CYCLE_MS - (elapsed % CYCLE_MS);
+            const left = cycle - (elapsed % cycle);
             const mins = Math.floor(left / 60000);
             const secs = Math.floor((left % 60000) / 1000);
-            const periods = Math.floor(elapsed / CYCLE_MS);
+            const periods = Math.floor(elapsed / cycle);
 
             const earnedYo = periods * yoChips;
-            const earnedLiza = periods * lizaChips;
 
+            document.getElementById('procLizaBalance').innerText = formatNum(myBalance);
             document.getElementById('yoChipsCount').innerText = yoChips;
-            document.getElementById('lizaChipsCount').innerText = lizaChips;
             document.getElementById('yoPerMin').innerText = yoChips;
-            document.getElementById('lizaPerMin').innerText = lizaChips;
             document.getElementById('chipEarnedYo').innerText = formatNum(earnedYo);
-            document.getElementById('chipEarnedLiza').innerText = formatNum(earnedLiza);
             document.getElementById('chipTimer').innerText = mins + ":" + secs.toString().padStart(2, "0");
+            document.getElementById('sharpenLevelDisplay').innerText = chipSharpenLevel;
+            document.getElementById('chipCycleDisplay').innerText = (cycle / 1000);
 
-            document.getElementById('chipClaimBtn').disabled = periods <= 0 || (yoChips + lizaChips) === 0;
+            document.getElementById('chipClaimBtn').disabled = periods <= 0 || yoChips === 0;
+            document.getElementById('buyYoChipBtn').disabled = myBalance < YO_CHIP_COST || yoChips >= MAX_CHIPS;
 
-            const totalChips = yoChips + lizaChips;
-            document.getElementById('buyYoChipBtn').disabled = myBalance < YO_CHIP_COST || totalChips >= MAX_CHIPS;
-            document.getElementById('buyLizaChipBtn').disabled = myBalance < LIZA_CHIP_COST || totalChips >= MAX_CHIPS;
+            document.getElementById('btcLizaBalance').innerText = formatNum(myBalance);
+            document.getElementById('btcYoBalance').innerText = formatNum(ultraQuants);
+            document.getElementById('btcBalanceDisplay').innerText = formatNum(bitcoinBalance);
+            document.getElementById('btcTotalDisplay').innerText = formatNum(bitcoinTotal);
+            document.getElementById('btcBurnBtn').disabled = ultraQuants < BTC_BURN_COST || bitcoinTotal >= BTC_MAX_SUPPLY;
+
+            const sharpenSection = document.getElementById('sharpenSection');
+            const sharpenInfo = document.getElementById('sharpenInfo');
+            const sharpenWarning = document.getElementById('sharpenWarning');
+            const sharpenBtn = document.getElementById('sharpenBtn');
+
+            if (yoChips >= MAX_CHIPS) {
+                sharpenSection.style.display = 'block';
+
+                if (chipSharpenLevel >= 8) {
+                    sharpenInfo.innerHTML = `Максимальная заточка <b>+8</b> достигнута!<br>Цикл: <b>1 секунда</b>`;
+                    sharpenBtn.disabled = true;
+                    sharpenBtn.innerText = 'Макс. заточка';
+                    sharpenWarning.style.display = 'none';
+                } else {
+                    const next = chipSharpenLevel + 1;
+                    const data = SHARPEN_DATA[next];
+                    const chancePercent = Math.round(data.chance * 100);
+
+                    sharpenInfo.innerHTML = `
+                        Следующая точка: <b>+${next}</b><br>
+                        Стоимость: <b>${formatNum(data.cost)} LIZA</b><br>
+                        Шанс: <b>${chancePercent}%</b><br>
+                        Цикл станет: <b>${data.cycle} сек</b>
+                    `;
+
+                    if (next >= 4) {
+                        sharpenWarning.style.display = 'block';
+                    } else {
+                        sharpenWarning.style.display = 'none';
+                    }
+
+                    sharpenBtn.disabled = myBalance < data.cost;
+                    sharpenBtn.innerText = `Точить +${next} (${formatNum(data.cost)} LIZA)`;
+                }
+            } else {
+                sharpenSection.style.display = 'none';
+            }
 
             renderChips();
         }
 
         function buyYoChip() {
-            if (yoChips + lizaChips >= MAX_CHIPS) return alert('Все 64 слота заняты!');
+            if (yoChips >= MAX_CHIPS) return alert('Все 64 слота заняты!');
             if (myBalance < YO_CHIP_COST) return alert('Недостаточно LIZA!');
             myBalance -= YO_CHIP_COST;
             yoChips++;
@@ -996,40 +1558,146 @@
             showFloat('+1 YO-чип');
         }
 
-        function buyLizaChip() {
-            if (yoChips + lizaChips >= MAX_CHIPS) return alert('Все 64 слота заняты!');
-            if (myBalance < LIZA_CHIP_COST) return alert('Недостаточно LIZA!');
-            myBalance -= LIZA_CHIP_COST;
-            lizaChips++;
-            saveUser();
-            updateUI();
-            updateChipUI();
-            playSound();
-            showFloat('+1 LIZA-чип');
-        }
-
         function claimChips() {
+            const cycle = getChipCycleMs();
             const now = Date.now();
-            const periods = Math.floor((now - chipLastPayout) / CYCLE_MS);
+            const periods = Math.floor((now - chipLastPayout) / cycle);
             if (periods <= 0) return;
 
             const safe = Math.min(periods, 100);
             const earnedYo = safe * yoChips;
-            const earnedLiza = safe * lizaChips;
 
             ultraQuants += earnedYo;
-            myBalance = Math.min(Number(MAX_BALANCE), myBalance + earnedLiza);
-            chipLastPayout += safe * CYCLE_MS;
+            chipLastPayout += safe * cycle;
 
             saveUser();
             updateUI();
             updateChipUI();
             playSound();
             if (earnedYo > 0) showFloat('+' + earnedYo + ' YO');
-            if (earnedLiza > 0) setTimeout(() => showFloat('+' + earnedLiza + ' LIZA'), 400);
+        }
+
+        function burnForBitcoin() {
+            if (ultraQuants < BTC_BURN_COST) return alert('Недостаточно YO!');
+            if (bitcoinTotal >= BTC_MAX_SUPPLY) return alert('Достигнут максимальный саплай Bitcoin (21 000 000)!');
+
+            ultraQuants -= BTC_BURN_COST;
+            bitcoinBalance += 1;
+
+            db.ref("global/bitcoinTotal").transaction(cur => {
+                const current = Number(cur) || 0;
+                if (current >= BTC_MAX_SUPPLY) return;
+                return current + 1;
+            });
+
+            saveUser();
+            updateUI();
+            updateChipUI();
+            playSound();
+            showFloat('+1 Bitcoin');
+        }
+
+        function sharpenProcessor() {
+            if (yoChips < MAX_CHIPS) return alert('Нужно заполнить все 64 YO-чипа!');
+            if (chipSharpenLevel >= 8) return alert('Максимальная заточка уже достигнута!');
+
+            const next = chipSharpenLevel + 1;
+            const data = SHARPEN_DATA[next];
+
+            if (myBalance < data.cost) return alert('Недостаточно LIZA!');
+
+            myBalance -= data.cost;
+
+            const success = Math.random() < data.chance;
+
+            if (success) {
+                chipSharpenLevel = next;
+                playSharpenSuccess();
+                showFloat('УСПЕХ! +' + next);
+                saveUser();
+                updateUI();
+                updateChipUI();
+            } else {
+                playSharpenFail();
+                showFloat('ПРОВАЛ!');
+
+                chipSharpenLevel = 0;
+                yoChips = Math.max(0, yoChips - 32);
+
+                saveUser();
+                updateUI();
+                updateChipUI();
+
+                alert('Процессор сломался!\nВсе точки сгорели.\nПотеряно 32 YO-чипа.');
+            }
+        }
+
+        function playSharpenSuccess() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(520, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.25);
+                gain.gain.value = 0.18;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                osc.stop(ctx.currentTime + 0.35);
+            } catch(e) {}
+        }
+
+        function playSharpenFail() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.55);
+                gain.gain.value = 0.22;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+                osc.stop(ctx.currentTime + 0.65);
+            } catch(e) {}
         }
 
         // ===== YOPONY =====
+        function updatePonyBankDisplay() {
+            let bankValue = 0;
+            let label = '';
+            let curLabel = '';
+            if (ponyCurrency === 'liza') {
+                bankValue = ponyLizaBank;
+                label = 'Банк LIZA: ';
+                curLabel = 'LIZA';
+            } else if (ponyCurrency === 'yo') {
+                bankValue = ponyYoBank;
+                label = 'Банк YO: ';
+                curLabel = 'YO';
+            } else {
+                bankValue = ponyBtcBank;
+                label = 'Банк Bitcoin: ';
+                curLabel = 'BTC';
+            }
+            document.getElementById('ponyBankInfo').innerHTML = label + '<span id="yoponyBankDisplay">' + formatNum(bankValue) + '</span>';
+            document.getElementById('ponyCurrencyLabel').innerText = curLabel;
+        }
+
+        function setPonyCurrency(cur) {
+            if (isRacing) return;
+            ponyCurrency = cur;
+            document.querySelectorAll('#page-yopony .currency-btn').forEach(b => b.classList.remove('active'));
+            if (cur === 'liza') document.getElementById('ponyCurLiza').classList.add('active');
+            else if (cur === 'yo') document.getElementById('ponyCurYo').classList.add('active');
+            else document.getElementById('ponyCurBtc').classList.add('active');
+            updatePonyBankDisplay();
+        }
+
         function renderTracks() {
             const track = document.getElementById('raceTrack');
             track.innerHTML = PONIES.map(p => `
@@ -1051,7 +1719,8 @@
             document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('bet-' + id).classList.add('selected');
             const betVal = parseFloat(document.getElementById('ponyBetAmount').value) || 1;
-            document.getElementById('raceStatus').innerText = `Выбрана ${PONIES[id-1].name} • Ставка: ${betVal} YO`;
+            const curName = ponyCurrency === 'liza' ? 'LIZA' : ponyCurrency === 'yo' ? 'YO' : 'BTC';
+            document.getElementById('raceStatus').innerText = `Выбрана ${PONIES[id-1].name} • Ставка: ${betVal} ${curName}`;
         }
 
         function startRace() {
@@ -1059,16 +1728,40 @@
             if (!selectedPony) return alert('Сначала выбери пони!');
 
             const betVal = parseFloat(document.getElementById('ponyBetAmount').value);
-            if (isNaN(betVal) || betVal < 1) return alert('Минимальная ставка 1 YO');
-            if (betVal > ultraQuants) return alert('Недостаточно YO!');
-            if (betVal * 5 > yoponyBank) return alert('В банке недостаточно YO для выплаты ×5');
+            if (isNaN(betVal) || betVal < 1) return alert('Минимальная ставка 1');
+
+            let bankRef = '';
+            let currencyName = '';
+
+            if (ponyCurrency === 'liza') {
+                bankRef = "global/yoponyLizaBank";
+                currencyName = 'LIZA';
+                if (betVal > myBalance) return alert('Недостаточно LIZA!');
+                if (betVal * 10 > ponyLizaBank) return alert('В банке LIZA недостаточно средств для выплаты ×10');
+            } else if (ponyCurrency === 'yo') {
+                bankRef = "global/yoponyYoBank";
+                currencyName = 'YO';
+                if (betVal > ultraQuants) return alert('Недостаточно YO!');
+                if (betVal * 10 > ponyYoBank) return alert('В банке YO недостаточно средств для выплаты ×10');
+            } else {
+                bankRef = "global/yoponyBtcBank";
+                currencyName = 'Bitcoin';
+                if (betVal > bitcoinBalance) return alert('Недостаточно Bitcoin!');
+                if (betVal * 10 > ponyBtcBank) return alert('В банке Bitcoin недостаточно средств для выплаты ×10');
+            }
 
             currentBet = betVal;
 
-            ultraQuants -= currentBet;
-            db.ref("global/yoponyBank").transaction(cur => {
-                return (Number(cur) || YOPONY_START_BANK) + currentBet;
-            });
+            if (ponyCurrency === 'liza') {
+                myBalance -= currentBet;
+                db.ref(bankRef).transaction(cur => (Number(cur) || YOPONY_LIZA_START) + currentBet);
+            } else if (ponyCurrency === 'yo') {
+                ultraQuants -= currentBet;
+                db.ref(bankRef).transaction(cur => (Number(cur) || YOPONY_YO_START) + currentBet);
+            } else {
+                bitcoinBalance -= currentBet;
+                db.ref(bankRef).transaction(cur => (Number(cur) || YOPONY_BTC_START) + currentBet);
+            }
 
             saveUser();
             updateUI();
@@ -1127,10 +1820,12 @@
             document.getElementById('track-' + raceWinner).classList.add('winner');
             document.getElementById('runner-' + raceWinner).style.left = '95%';
 
+            const curName = ponyCurrency === 'liza' ? 'LIZA' : ponyCurrency === 'yo' ? 'YO' : 'BTC';
+
             if (selectedPony === raceWinner) {
                 canClaim = true;
-                const winAmount = currentBet * 5;
-                document.getElementById('raceStatus').innerText = `🎉 ${PONIES[raceWinner-1].name} победила! Выигрыш: ${winAmount} YO`;
+                const winAmount = currentBet * 10;
+                document.getElementById('raceStatus').innerText = `🎉 ${PONIES[raceWinner-1].name} победила! Выигрыш: ${winAmount} ${curName}`;
                 document.getElementById('claimWinBtn').style.display = 'inline-block';
             } else {
                 document.getElementById('raceStatus').innerText = `Победила ${PONIES[raceWinner-1].name}. Ты ставил на ${PONIES[selectedPony-1].name}`;
@@ -1143,22 +1838,43 @@
 
         function claimWin() {
             if (!canClaim) return;
-            const winAmount = currentBet * 5;
+            const winAmount = currentBet * 10;
+            let bankRef = '';
 
-            db.ref("global/yoponyBank").transaction(cur => {
-                const bank = Number(cur) || YOPONY_START_BANK;
-                if (bank < winAmount) return bank;
-                return bank - winAmount;
-            });
+            if (ponyCurrency === 'liza') {
+                bankRef = "global/yoponyLizaBank";
+                db.ref(bankRef).transaction(cur => {
+                    const bank = Number(cur) || YOPONY_LIZA_START;
+                    if (bank < winAmount) return bank;
+                    return bank - winAmount;
+                });
+                myBalance += winAmount;
+            } else if (ponyCurrency === 'yo') {
+                bankRef = "global/yoponyYoBank";
+                db.ref(bankRef).transaction(cur => {
+                    const bank = Number(cur) || YOPONY_YO_START;
+                    if (bank < winAmount) return bank;
+                    return bank - winAmount;
+                });
+                ultraQuants += winAmount;
+            } else {
+                bankRef = "global/yoponyBtcBank";
+                db.ref(bankRef).transaction(cur => {
+                    const bank = Number(cur) || YOPONY_BTC_START;
+                    if (bank < winAmount) return bank;
+                    return bank - winAmount;
+                });
+                bitcoinBalance += winAmount;
+            }
 
-            ultraQuants += winAmount;
             canClaim = false;
             document.getElementById('claimWinBtn').style.display = 'none';
-            document.getElementById('raceStatus').innerText = `Получено +${winAmount} YO!`;
+            const curName = ponyCurrency === 'liza' ? 'LIZA' : ponyCurrency === 'yo' ? 'YO' : 'BTC';
+            document.getElementById('raceStatus').innerText = `Получено +${winAmount} ${curName}!`;
             saveUser();
             updateUI();
             playSound();
-            showFloat('+' + winAmount + ' YO');
+            showFloat('+' + winAmount + ' ' + curName);
         }
 
         function playGallopMusic() {
@@ -1180,7 +1896,138 @@
             } catch(e) {}
         }
 
-        // ===== Остальной код =====
+        // ===== DICE =====
+        function updateDiceBankDisplay() {
+            let bankValue = 0;
+            let label = '';
+            if (diceCurrency === 'liza') {
+                bankValue = lizaBank;
+                label = 'Банк LIZA: ';
+            } else if (diceCurrency === 'yo') {
+                bankValue = yoBank;
+                label = 'Банк YO: ';
+            } else {
+                bankValue = btcBank;
+                label = 'Банк Bitcoin: ';
+            }
+            document.getElementById('diceBankInfo').innerHTML = label + '<strong id="diceBankDisplay">' + formatNum(bankValue) + '</strong>';
+        }
+
+        function setDiceCurrency(cur) {
+            diceCurrency = cur;
+            document.querySelectorAll('#page-dice .currency-btn').forEach(b => b.classList.remove('active'));
+            if (cur === 'liza') document.getElementById('curLiza').classList.add('active');
+            else if (cur === 'yo') document.getElementById('curYo').classList.add('active');
+            else document.getElementById('curBtc').classList.add('active');
+            updateDiceBankDisplay();
+            document.getElementById('diceResult').innerText = 'Выбрана валюта: ' + (cur === 'liza' ? 'LIZA' : cur === 'yo' ? 'YO' : 'Bitcoin');
+        }
+
+        function playDice(dir) {
+            const bet = parseFloat(document.getElementById("diceBet").value);
+            if (isNaN(bet) || bet <= 0) return alert("Введите ставку");
+
+            let currencyName = '';
+            let bankRef = '';
+
+            if (diceCurrency === 'liza') {
+                currencyName = 'LIZA';
+                if (bet > myBalance) return alert("Недостаточно LIZA");
+                if (bet > lizaBank) return alert("В банке LIZA недостаточно средств");
+                bankRef = "global/diceLizaBank";
+            } else if (diceCurrency === 'yo') {
+                currencyName = 'YO';
+                if (bet > ultraQuants) return alert("Недостаточно YO");
+                if (bet > yoBank) return alert("В банке YO недостаточно средств");
+                bankRef = "global/diceYoBank";
+            } else {
+                currencyName = 'Bitcoin';
+                if (bet > bitcoinBalance) return alert("Недостаточно Bitcoin");
+                if (bet > btcBank) return alert("В банке Bitcoin недостаточно средств");
+                bankRef = "global/diceBtcBank";
+            }
+
+            const roll = Math.random() * 100;
+            const win = (dir === "low" && roll < 48) || (dir === "high" && roll > 52);
+            const el = document.getElementById("diceResult");
+
+            if (win) {
+                if (diceCurrency === 'liza') {
+                    myBalance += bet;
+                    db.ref(bankRef).transaction(cur => Math.max(0, (Number(cur) || LIZA_BANK_START) - bet));
+                } else if (diceCurrency === 'yo') {
+                    ultraQuants += bet;
+                    db.ref(bankRef).transaction(cur => Math.max(0, (Number(cur) || YO_BANK_START) - bet));
+                } else {
+                    bitcoinBalance += bet;
+                    db.ref(bankRef).transaction(cur => Math.max(0, (Number(cur) || BTC_BANK_START) - bet));
+                }
+                el.innerHTML = `<span class="win">ВЫИГРЫШ ${roll.toFixed(2)} → +${formatNum(bet)} ${currencyName}</span>`;
+                playSound();
+            } else {
+                if (diceCurrency === 'liza') {
+                    myBalance -= bet;
+                    db.ref(bankRef).transaction(cur => (Number(cur) || LIZA_BANK_START) + bet);
+                } else if (diceCurrency === 'yo') {
+                    ultraQuants -= bet;
+                    db.ref(bankRef).transaction(cur => (Number(cur) || YO_BANK_START) + bet);
+                } else {
+                    bitcoinBalance -= bet;
+                    db.ref(bankRef).transaction(cur => (Number(cur) || BTC_BANK_START) + bet);
+                }
+                el.innerHTML = `<span class="lose">ПРОИГРЫШ ${roll.toFixed(2)} → -${formatNum(bet)} ${currencyName}</span>`;
+            }
+
+            db.ref("diceHistory").push({
+                user: myName,
+                currency: diceCurrency,
+                bet: bet,
+                roll: parseFloat(roll.toFixed(2)),
+                win: win,
+                time: Date.now()
+            });
+
+            saveUser();
+            updateUI();
+            updateChipUI();
+            updateDiceBankDisplay();
+        }
+
+        function renderDiceHistory(data) {
+            const box = document.getElementById("diceHistoryList");
+            if (!data) {
+                box.innerHTML = '<div style="text-align:center;color:#666;padding:30px 10px;">Пока никто не играл</div>';
+                return;
+            }
+
+            const list = Object.values(data)
+                .sort((a, b) => b.time - a.time)
+                .slice(0, 80);
+
+            if (list.length === 0) {
+                box.innerHTML = '<div style="text-align:center;color:#666;padding:30px 10px;">Пока никто не играл</div>';
+                return;
+            }
+
+            box.innerHTML = list.map(item => {
+                const t = new Date(item.time).toLocaleTimeString("ru", { hour: "2-digit", minute: "2-digit" });
+                const curName = item.currency === 'liza' ? 'LIZA' : item.currency === 'yo' ? 'YO' : 'BTC';
+                const resultClass = item.win ? 'win' : 'lose';
+                const resultText = item.win ? `+${formatNum(item.bet)}` : `-${formatNum(item.bet)}`;
+
+                return `
+                    <div class="history-item">
+                        <div class="hist-user">${escapeHtml(item.user)}</div>
+                        <div class="hist-info">
+                            ${formatNum(item.bet)} ${curName} • ${item.roll}
+                        </div>
+                        <div class="hist-result ${resultClass}">${resultText}</div>
+                        <div class="hist-time">${t}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function spawnBall(reward, label, className) {
             const ball = document.createElement('div');
             ball.className = 'flying-ball ' + className;
@@ -1253,8 +2100,9 @@
                 minerLevel,
                 ultraQuants,
                 yoChips,
-                lizaChips,
                 chipLastPayout,
+                chipSharpenLevel,
+                bitcoinBalance,
                 lastActive: Date.now(),
                 fromTelegram: myId.startsWith("tg_")
             }).catch(console.error);
@@ -1289,8 +2137,10 @@
                     if (minerLevel > MAX_MINER_LEVEL) minerLevel = MAX_MINER_LEVEL;
                     ultraQuants = Number(data.ultraQuants) || 0;
                     yoChips = Number(data.yoChips) || 0;
-                    lizaChips = Number(data.lizaChips) || 0;
                     chipLastPayout = data.chipLastPayout || Date.now();
+                    chipSharpenLevel = Number(data.chipSharpenLevel) || 0;
+                    if (chipSharpenLevel > 8) chipSharpenLevel = 8;
+                    bitcoinBalance = Number(data.bitcoinBalance) || 0;
                 }
                 userRef.update({
                     name: myName,
@@ -1299,8 +2149,9 @@
                     minerLevel,
                     ultraQuants,
                     yoChips,
-                    lizaChips,
                     chipLastPayout,
+                    chipSharpenLevel,
+                    bitcoinBalance,
                     lastActive: Date.now(),
                     fromTelegram: myId.startsWith("tg_")
                 });
@@ -1308,6 +2159,8 @@
                 updateMinerUI();
                 updateChipUI();
                 renderTracks();
+                updateDiceBankDisplay();
+                updatePonyBankDisplay();
             });
 
             userRef.on("value", snap => {
@@ -1323,29 +2176,80 @@
                 document.getElementById("ultraTotalDisplay").innerText = formatNum(ultraTotal);
             });
 
-            db.ref("global/yoponyBank").on("value", snap => {
+            db.ref("global/bitcoinTotal").on("value", snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
-                    db.ref("global/yoponyBank").set(YOPONY_START_BANK);
-                    yoponyBank = YOPONY_START_BANK;
+                    db.ref("global/bitcoinTotal").set(0);
+                    bitcoinTotal = 0;
                 } else {
-                    yoponyBank = Number(val);
+                    bitcoinTotal = Number(val);
                 }
-                document.getElementById("yoponyBankDisplay").innerText = formatNum(yoponyBank);
+                document.getElementById("btcTotalDisplay").innerText = formatNum(bitcoinTotal);
+                document.getElementById('btcBurnBtn').disabled = ultraQuants < BTC_BURN_COST || bitcoinTotal >= BTC_MAX_SUPPLY;
             });
 
-            db.ref("global/diceBank").on("value", snap => {
+            db.ref("global/diceLizaBank").on("value", snap => {
                 const val = snap.val();
                 if (val === null || val === undefined) {
-                    db.ref("global/diceBank").set(START_BANK);
-                    diceBank = START_BANK;
-                } else {
-                    diceBank = Number(val);
-                }
-                document.getElementById("diceBank").innerText = formatNum(diceBank);
+                    db.ref("global/diceLizaBank").set(LIZA_BANK_START);
+                    lizaBank = LIZA_BANK_START;
+                } else lizaBank = Number(val);
+                if (diceCurrency === 'liza') updateDiceBankDisplay();
             });
 
-            db.ref("users").on("value", snap => renderLeaderboard(snap.val()));
+            db.ref("global/diceYoBank").on("value", snap => {
+                const val = snap.val();
+                if (val === null || val === undefined) {
+                    db.ref("global/diceYoBank").set(YO_BANK_START);
+                    yoBank = YO_BANK_START;
+                } else yoBank = Number(val);
+                if (diceCurrency === 'yo') updateDiceBankDisplay();
+            });
+
+            db.ref("global/diceBtcBank").on("value", snap => {
+                const val = snap.val();
+                if (val === null || val === undefined) {
+                    db.ref("global/diceBtcBank").set(BTC_BANK_START);
+                    btcBank = BTC_BANK_START;
+                } else btcBank = Number(val);
+                if (diceCurrency === 'btc') updateDiceBankDisplay();
+            });
+
+            db.ref("global/yoponyLizaBank").on("value", snap => {
+                const val = snap.val();
+                if (val === null || val === undefined) {
+                    db.ref("global/yoponyLizaBank").set(YOPONY_LIZA_START);
+                    ponyLizaBank = YOPONY_LIZA_START;
+                } else ponyLizaBank = Number(val);
+                if (ponyCurrency === 'liza') updatePonyBankDisplay();
+            });
+
+            db.ref("global/yoponyYoBank").on("value", snap => {
+                const val = snap.val();
+                if (val === null || val === undefined) {
+                    db.ref("global/yoponyYoBank").set(YOPONY_YO_START);
+                    ponyYoBank = YOPONY_YO_START;
+                } else ponyYoBank = Number(val);
+                if (ponyCurrency === 'yo') updatePonyBankDisplay();
+            });
+
+            db.ref("global/yoponyBtcBank").on("value", snap => {
+                const val = snap.val();
+                if (val === null || val === undefined) {
+                    db.ref("global/yoponyBtcBank").set(YOPONY_BTC_START);
+                    ponyBtcBank = YOPONY_BTC_START;
+                } else ponyBtcBank = Number(val);
+                if (ponyCurrency === 'btc') updatePonyBankDisplay();
+            });
+
+            db.ref("diceHistory").orderByChild("time").limitToLast(80).on("value", snap => {
+                renderDiceHistory(snap.val());
+            });
+
+            db.ref("users").on("value", snap => {
+                renderLeaderboard(snap.val());
+            });
+
             db.ref("chat").orderByChild("time").limitToLast(50).on("value", snap => renderChat(snap.val()));
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1358,6 +2262,8 @@
                     if (page === 'dice' || page === 'yo' || page === 'yopony' || page === 'processor') {
                         updateUI();
                         if (page === 'processor') updateChipUI();
+                        if (page === 'dice') updateDiceBankDisplay();
+                        if (page === 'yopony') updatePonyBankDisplay();
                     }
                 };
             });
@@ -1366,8 +2272,9 @@
             document.getElementById("claimBtn").onclick = claimMiner;
             document.getElementById("upgradeBtn").onclick = upgradeMiner;
             document.getElementById("buyYoChipBtn").onclick = buyYoChip;
-            document.getElementById("buyLizaChipBtn").onclick = buyLizaChip;
             document.getElementById("chipClaimBtn").onclick = claimChips;
+            document.getElementById("sharpenBtn").onclick = sharpenProcessor;
+            document.getElementById("btcBurnBtn").onclick = burnForBitcoin;
             document.getElementById("startRaceBtn").onclick = startRace;
             document.getElementById("claimWinBtn").onclick = claimWin;
             
@@ -1391,11 +2298,20 @@
         function updateUI() {
             const txt = formatNum(myBalance);
             document.getElementById("balanceDisplay").innerText = txt;
-            document.getElementById("diceBalanceDisplay").innerText = txt;
-            document.getElementById("diceBal").innerText = txt;
             document.getElementById("yoBalanceDisplay").innerText = txt;
             document.getElementById("ultraBalanceDisplay").innerText = formatNum(ultraQuants);
-            document.getElementById("yoponyBalance").innerText = formatNum(ultraQuants);
+            document.getElementById("procLizaBalance").innerText = txt;
+            document.getElementById("btcLizaBalance").innerText = txt;
+            document.getElementById("btcYoBalance").innerText = formatNum(ultraQuants);
+            document.getElementById("btcBalanceDisplay").innerText = formatNum(bitcoinBalance);
+
+            document.getElementById("diceLizaBal").innerText = formatNum(myBalance);
+            document.getElementById("diceYoBal").innerText = formatNum(ultraQuants);
+            document.getElementById("diceBtcBal").innerText = formatNum(bitcoinBalance);
+
+            document.getElementById("ponyLizaBal").innerText = formatNum(myBalance);
+            document.getElementById("ponyYoBal").innerText = formatNum(ultraQuants);
+            document.getElementById("ponyBtcBal").innerText = formatNum(bitcoinBalance);
         }
 
         function clickYO() {
@@ -1513,29 +2429,6 @@
             showFloat("+" + option.amount + " YO");
         }
 
-        function playDice(dir) {
-            const bet = parseFloat(document.getElementById("diceBet").value);
-            if (isNaN(bet) || bet <= 0) return alert("Введите ставку");
-            if (bet > myBalance) return alert("Недостаточно LIZA");
-            if (bet > diceBank) return alert("В банке мало средств");
-
-            const roll = Math.random() * 100;
-            const win = (dir === "low" && roll < 48) || (dir === "high" && roll > 52);
-            const el = document.getElementById("diceResult");
-
-            if (win) {
-                myBalance += bet;
-                db.ref("global/diceBank").transaction(cur => Math.max(0, (Number(cur) || START_BANK) - bet));
-                el.innerHTML = `<span class="win">ВЫИГРЫШ ${roll.toFixed(2)} → +${formatNum(bet)}</span>`;
-                playSound();
-            } else {
-                myBalance -= bet;
-                db.ref("global/diceBank").transaction(cur => (Number(cur) || START_BANK) + bet);
-                el.innerHTML = `<span class="lose">ПРОИГРЫШ ${roll.toFixed(2)} → -${formatNum(bet)}</span>`;
-            }
-            saveUser(); updateUI();
-        }
-
         function sendChat() {
             const input = document.getElementById("chatInput");
             const text = input.value.trim();
@@ -1567,20 +2460,49 @@
 
         function renderLeaderboard(users) {
             const box = document.getElementById("leaderboardList");
+            const now = Date.now();
+
             if (!users) {
                 box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
+                document.getElementById("onlineCount").innerText = "0";
+                document.getElementById("telegramCount").innerText = "0";
+                document.getElementById("totalPlayers").innerText = "0";
                 return;
             }
-            const sorted = Object.entries(users)
-                .map(([id, data]) => ({ id, name: data.name || "Игрок", balance: Number(data.balance) || 0 }))
+
+            let online = 0;
+            let telegram = 0;
+            let total = 0;
+
+            const list = [];
+
+            Object.entries(users).forEach(([id, data]) => {
+                total++;
+                const lastActive = data.lastActive || 0;
+                if (now - lastActive < ONLINE_THRESHOLD) online++;
+                if (data.fromTelegram || id.startsWith("tg_")) telegram++;
+
+                list.push({
+                    id,
+                    name: data.name || "Игрок",
+                    balance: Number(data.balance) || 0
+                });
+            });
+
+            document.getElementById("onlineCount").innerText = formatNum(online);
+            document.getElementById("telegramCount").innerText = formatNum(telegram);
+            document.getElementById("totalPlayers").innerText = formatNum(total);
+
+            const sorted = list
                 .filter(u => u.balance > 0 || u.id.startsWith("tg_"))
                 .sort((a, b) => b.balance - a.balance)
-                .slice(0, 100);
+                .slice(0, 10000);
 
             if (sorted.length === 0) {
                 box.innerHTML = '<div style="padding:16px;text-align:center;color:#666;">Пока никого нет</div>';
                 return;
             }
+
             box.innerHTML = sorted.map((u, i) => `
                 <div class="lb-item">
                     <div class="lb-left">
@@ -1629,6 +2551,8 @@
         }
 
         window.selectPony = selectPony;
+        window.setDiceCurrency = setDiceCurrency;
+        window.setPonyCurrency = setPonyCurrency;
 
         init();
     </script>
